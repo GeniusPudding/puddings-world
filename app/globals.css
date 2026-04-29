@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-base: #0a0a0b;
+  --color-bg-panel: #111114;
+  --color-bg-raised: #17171b;
+  --color-bg-border: #26262c;
+
+  --color-ink-primary: #f2f2f3;
+  --color-ink-secondary: #a3a3ad;
+  --color-ink-muted: #6b6b75;
+
+  --color-accent: #7c9cff;
+  --color-accent-green: #3ecf8e;
+  --color-accent-amber: #f5b642;
+  --color-accent-red: #ef6461;
+}
+
+html,
+body {
+  background: var(--color-bg-base);
+  color: var(--color-ink-primary);
+}
+
+body {
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+}

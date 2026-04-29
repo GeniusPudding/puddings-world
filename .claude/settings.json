@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./scripts/setup.sh)",
+      "Bash(./scripts/dev.sh)",
+      "Bash(./scripts/deploy.sh)",
+      "Bash(pnpm *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(vercel *)",
+      "Bash(docker *)",
+      "PowerShell(./scripts/setup.ps1)",
+      "PowerShell(./scripts/dev.ps1)",
+      "PowerShell(./scripts/deploy.ps1)",
+      "PowerShell(pnpm *)",
+      "PowerShell(npm *)",
+      "PowerShell(npx *)"
+    ]
+  }
+}
