@@ -55,10 +55,10 @@ const IDENTITIES: Identity[] = [
     label: "curious",
     emoji: "👋",
     greeting:
-      "No pressure. /now is the freshest snapshot of what's actually happening. /about explains the bigger picture. /projects has everything I've made room for.",
+      "No pressure. /about explains the bigger picture. /playground has the fun stuff. /projects has everything I've made room for.",
     routes: [
-      { label: "What I'm doing now", href: "/now" },
       { label: "About me", href: "/about" },
+      { label: "Playground", href: "/playground" },
       { label: "Project dashboard", href: "/projects" },
     ],
   },
@@ -67,9 +67,9 @@ const IDENTITIES: Identity[] = [
     label: "friend",
     emoji: "🫶",
     greeting:
-      "Hey. Glad you swung by. /now is the honest, recent-ish update. Email if you want to actually hang out instead of just checking my homepage.",
+      "Hey. Glad you swung by. /playground is where the fun stuff lives — that's probably the room you want. Email if you want to actually hang out instead of just checking my homepage.",
     routes: [
-      { label: "Now", href: "/now" },
+      { label: "Playground", href: "/playground" },
       { label: "Email", href: "/contact" },
     ],
   },
