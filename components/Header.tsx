@@ -9,13 +9,11 @@ type Props = {
 export function Header({ totalProjects, live, shipped, tbd, lastFetched }: Props) {
   return (
     <header>
-      <div className="flex items-baseline gap-3">
-        <h1 className="font-mono text-3xl font-semibold tracking-tight">puddingsworld</h1>
-        <span className="text-sm text-ink-muted">/ R&D dashboard</span>
-      </div>
+      <h1 className="text-3xl font-semibold tracking-tight">Projects &amp; Research</h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-secondary">
-        A running tab of what I&apos;m building. Project metadata is authored
-        by hand; GitHub activity is refreshed weekly by a scheduled job.
+        A running tab of what I&apos;m building, across applied software and
+        research prototypes. Metadata is hand-authored; live GitHub activity
+        is refreshed weekly by a scheduled job.
       </p>
 
       <dl className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
