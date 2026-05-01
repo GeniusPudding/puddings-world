@@ -4,7 +4,7 @@ import { WhoAmIPrompt } from "@/components/WhoAmIPrompt";
 import { tracks } from "@/content/projects";
 import { loadActivity } from "@/lib/activity";
 
-const FEATURED_SLUGS = ["epg-data-analyzer", "surgery-ocr", "invisible-go"];
+const FEATURED_SLUGS = ["flowfusion-bp", "surgery-ocr", "invisible-go"];
 
 export default async function HomePage() {
   const activity = await loadActivity();

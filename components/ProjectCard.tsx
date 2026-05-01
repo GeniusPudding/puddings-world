@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ActivitySnapshot, Project } from "@/lib/types";
 import { repoKey } from "@/lib/activity";
 import { StatusBadge } from "./StatusBadge";
@@ -35,18 +36,27 @@ export function ProjectCard({
     : undefined;
 
   return (
-    <article className="group relative flex flex-col rounded-xl border border-bg-border bg-bg-panel p-5 transition-colors hover:border-ink-muted">
+    <article className="group relative flex flex-col rounded-xl border border-bg-border bg-bg-panel p-5 transition-colors hover:border-ink-muted has-[a.card-link:focus-visible]:border-accent">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="truncate text-base font-semibold tracking-tight">
-            {project.title}
+            {project.status === "tbd" ? (
+              <span>{project.title}</span>
+            ) : (
+              <Link
+                href={`/projects/${project.slug}`}
+                className="card-link relative z-10 outline-none transition-colors group-hover:text-accent before:absolute before:inset-0 before:-m-5 before:rounded-xl before:content-['']"
+              >
+                {project.title}
+              </Link>
+            )}
           </h3>
           {repo && !isAnonymous && (
             <a
               href={repoHref}
               target="_blank"
               rel="noreferrer"
-              className="mt-0.5 block truncate font-mono text-xs text-ink-muted hover:text-accent"
+              className="relative z-20 mt-0.5 block truncate font-mono text-xs text-ink-muted hover:text-accent"
             >
               {repo.owner}/{repo.name}
             </a>

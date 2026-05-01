@@ -4,7 +4,12 @@ export type Project = {
   slug: string;
   title: string;
   tagline: string;
+  /** Long-form description shown on the project detail page. Markdown not parsed; render as paragraphs. */
   description?: string;
+  /** Path under /public for the project's hero / visualization image, e.g. "/projects/foo.png". */
+  image?: string;
+  /** One-line caption shown under the image. Helpful when the image is a diagram or screenshot. */
+  imageCaption?: string;
   repo?: {
     owner: string;
     name: string;
