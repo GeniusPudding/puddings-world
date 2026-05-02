@@ -1,14 +1,36 @@
 import type { Metadata } from "next";
 import { Nav } from "@/components/Nav";
+import { Footer } from "@/components/Footer";
 import "./globals.css";
 
+const SITE_URL = "https://puddings-world.com";
+const SITE_TITLE = "puddingsworld";
+const SITE_DESCRIPTION =
+  "A workshop, not a portfolio. Personal site of GeniusPudding — AI/LLM engineering by day, biosignal AI, simulation, audio, and games on the side.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "puddingsworld",
+    default: SITE_TITLE,
     template: "%s · puddingsworld",
   },
-  description:
-    "Software, research, and the messy in-between. Personal site of GeniusPudding.",
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_TITLE,
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
 };
 
 export default function RootLayout({
@@ -18,9 +40,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-bg-base text-ink-primary antialiased">
+      <body className="flex min-h-screen flex-col bg-bg-base text-ink-primary antialiased">
         <Nav />
-        {children}
+        <div className="flex-1">{children}</div>
+        <Footer />
       </body>
     </html>
   );
