@@ -1,4 +1,159 @@
 {
-  "fetchedAt": null,
-  "repos": {}
+  "fetchedAt": "2026-05-04T01:11:39.787Z",
+  "repos": {
+    "puddingforhealth/FlowFusionBP": {
+      "owner": "puddingforhealth",
+      "name": "FlowFusionBP",
+      "stars": 5,
+      "openIssues": 0,
+      "defaultBranch": "main",
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "f8fdf8c",
+        "message": "Update README.md",
+        "date": "2025-03-25T12:53:08Z",
+        "url": "https://github.com/puddingforhealth/FlowFusionBP/commit/f8fdf8c684ace37c65555cc9f58ce7a250fc82c5"
+      }
+    },
+    "puddingforhealth/EPG-LatentFlow": {
+      "owner": "puddingforhealth",
+      "name": "EPG-LatentFlow",
+      "stars": 2,
+      "openIssues": 0,
+      "defaultBranch": "main",
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "966e706",
+        "message": "Merge branch 'main' of https://github.com/jamesforhealth/EPG_data_analyzer",
+        "date": "2025-03-25T10:19:56Z",
+        "url": "https://github.com/puddingforhealth/EPG-LatentFlow/commit/966e7068ce9a60e95ae0acaf06a27efda71f5f5f"
+      }
+    },
+    "puddingforhealth/PPG-PulseFlowBP": {
+      "owner": "puddingforhealth",
+      "name": "PPG-PulseFlowBP",
+      "stars": 1,
+      "openIssues": 0,
+      "defaultBranch": "main",
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "d844325",
+        "message": "Remove .png and .pth files from repository tracking",
+        "date": "2025-03-25T12:36:26Z",
+        "url": "https://github.com/puddingforhealth/PPG-PulseFlowBP/commit/d844325bbabbbca03832ef788644e7d750b171cc"
+      }
+    },
+    "puddingforhealth/SurgeryOCR": {
+      "owner": "puddingforhealth",
+      "name": "SurgeryOCR",
+      "stars": 1,
+      "openIssues": 0,
+      "defaultBranch": "main",
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "a05e1f0",
+        "message": "Modularize the analysis functions",
+        "date": "2026-01-01T11:49:13Z",
+        "url": "https://github.com/puddingforhealth/SurgeryOCR/commit/a05e1f0df5012e554b0395c4dc0fa35d590acbe5"
+      }
+    },
+    "JaggerYu928/SofaTearing": {
+      "owner": "JaggerYu928",
+      "name": "SofaTearing",
+      "stars": 0,
+      "openIssues": 0,
+      "defaultBranch": "master",
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "ee86cbc",
+        "message": "Fix compile issure #1",
+        "date": "2023-01-19T08:22:01Z",
+        "url": "https://github.com/JaggerYu928/SofaTearing/commit/ee86cbc49b8c29ba60ada1e7ea82ff4664fedce5"
+      }
+    },
+    "jaggerturkey/CatAR_homepage": {
+      "owner": "jaggerturkey",
+      "name": "CatAR_homepage",
+      "stars": 0,
+      "openIssues": 0,
+      "defaultBranch": "main",
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "ee71fdb",
+        "message": "Temp : Upload & Analysis video API function works",
+        "date": "2026-01-22T09:47:27Z",
+        "url": "https://github.com/jaggerturkey/CatAR_homepage/commit/ee71fdb5606754ee59b766f815e9b8948b44e7fc"
+      }
+    },
+    "GeniusPudding/InvisibleGo": {
+      "owner": "GeniusPudding",
+      "name": "InvisibleGo",
+      "stars": 1,
+      "openIssues": 0,
+      "defaultBranch": "main",
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "e81fd3f",
+        "message": "Add Docker + Caddy deploy stack with AWS provisioning scripts",
+        "date": "2026-04-24T10:18:47Z",
+        "url": "https://github.com/GeniusPudding/InvisibleGo/commit/e81fd3fd330d538ed4f1fae77d64fac8ab6bb06e"
+      }
+    },
+    "GeniusPudding/reprise-studio": {
+      "owner": "GeniusPudding",
+      "name": "reprise-studio",
+      "stars": 0,
+      "openIssues": 0,
+      "defaultBranch": "main",
+      "weeklyCommits": 4,
+      "latestCommit": {
+        "sha": "2395d97",
+        "message": "Fix TimeScrubber swallowing shortcut keys when slider has focus\n\nRange / checkbox / button inputs never produce text, so the early-return\nthat protects text-typing inputs was wrong to include them. After clicking\nthe slider, =/-/+/_/r etc were going to the input and getting eaten.",
+        "date": "2026-05-02T01:59:23Z",
+        "url": "https://github.com/GeniusPudding/reprise-studio/commit/2395d97cb7ff7a7f0309008130f21f30f578a542"
+      }
+    },
+    "GeniusPudding/Kaikou-Claude": {
+      "owner": "GeniusPudding",
+      "name": "Kaikou-Claude",
+      "stars": 3,
+      "openIssues": 0,
+      "defaultBranch": "main",
+      "weeklyCommits": 1,
+      "latestCommit": {
+        "sha": "9a9c9a5",
+        "message": "Fix Windows PowerShell profile auto-start (Layer 2)\n\n- Use Start-Process -WindowStyle Hidden for background daemon launch\n  (PowerShell has no & background operator like bash)\n- Fix string interpolation: $null was expanded in double-quoted strings\n- Uninstall: line-based filtering instead of fragile regex",
+        "date": "2026-04-27T04:38:14Z",
+        "url": "https://github.com/GeniusPudding/Kaikou-Claude/commit/9a9c9a529ae5efa27f511c8958a727e7aaea5c71"
+      }
+    },
+    "GeniusPudding/SADroid": {
+      "owner": "GeniusPudding",
+      "name": "SADroid",
+      "stars": 0,
+      "openIssues": 0,
+      "defaultBranch": "main",
+      "weeklyCommits": 1,
+      "latestCommit": {
+        "sha": "dcd54e8",
+        "message": "Move ApkSmith submodule from droidbot/ to project root\n\nThe submodule was unnecessarily nested at droidbot/ApkSmith/ — it is\na project-level dependency, not specific to the droidbot subdirectory.\n\nMoved to SADroid/ApkSmith/ and replaced the sys.path hacks in both\ndriver files with clean imports:\n\n  # Before (fragile, path-dependent)\n  sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'ApkSmith', 'src'))\n  from apksmith import instrument_apk  # noqa: E402\n\n  # After (standard pip package)\n  from apksmith import instrument_apk\n\nSetup: run `pip install -e ApkSmith/` from the SADroid root to make\nthe apksmith package available as a normal import.\n\nCo-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>",
+        "date": "2026-05-01T16:10:26Z",
+        "url": "https://github.com/GeniusPudding/SADroid/commit/dcd54e8cff22665fbd5924a42fb472edcb61bb3c"
+      }
+    },
+    "GeniusPudding/ApkSmith": {
+      "owner": "GeniusPudding",
+      "name": "ApkSmith",
+      "stars": 0,
+      "openIssues": 0,
+      "defaultBranch": "main",
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "50a7c97",
+        "message": "Fix all ruff lint errors + stabilise E2E test\n\nLint fixes (38 issues across 11 files):\n- Import sorting (I001) via ruff --fix\n- Line too long (E501): break strings, reflow args\n- Lambda assignments (E731): convert to def functions\n- Unnecessary f-strings (F541): remove extraneous f prefix\n- Unused imports (F401): remove dead imports\n- Nested with statements (SIM117): combine into single with\n- Unnecessary mode arg (UP015): drop \"r\" from open()\n\nE2E test stability fixes:\n- Add force-stop before launching so onCreate always re-executes\n- Enlarge logcat buffer to 4M and add 1s settle time after clear\n- Replace logcat tag-based filtering (unreliable on some emulator\n  images) with full drain + Python-side grep\n- All 40 tests pass (39 unit + 1 E2E), CI lint clean\n\nCo-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>",
+        "date": "2026-04-22T14:48:52Z",
+        "url": "https://github.com/GeniusPudding/ApkSmith/commit/50a7c9770bcda8d042e2cd5ebef3043fcfa3ca3f"
+      }
+    }
+  }
 }
