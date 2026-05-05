@@ -14,6 +14,10 @@
   --color-accent-green: #3ecf8e;
   --color-accent-amber: #f5b642;
   --color-accent-red: #ef6461;
+
+  --font-serif:
+    var(--font-newsreader), "PingFang TC", "Songti TC",
+    "Noto Serif TC", "Microsoft JhengHei", ui-serif, Georgia, serif;
 }
 
 html,

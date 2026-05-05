@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
+import { newsreader } from "@/lib/fonts";
 import "./globals.css";
 
 const SITE_URL = "https://puddings-world.com";
@@ -39,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={newsreader.variable}>
       <body className="flex min-h-screen flex-col bg-bg-base text-ink-primary antialiased">
         <Nav />
         <div className="flex-1">{children}</div>
