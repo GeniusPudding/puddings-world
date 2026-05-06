@@ -12,10 +12,10 @@
     "fetch-activity": "tsx scripts/fetch-activity.ts"
   },
   "dependencies": {
-    "embla-carousel-react": "^8.6.0",
     "next": "^15.1.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "swiper": "^12.1.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",
