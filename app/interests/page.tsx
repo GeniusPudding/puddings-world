@@ -1,35 +1,9 @@
+import { interests, type InterestSection } from "@/content/interests";
+
 export const metadata = {
   title: "Interests · puddingsworld",
-  description: "What I'm into outside the main thread.",
+  description: "Things I consume — reading, listening, playing, watching, eating.",
 };
-
-const SECTIONS = [
-  {
-    title: "Games",
-    body:
-      "TODO: Go, board games, video games, designing your own games — fill in what fits. The InvisibleGo project came out of this.",
-  },
-  {
-    title: "Music",
-    body:
-      "TODO: instruments you play, genres you obsess over, production tools. Reprise Studio came out of this.",
-  },
-  {
-    title: "Reading",
-    body:
-      "TODO: a few books / authors / fields that have shaped how you think. No need for a full shelf — three to five is enough.",
-  },
-  {
-    title: "Movement",
-    body:
-      "TODO: running, climbing, lifting, hiking, whatever — or skip this section if it's not a thread for you.",
-  },
-  {
-    title: "Other rabbit holes",
-    body:
-      "TODO: weird ones. Cooking, languages, fountain pens, urban planning, electronic music history. The stuff that doesn't fit anywhere else but explains a lot about you.",
-  },
-];
 
 export default function InterestsPage() {
   return (
@@ -39,37 +13,96 @@ export default function InterestsPage() {
           interests
         </p>
         <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">
-          Outside the main thread.
+          Things I keep returning to.
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-ink-secondary">
-          About is the structured intro. This page is the unstructured one —
-          the things I do with the rest of the time, some of which leak back
-          into the projects.
+          What I consume — books, music, games, films, food. The inputs side.{" "}
+          <span className="text-ink-muted">
+            (What I create lives in <a href="/musings" className="hover:text-accent">/musings</a>,{" "}
+            <a href="/projects" className="hover:text-accent">/projects</a>, and{" "}
+            <a href="/playground" className="hover:text-accent">/playground</a>.)
+          </span>
         </p>
       </header>
 
       <div className="mt-12 space-y-8">
-        {SECTIONS.map((s) => (
-          <section
-            key={s.title}
-            className="rounded-xl border border-bg-border bg-bg-panel p-6"
-          >
-            <h2 className="text-lg font-semibold tracking-tight">{s.title}</h2>
-            <p className="mt-3 text-sm leading-relaxed text-ink-secondary">
-              {s.body}
-            </p>
-          </section>
+        {interests.map((section) => (
+          <Section key={section.slug} section={section} />
         ))}
       </div>
 
-      <p className="mt-12 text-xs text-ink-muted">
+      <p className="mt-12 text-xs italic text-ink-muted">
         Edit{" "}
-        <code className="rounded bg-bg-raised px-1 font-mono">
-          app/interests/page.tsx
+        <code className="rounded bg-bg-raised px-1 font-mono not-italic">
+          content/interests.ts
         </code>
-        . Drop sections you don&apos;t care about; add ones you do. The point
-        is to feel like a person, not a CV.
+        {" "}to add or change items. Each section: 3–5 items + an optional
+        &ldquo;why these&rdquo; one-liner.
       </p>
     </main>
+  );
+}
+
+function Section({ section }: { section: InterestSection }) {
+  return (
+    <section className="rounded-xl border border-bg-border bg-bg-panel p-6 sm:p-7">
+      <header className="flex items-baseline justify-between gap-3">
+        <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-ink-primary">
+          {section.label}
+        </h2>
+        <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+          {section.items.length} item{section.items.length === 1 ? "" : "s"}
+        </span>
+      </header>
+      <p className="mt-2 text-sm text-ink-secondary">{section.eyebrow}</p>
+
+      {section.items.length > 0 ? (
+        <>
+          <ul className="mt-5 divide-y divide-bg-border/60 font-mono text-sm">
+            {section.items.map((item, i) => (
+              <li
+                key={i}
+                className="flex items-baseline justify-between gap-4 py-2.5"
+              >
+                {item.href ? (
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="min-w-0 truncate text-ink-primary transition-colors hover:text-accent"
+                  >
+                    {item.primary}
+                  </a>
+                ) : (
+                  <span className="min-w-0 truncate text-ink-primary">
+                    {item.primary}
+                  </span>
+                )}
+                {item.secondary && (
+                  <span className="shrink-0 text-right text-xs text-ink-muted">
+                    {item.secondary}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+          {section.whyThese && (
+            <p className="mt-5 border-t border-bg-border pt-4 text-sm italic leading-relaxed text-ink-secondary">
+              <span className="not-italic font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+                Why these —{" "}
+              </span>
+              {section.whyThese}
+            </p>
+          )}
+        </>
+      ) : (
+        <p className="mt-5 font-mono text-xs italic text-ink-muted">
+          (empty — open{" "}
+          <code className="not-italic">content/interests.ts</code>, find the{" "}
+          <code className="not-italic">{section.slug}</code> section, push items
+          into <code className="not-italic">items: [...]</code>)
+        </p>
+      )}
+    </section>
   );
 }
