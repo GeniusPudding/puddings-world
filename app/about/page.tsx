@@ -13,7 +13,7 @@ const BACKGROUND = [
   {
     period: "MS",
     detail:
-      "Computer Science, National Taiwan University — Intelligent Healthcare track.",
+      "Computer Science, National Taiwan University — Intelligent Medicine Program.",
   },
   {
     period: "BS",

@@ -3,10 +3,7 @@ export const metadata = {
 };
 
 const CONTACT = {
-  // TODO: replace with your public-facing professional email.
-  // Avoid posting your primary personal email if you want to limit spam —
-  // use an alias (e.g. hello@puddings-world.com) once your domain is live.
-  email: "TODO@puddings-world.com",
+  email: "geniuspuddingforgames@gmail.com",
   github: "https://github.com/GeniusPudding",
 };
 

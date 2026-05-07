@@ -39,7 +39,7 @@ export default async function HomePage() {
         <WhoAmIPrompt />
       </section>
 
-      <section className="border-t border-bg-border pt-12 pb-20">
+      <section className="border-t border-bg-border pt-12 pb-16">
         <div className="mb-6 flex items-baseline justify-between">
           <h2 className="text-xl font-semibold tracking-tight">Featured</h2>
           <Link
@@ -53,6 +53,36 @@ export default async function HomePage() {
           {featured.map((project) => (
             <ProjectCard key={project.slug} project={project} activity={activity} />
           ))}
+        </div>
+      </section>
+
+      <section className="border-t border-bg-border pt-12 pb-20">
+        <div className="mx-auto max-w-2xl text-center sm:text-left">
+          <p className="font-mono text-xs uppercase tracking-[0.25em] text-accent">
+            get in touch
+          </p>
+          <h2 className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+            Reach me directly.
+          </h2>
+          <p className="mt-4 text-base leading-relaxed text-ink-secondary">
+            Email is the fastest way. Mention rough scope, timeline, and budget
+            if it&apos;s a project inquiry — that&apos;s how I tell you quickly
+            whether I&apos;m a good fit.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <a
+              href="mailto:geniuspuddingforgames@gmail.com"
+              className="rounded-md border border-accent/40 bg-accent/10 px-4 py-2 text-center font-mono text-sm text-accent transition-colors hover:bg-accent/20"
+            >
+              geniuspuddingforgames@gmail.com
+            </a>
+            <Link
+              href="/contact"
+              className="rounded-md border border-bg-border bg-bg-panel px-4 py-2 text-center font-mono text-sm text-ink-secondary transition-colors hover:text-ink-primary"
+            >
+              other ways →
+            </Link>
+          </div>
         </div>
       </section>
     </main>
