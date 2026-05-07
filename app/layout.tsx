@@ -7,7 +7,7 @@ import "./globals.css";
 const SITE_URL = "https://puddings-world.com";
 const SITE_TITLE = "puddingsworld";
 const SITE_DESCRIPTION =
-  "A workshop, not a portfolio. Personal site of GeniusPudding — AI/LLM engineering by day, biosignal AI, simulation, audio, and games on the side.";
+  "Pudding builds the world. Personal site of GeniusPudding — AI/LLM engineering by day, biosignal AI, simulation, audio, and games on the side.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

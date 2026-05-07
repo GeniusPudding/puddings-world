@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "puddingsworld — A workshop, not a portfolio.";
+export const alt = "puddingsworld — Pudding builds the world.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -42,7 +42,7 @@ export default function OpenGraphImage() {
             display: "flex",
           }}
         >
-          A workshop,
+          Pudding builds
         </div>
         <div
           style={{
@@ -54,7 +54,7 @@ export default function OpenGraphImage() {
             display: "flex",
           }}
         >
-          not a portfolio.
+          the world.
         </div>
         <div
           style={{

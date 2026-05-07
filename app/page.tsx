@@ -17,11 +17,15 @@ export default async function HomePage() {
   return (
     <main className="mx-auto w-full max-w-6xl px-6">
       <section className="pt-16 pb-12 sm:pt-24 sm:pb-16">
+        <div className="mb-10 inline-flex items-center gap-2 rounded-md border border-accent-amber/40 bg-accent-amber/10 px-3 py-1.5 font-mono text-xs text-accent-amber">
+          <span aria-hidden>🛠</span>
+          <span>in active iteration — content shifts week to week</span>
+        </div>
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent">
           puddingsworld
         </p>
         <h1 className="mt-6 max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-          A workshop, not a portfolio.
+          Pudding builds the world.
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-secondary">
           I build things — biosignal AI, surgical vision, audio tools, Android
