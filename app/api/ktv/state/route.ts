@@ -14,20 +14,29 @@ const DEFAULT_STATE: State = {
   updatedAt: new Date(0).toISOString(),
 };
 
-export const dynamic = "force-dynamic";
+// Audience polls /state every 5s. Edge-cache for 2s so a busy gig with
+// dozens of phones doesn't multiply KV reads. Up to 2s of staleness is
+// imperceptible for queue / now-playing UX.
+const PUBLIC_CACHE_HEADERS = {
+  "Cache-Control": "public, s-maxage=2, stale-while-revalidate=4",
+};
+const NO_STORE_HEADERS = {
+  "Cache-Control": "no-store",
+};
 
 export async function GET() {
   const redis = getRedis();
   if (!redis) {
     return Response.json(
       { error: "kv_unavailable", message: "KV not configured on this deploy" },
-      { status: 503 },
+      { status: 503, headers: NO_STORE_HEADERS },
     );
   }
-  const [state, queue] = await Promise.all([
-    redis.get<State>(KV_KEYS.state),
-    redis.get<QueueItem[]>(KV_KEYS.queue),
-  ]);
+  // mget bills as a single Upstash command and returns both values in one
+  // round-trip (vs two separate .get calls = two commands).
+  const [state, queue] = await redis.mget<
+    [State | null, QueueItem[] | null]
+  >(KV_KEYS.state, KV_KEYS.queue);
   const s = state ?? DEFAULT_STATE;
   const q = queue ?? [];
 
@@ -67,7 +76,7 @@ export async function GET() {
     nowPlaying,
     queue: queuePublic,
   };
-  return Response.json(body);
+  return Response.json(body, { headers: PUBLIC_CACHE_HEADERS });
 }
 
 export async function PATCH(req: Request) {

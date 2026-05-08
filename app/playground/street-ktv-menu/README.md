@@ -96,6 +96,27 @@ The audience web **never directly tells the performer app to play a song** —
 that responsibility is entirely on the app side. The web just adds rows
 to the queue; the app polls and decides when / what to play.
 
+### Playback mode (manual)
+
+The performer app does **not auto-play** the next song. Each request is
+just a notification — the performer taps "Play" on the app panel to
+start. This keeps creative control with the performer (skip songs they
+don't feel like, stretch breaks, etc.) and avoids the awkwardness of
+audio kicking off before the performer is ready.
+
+So the typical app flow is:
+
+```
+queue receives new item
+  → app shows in-app notification + maybe sound
+  → performer taps the item to start
+    → PATCH /api/ktv/state { nowPlayingId: <id> }
+    → app starts audio playback locally
+  → song ends (or performer taps 'next' / 'skip')
+    → DELETE /api/ktv/queue/<id>
+    → PATCH /api/ktv/state { nowPlayingId: <next.id or null> }
+```
+
 ### Audio output (performer app's job, not web's)
 
 Where the audio actually comes out — phone speaker, Bluetooth speaker,
@@ -236,9 +257,14 @@ The performer iOS / Android app needs to do these things:
 2. **Display QR:** print or show a QR for
    `https://puddings-world.com/playground/street-ktv-menu` (no query
    params needed in v0).
-3. **Poll the queue every ~3 s:** `GET /api/ktv/queue` (auth).
-4. **When starting a song:** `PATCH /api/ktv/state { nowPlayingId: <id> }`
-   (auth), then play audio locally / through whatever speaker is hooked up.
+3. **Poll the queue every ~3 s:** `GET /api/ktv/queue` (auth). On a
+   delta vs the previous poll, fire an in-app notification (toast,
+   sound, vibration) so the performer notices a new request without
+   staring at the screen.
+4. **Manual playback:** the performer taps an item to play. App calls
+   `PATCH /api/ktv/state { nowPlayingId: <id> }` (auth), then starts
+   audio playback locally / through whatever speaker is hooked up.
+   **Do not auto-play** — see "Playback mode" above.
 5. **When a song finishes / is skipped:**
    `DELETE /api/ktv/queue/<id>` (auth) and
    `PATCH /api/ktv/state { nowPlayingId: <next?.id or null> }`.
@@ -249,6 +275,17 @@ The performer iOS / Android app needs to do these things:
 
 Auth is a single shared bearer token (`KTV_PERFORMER_KEY`) baked into
 the app's settings. It must never leave the app's local storage.
+
+### App-side load discipline
+
+- 3 s polling is fine for a single app. **Do not** poll faster than 1 s.
+- If the app is backgrounded (gig paused, performer switching apps),
+  pause polling. Resume on foreground. Same idea as the audience web's
+  Page Visibility API.
+- Do not GET state and queue separately when both are needed — the
+  performer-only `GET /api/ktv/queue` already returns enriched queue
+  with joined catalog info; pair it with one `GET /api/ktv/state`
+  (cached) only when you also need `nowPlayingId` confirmation.
 
 ## End-to-end manual test
 
@@ -268,6 +305,52 @@ actual audience.
 □ 9. Performer app: close queue (PATCH acceptingRequests:false) →
        audience can no longer submit, sees the closed banner.
 ```
+
+## Backend load model
+
+Naive polling at audience scale will burn through Upstash free tier
+fast (500k commands / month, 10k / day). The current design keeps load
+down with three layers:
+
+1. **Edge cache on `GET /api/ktv/state`**:
+   `Cache-Control: public, s-maxage=2, stale-while-revalidate=4`.
+   Vercel's CDN caches the response for 2 s. Within that window, every
+   audience phone hitting `/state` is served from the edge — only the
+   first request after each 2 s window touches Redis. Multiplier
+   collapses regardless of audience size.
+
+2. **`redis.mget`** for the state + queue read. Counts as a single
+   Upstash command instead of two `.get()` calls.
+
+3. **Page Visibility API** in the audience client. When the tab is
+   hidden (phone locked, switched to another app, etc.), polling pauses;
+   it resumes when the tab is visible again. A backgrounded phone is
+   contributing zero load.
+
+### Worst-case math
+
+A 2-hour gig with 50 simultaneous audience members polling every 5 s,
+all foregrounded, all hitting the same Vercel edge node:
+
+| Naive (no edge cache) | Optimized |
+|---|---|
+| 50 phones × 1440 polls × 2 KV ops = **144 000 ops** | edge serves cache; origin hits ≈ 30 / min × 120 min = 3600 origin requests × 1 op (mget) = **3600 ops** |
+
+That's ~40× reduction. Free tier daily limit (10 000) covers a couple
+gigs / day.
+
+The performer app's `GET /api/ktv/queue` polling (one client, every 3 s)
+adds ~2400 ops per gig and is left uncached so the performer sees fresh
+state quickly.
+
+### What to watch in production
+
+- Upstash dashboard → **Usage** → daily commands. If close to 8000+,
+  raise `s-maxage` (e.g. to 3 s) or increase `POLL_INTERVAL_MS` (e.g.
+  to 7 s).
+- Vercel dashboard → **Analytics → Function invocations** for
+  `/api/ktv/state`. Should be much lower than client poll count
+  thanks to the cache.
 
 ## Roadmap (deferred)
 

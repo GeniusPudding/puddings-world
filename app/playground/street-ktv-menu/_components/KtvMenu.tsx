@@ -36,12 +36,18 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
   const [selected, setSelected] = useState<Song | null>(null);
   const [submit, setSubmit] = useState<SubmitStatus>({ kind: "idle" });
 
-  // Poll state every few seconds so audience sees queue advance + now-playing
+  // Poll state every few seconds so audience sees queue advance + now-playing.
+  // Pauses when the tab is hidden — backgrounded phones don't need to keep
+  // hammering the API.
   useEffect(() => {
     let cancelled = false;
+    let timer: ReturnType<typeof setInterval> | null = null;
+
     async function load() {
       try {
-        const res = await fetch("/api/ktv/state", { cache: "no-store" });
+        // Hits Vercel's edge cache (s-maxage=2) most of the time; default
+        // browser cache mode is fine.
+        const res = await fetch("/api/ktv/state");
         if (!res.ok) {
           if (cancelled) return;
           if (res.status === 503) {
@@ -64,11 +70,40 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
           });
       }
     }
-    load();
-    const id = setInterval(load, POLL_INTERVAL_MS);
+
+    function startPolling() {
+      if (timer) return;
+      load();
+      timer = setInterval(load, POLL_INTERVAL_MS);
+    }
+
+    function stopPolling() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    function onVisibilityChange() {
+      if (typeof document === "undefined") return;
+      if (document.visibilityState === "visible") {
+        startPolling();
+      } else {
+        stopPolling();
+      }
+    }
+
+    if (typeof document !== "undefined") {
+      if (document.visibilityState === "visible") startPolling();
+      document.addEventListener("visibilitychange", onVisibilityChange);
+    }
+
     return () => {
       cancelled = true;
-      clearInterval(id);
+      if (typeof document !== "undefined") {
+        document.removeEventListener("visibilitychange", onVisibilityChange);
+      }
+      stopPolling();
     };
   }, []);
 
