@@ -18,6 +18,16 @@ type SubmitStatus =
   | { kind: "not_accepting" }
   | { kind: "error"; message: string };
 
+/** A row this browser put into the queue; persisted so we can DELETE it later. */
+type MyRequest = {
+  id: string;
+  cancelToken: string;
+  songId: string;
+  /** ISO 8601 — used to keep just-added rows from being pruned during the
+   *  brief window before the edge cache catches up. */
+  addedAt: string;
+};
+
 const LANG_LABEL: Record<Song["language"], string> = {
   zh: "中文",
   en: "EN",
@@ -27,6 +37,41 @@ const LANG_LABEL: Record<Song["language"], string> = {
 };
 
 const POLL_INTERVAL_MS = 5000;
+const MY_REQUESTS_KEY = "ktv:my-requests";
+// Keep newly-added rows around at least this long before allowing the
+// "not in live queue → prune" rule to drop them. Edge cache on /state can
+// serve up to 2s stale, so 10s is a comfortable buffer.
+const MIN_PRUNE_AGE_MS = 10_000;
+
+function loadMyRequests(): MyRequest[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(MY_REQUESTS_KEY);
+    if (!raw) return [];
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (r): r is MyRequest =>
+        !!r &&
+        typeof r === "object" &&
+        typeof (r as MyRequest).id === "string" &&
+        typeof (r as MyRequest).cancelToken === "string" &&
+        typeof (r as MyRequest).songId === "string" &&
+        typeof (r as MyRequest).addedAt === "string",
+    );
+  } catch {
+    return [];
+  }
+}
+
+function saveMyRequests(reqs: MyRequest[]) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(MY_REQUESTS_KEY, JSON.stringify(reqs));
+  } catch {
+    /* quota / private mode — quietly ignore */
+  }
+}
 
 export function KtvMenu({ catalog }: { catalog: Song[] }) {
   const [fetchStatus, setFetchStatus] = useState<FetchStatus>({
@@ -35,6 +80,37 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Song | null>(null);
   const [submit, setSubmit] = useState<SubmitStatus>({ kind: "idle" });
+  const [myRequests, setMyRequests] = useState<MyRequest[]>([]);
+
+  // Hydrate "my queued songs" from localStorage on mount only — leaving
+  // initial state empty avoids SSR/CSR hydration mismatch.
+  useEffect(() => {
+    setMyRequests(loadMyRequests());
+  }, []);
+
+  // Whenever fresh state arrives, drop tracked rows that are no longer in
+  // the live queue (sung, canceled, or a fresh gig wiped the queue).
+  // Spare anything younger than MIN_PRUNE_AGE_MS so edge-cache lag right
+  // after a POST can't accidentally evict the row we just added.
+  useEffect(() => {
+    if (fetchStatus.kind !== "ready") return;
+    const liveIds = new Set<string>(
+      fetchStatus.state.queue.map((q) => q.id),
+    );
+    if (fetchStatus.state.nowPlayingId)
+      liveIds.add(fetchStatus.state.nowPlayingId);
+    const now = Date.now();
+    setMyRequests((prev) => {
+      const next = prev.filter(
+        (r) =>
+          liveIds.has(r.id) ||
+          now - new Date(r.addedAt).getTime() < MIN_PRUNE_AGE_MS,
+      );
+      if (next.length === prev.length) return prev;
+      saveMyRequests(next);
+      return next;
+    });
+  }, [fetchStatus]);
 
   // Poll state every few seconds so audience sees queue advance + now-playing.
   // Pauses when the tab is hidden — backgrounded phones don't need to keep
@@ -134,6 +210,21 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
     setSubmit({ kind: "idle" });
   }
 
+  async function refreshState() {
+    // Cache-buster query bypasses Vercel's edge cache (s-maxage=2) so the
+    // newly-added row appears immediately instead of after up to 2s.
+    try {
+      const r = await fetch(`/api/ktv/state?_=${Date.now()}`, {
+        cache: "no-store",
+      });
+      if (!r.ok) return;
+      const s: StatePublic = await r.json();
+      setFetchStatus({ kind: "ready", state: s });
+    } catch {
+      /* ignore — next polling tick will catch up */
+    }
+  }
+
   async function submitRequest() {
     if (!selected) return;
     setSubmit({ kind: "submitting" });
@@ -146,13 +237,23 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
       const body = await res.json().catch(() => ({}));
       if (res.ok) {
         setSubmit({ kind: "ok", position: body.position ?? 0 });
-        // Refresh state so the queue display reflects the new request
-        fetch("/api/ktv/state", { cache: "no-store" })
-          .then((r) => r.json())
-          .then((s: StatePublic) =>
-            setFetchStatus({ kind: "ready", state: s }),
-          )
-          .catch(() => {});
+        if (
+          typeof body.id === "string" &&
+          typeof body.cancelToken === "string"
+        ) {
+          const entry: MyRequest = {
+            id: body.id,
+            cancelToken: body.cancelToken,
+            songId: selected.id,
+            addedAt: new Date().toISOString(),
+          };
+          setMyRequests((prev) => {
+            const next = [...prev, entry];
+            saveMyRequests(next);
+            return next;
+          });
+        }
+        refreshState();
         return;
       }
       switch (body.error) {
@@ -177,6 +278,37 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
         message: err instanceof Error ? err.message : "network error",
       });
     }
+  }
+
+  async function cancelMyRequest(id: string) {
+    const entry = myRequests.find((r) => r.id === id);
+    if (!entry) return;
+    // Optimistic: remove locally first, restore only if the server
+    // explicitly says "you don't own this" (401).
+    setMyRequests((prev) => {
+      const next = prev.filter((r) => r.id !== id);
+      saveMyRequests(next);
+      return next;
+    });
+    try {
+      const res = await fetch(`/api/ktv/queue/${encodeURIComponent(id)}`, {
+        method: "DELETE",
+        headers: { "X-Cancel-Token": entry.cancelToken },
+      });
+      // 204 = deleted, 404 = already gone (performer beat us to it). Both fine.
+      if (!res.ok && res.status === 401) {
+        // Token mismatch (shouldn't happen) — restore the entry so the user
+        // can try again or at least see it.
+        setMyRequests((prev) => {
+          const next = [...prev, entry];
+          saveMyRequests(next);
+          return next;
+        });
+      }
+    } catch {
+      /* network blip — leave optimistic state, next poll will reconcile */
+    }
+    refreshState();
   }
 
   // ── Render ────────────────────────────────────────────────────────────
@@ -240,7 +372,11 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
         )}
       </header>
 
-      <LiveQueue state={state} />
+      <LiveQueue
+        state={state}
+        myIds={new Set(myRequests.map((r) => r.id))}
+        onCancel={cancelMyRequest}
+      />
 
       <div className="sticky top-[68px] z-10 -mx-5 mb-4 bg-bg-base/85 px-5 py-3 backdrop-blur">
         <input
@@ -307,7 +443,15 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
   );
 }
 
-function LiveQueue({ state }: { state: StatePublic }) {
+function LiveQueue({
+  state,
+  myIds,
+  onCancel,
+}: {
+  state: StatePublic;
+  myIds: Set<string>;
+  onCancel: (id: string) => void;
+}) {
   const empty = !state.nowPlaying && state.queue.length === 0;
 
   if (empty) {
@@ -351,20 +495,40 @@ function LiveQueue({ state }: { state: StatePublic }) {
             up next ({state.queue.length})
           </p>
           <ol className="mt-2 space-y-1.5 text-sm">
-            {state.queue.slice(0, 5).map((q, i) => (
-              <li
-                key={q.id}
-                className="flex items-baseline gap-2 truncate"
-              >
-                <span className="shrink-0 font-mono text-[10px] text-ink-muted">
-                  {String(i + 1).padStart(2, "0")}.
-                </span>
-                <span className="truncate text-ink-primary">{q.title}</span>
-                <span className="shrink-0 font-mono text-[10px] text-ink-muted">
-                  · {q.artist}
-                </span>
-              </li>
-            ))}
+            {state.queue.slice(0, 5).map((q, i) => {
+              const mine = myIds.has(q.id);
+              return (
+                <li
+                  key={q.id}
+                  className="flex items-center gap-2"
+                >
+                  <span className="shrink-0 font-mono text-[10px] text-ink-muted">
+                    {String(i + 1).padStart(2, "0")}.
+                  </span>
+                  <span className="min-w-0 flex-1 truncate">
+                    <span className="text-ink-primary">{q.title}</span>
+                    <span className="ml-1 font-mono text-[10px] text-ink-muted">
+                      · {q.artist}
+                    </span>
+                    {mine && (
+                      <span className="ml-1.5 font-mono text-[10px] text-accent">
+                        · yours
+                      </span>
+                    )}
+                  </span>
+                  {mine && (
+                    <button
+                      type="button"
+                      onClick={() => onCancel(q.id)}
+                      aria-label={`cancel ${q.title}`}
+                      className="-mr-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-bg-border bg-bg-raised font-mono text-xs text-ink-muted transition-colors hover:border-accent-red hover:text-accent-red"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </li>
+              );
+            })}
             {state.queue.length > 5 && (
               <li className="font-mono text-[10px] text-ink-muted">
                 + {state.queue.length - 5} more queued

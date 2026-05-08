@@ -24,6 +24,7 @@ export function getRedis(): Redis | null {
 export const KV_KEYS = {
   queue: "ktv:queue",
   state: "ktv:state",
+  catalog: "ktv:catalog",
   rateLimit: (ipHash: string) => `ktv:rl:${ipHash}`,
 } as const;
 

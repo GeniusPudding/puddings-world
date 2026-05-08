@@ -27,20 +27,36 @@ The performer app itself lives in a separate repo
 
 | Thing | File / location | Edited by |
 |---|---|---|
-| **Songbook** (catalog) | [`content/ktv-catalog.ts`](../../../content/ktv-catalog.ts) | You — push to deploy |
+| **Songbook** (catalog) — live | Vercel KV, key `ktv:catalog` | Performer app via `PUT /api/ktv/catalog` |
+| **Songbook** — seed / fallback | [`content/ktv-catalog.ts`](../../../content/ktv-catalog.ts) | You, only when seeding a fresh deploy |
 | Audience UI | [`page.tsx`](./page.tsx) + [`_components/KtvMenu.tsx`](./_components/KtvMenu.tsx) | Engineering |
 | API route handlers | [`app/api/ktv/`](../../api/ktv/) | Engineering |
-| Backend lib (KV / auth / rate-limit / types) | [`lib/ktv/`](../../../lib/ktv/) | Engineering |
-| Queue + state | Vercel KV (Upstash Redis), keys `ktv:queue` and `ktv:state` | Both audience POST and performer app |
-| Spec doc (handoff to performer app) | `~/Desktop/StreetPerformerMaster/audience_web/CLAUDE.md` | Cross-team |
+| Backend lib (KV / auth / rate-limit / types / catalog loader) | [`lib/ktv/`](../../../lib/ktv/) | Engineering |
+| Queue + state | Vercel KV, keys `ktv:queue` and `ktv:state` | Both audience POST and performer app |
+| Spec doc (cross-end contract) | `~/Desktop/StreetPerformerMaster/app/CLAUDE.md` §1.5 | Cross-team |
 
-### Editing the songbook
+### Editing the songbook (live, post-deploy)
 
-Open `content/ktv-catalog.ts`. Each entry:
+The performer app owns the catalog. After processing new accompaniment
+files (Demucs → m4a → sync to phone), the app's sync script also calls
+`PUT /api/ktv/catalog` with the full list. The audience page revalidates
+within seconds (the PUT handler busts the page's `ktv-catalog` cache tag
+via `revalidateTag`).
+
+You should not need to touch this repo to add or remove songs.
+
+### Editing the seed / fallback (rare)
+
+`content/ktv-catalog.ts` is only consulted when KV is unset (local dev
+without `KV_REST_API_URL`) or empty (a fresh production deploy before the
+app has synced). Once the app has done at least one PUT, the seed becomes
+irrelevant in production.
+
+Schema for both the live PUT body and the seed file:
 
 ```ts
 {
-  id: 'moon-tells-my-heart',  // stable URL-safe slug; queue references this
+  id: 'moon-tells-my-heart',  // stable lowercase kebab-case slug
   title: '月亮代表我的心',
   artist: '鄧麗君',
   language: 'zh',             // 'zh' | 'en' | 'jp' | 'ko' | 'other'
@@ -50,17 +66,19 @@ Open `content/ktv-catalog.ts`. Each entry:
 }
 ```
 
-Add / remove / edit entries, then `git push`. Vercel auto-redeploys
-the whole site within ~1 minute. **Don't rename an existing `id`
-mid-gig** — pending queue items reference it by id and will go stale.
+**Don't rename an existing `id` mid-gig** — pending queue items reference
+it by id and will orphan if the slug disappears.
 
 ## Tech stack
 
 - **Next.js 15** App Router. `page.tsx` is a server component that
-  imports the catalog and hands it to a client component.
-- **Vercel KV (Upstash Redis)** as the cross-platform shared queue.
-  Two keys total: `ktv:queue` (JSON array of QueueItem), `ktv:state`
-  (JSON object: `acceptingRequests`, `nowPlayingId`, `updatedAt`).
+  loads the songbook from Vercel KV (with a 30 s ISR cache, tagged
+  `ktv-catalog` so PUTs invalidate immediately) and hands it to a
+  client component.
+- **Vercel KV (Upstash Redis)** as the cross-platform shared store.
+  Three keys total: `ktv:queue` (JSON array of QueueItem),
+  `ktv:state` (JSON object: `acceptingRequests`, `nowPlayingId`,
+  `updatedAt`), and `ktv:catalog` (JSON array of Song).
 - **`@upstash/redis`** SDK in `lib/ktv/kv.ts` (lazy client; no env =
   graceful 503).
 - **Bearer-token auth** for performer-only endpoints (`KTV_PERFORMER_KEY`
@@ -76,6 +94,10 @@ mid-gig** — pending queue items reference it by id and will go stale.
    Audience phone (web)            Vercel KV                Performer app
                                   (single source             (iOS / Android)
                                    of truth)
+   GET  /api/ktv/catalog ───────► ktv:catalog ───────────►  PUT  /api/ktv/catalog
+   (server component, ISR 30s,                                (sync script after
+    revalidated on PUT)                                        Demucs/encode, bearer)
+
    GET  /api/ktv/state ─────────► ktv:state ─────────────►  PATCH /api/ktv/state
         (poll every 5s,                                       (set nowPlayingId,
          public)                                               flip acceptingRequests)
@@ -139,6 +161,51 @@ device. The web has no opinion and no involvement.
 
 All endpoints under `/api/ktv/`. All return JSON unless noted.
 
+### `GET /api/ktv/catalog` — public
+
+Returns the live songbook. Edge-cached for 60 s
+(`Cache-Control: public, s-maxage=60, stale-while-revalidate=120`); the
+PUT handler calls `revalidateTag('ktv-catalog')` to publish updates
+without waiting for the cache to expire.
+
+```json
+{
+  "songs": [
+    { "id": "moon-tells-my-heart", "title": "月亮代表我的心", "artist": "鄧麗君",
+      "language": "zh", "key": "C", "durationSec": 220, "tags": ["ballad", "classic"] }
+  ]
+}
+```
+
+If KV is unset or empty, falls back to `content/ktv-catalog.ts`.
+
+### `PUT /api/ktv/catalog` — performer-only
+
+Idempotent replace. The performer app sends the full list every sync;
+the server overwrites `ktv:catalog` with whatever it receives.
+
+```http
+PUT /api/ktv/catalog
+Authorization: Bearer <KTV_PERFORMER_KEY>
+Content-Type: application/json
+
+{ "songs": [ { "id": "...", "title": "...", "artist": "...", "language": "zh", ... }, ... ] }
+```
+
+- 200 `{ count }` — replaced
+- 400 `bad_request` with `message` — validation failed (see below)
+- 401 `unauthorized` — missing / wrong bearer
+- 503 `kv_unavailable` — backend not provisioned
+
+Validation rules (any failure → 400 with explanation):
+
+- body must be `{ songs: Song[] }`
+- `id`: required, must match `/^[a-z0-9][a-z0-9-]{0,63}$/`, unique within payload
+- `title`, `artist`: required non-empty strings
+- `language`: required, one of `zh | en | jp | ko | other`
+- `key`, `durationSec`, `tags`: optional, lightly validated
+- max `5000` songs per payload
+
 ### `GET /api/ktv/state` — public
 
 Returns current state plus the full queue (with PII stripped).
@@ -183,7 +250,9 @@ Content-Type: application/json
 { "songId": "moon-tells-my-heart" }
 ```
 
-- 200 `{ id, position, queueLength }` — added
+- 200 `{ id, cancelToken, position, queueLength }` — added. The audience
+  client persists `(id, cancelToken)` in localStorage and uses it later
+  to delete its own row without bearer auth.
 - 403 `not_accepting` — performer closed the queue
 - 404 `unknown_song` — songId not in catalog
 - 409 `duplicate` — that song already in queue (returns its position)
@@ -212,10 +281,16 @@ instead.
 
 Empties the queue. Call this between gigs to start clean.
 
-### `DELETE /api/ktv/queue/:id` — performer-only
+### `DELETE /api/ktv/queue/:id` — performer or self-cancel
 
-Removes one specific item by id. Call after the song's been sung, or
-to skip a request.
+Removes one queue row. Two ways to authenticate:
+
+- `Authorization: Bearer <KTV_PERFORMER_KEY>` — performer (can delete any row)
+- `X-Cancel-Token: <token>` — audience self-cancel; the token must match
+  the `cancelToken` returned at POST time for this exact id
+
+Returns 204 on success, 401 if neither auth path is satisfied, 404 if
+the row no longer exists.
 
 ## Setup (one-time per Vercel project)
 

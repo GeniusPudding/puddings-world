@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { catalog } from "@/content/ktv-catalog";
+import { catalog as seedCatalog } from "@/content/ktv-catalog";
 import { isAuthorized } from "@/lib/ktv/auth";
 import { getRedis, KV_KEYS } from "@/lib/ktv/kv";
 import {
@@ -7,7 +7,7 @@ import {
   clientIp,
   hashIp,
 } from "@/lib/ktv/rate-limit";
-import type { QueueItem, State } from "@/lib/ktv/types";
+import type { QueueItem, Song, State } from "@/lib/ktv/types";
 
 export const dynamic = "force-dynamic";
 
@@ -23,22 +23,29 @@ export async function GET(req: Request) {
   if (!redis) {
     return Response.json({ error: "kv_unavailable" }, { status: 503 });
   }
-  const queue = (await redis.get<QueueItem[]>(KV_KEYS.queue)) ?? [];
-  // Strip ipHash (internal) and join catalog info for convenience
-  const enriched = queue.map(({ ipHash: _ipHash, ...item }) => {
-    const song = catalog.find((c) => c.id === item.songId);
-    return {
-      ...item,
-      song: song
-        ? {
-            title: song.title,
-            artist: song.artist,
-            language: song.language,
-            durationSec: song.durationSec,
-          }
-        : null,
-    };
-  });
+  const [queue, storedCatalog] = await redis.mget<
+    [QueueItem[] | null, Song[] | null]
+  >(KV_KEYS.queue, KV_KEYS.catalog);
+  const q = queue ?? [];
+  const cat =
+    storedCatalog && storedCatalog.length > 0 ? storedCatalog : seedCatalog;
+  // Strip internal fields (ipHash, cancelToken) and join catalog info.
+  const enriched = q.map(
+    ({ ipHash: _ipHash, cancelToken: _cancelToken, ...item }) => {
+      const song = cat.find((c) => c.id === item.songId);
+      return {
+        ...item,
+        song: song
+          ? {
+              title: song.title,
+              artist: song.artist,
+              language: song.language,
+              durationSec: song.durationSec,
+            }
+          : null,
+      };
+    },
+  );
   return Response.json(enriched);
 }
 
@@ -58,14 +65,9 @@ export async function POST(req: Request) {
 
   const isPerformer = isAuthorized(req);
 
-  const ipHash = hashIp(clientIp(req));
-  if (!isPerformer) {
-    const allowed = await checkAndStampRateLimit(ipHash);
-    if (!allowed) {
-      return Response.json({ error: "rate_limit" }, { status: 429 });
-    }
-  }
-
+  // Parse + validate the body before touching the rate limiter so an
+  // accidental bad JSON from a real audience phone doesn't burn their
+  // 30-second slot.
   let body: { songId?: string; requesterName?: string; message?: string };
   try {
     body = await req.json();
@@ -76,25 +78,36 @@ export async function POST(req: Request) {
     return Response.json({ error: "bad_request" }, { status: 400 });
   }
 
-  const song = catalog.find((c) => c.id === body.songId);
+  const ipHash = hashIp(clientIp(req));
+  if (!isPerformer) {
+    const allowed = await checkAndStampRateLimit(ipHash);
+    if (!allowed) {
+      return Response.json({ error: "rate_limit" }, { status: 429 });
+    }
+  }
+
+  // One round-trip for state + queue + catalog instead of three separate gets.
+  const [state, queue, storedCatalog] = await redis.mget<
+    [State | null, QueueItem[] | null, Song[] | null]
+  >(KV_KEYS.state, KV_KEYS.queue, KV_KEYS.catalog);
+  const cat =
+    storedCatalog && storedCatalog.length > 0 ? storedCatalog : seedCatalog;
+  const q = queue ?? [];
+
+  const song = cat.find((c) => c.id === body.songId);
   if (!song) {
     return Response.json({ error: "unknown_song" }, { status: 404 });
   }
 
   if (!isPerformer) {
-    const state = await redis.get<State>(KV_KEYS.state);
     if (state && !state.acceptingRequests) {
       return Response.json({ error: "not_accepting" }, { status: 403 });
     }
-  }
-
-  const queue = (await redis.get<QueueItem[]>(KV_KEYS.queue)) ?? [];
-  if (!isPerformer) {
-    const existing = queue.find((q) => q.songId === body.songId);
+    const existing = q.find((qi) => qi.songId === body.songId);
     if (existing) {
-      const position = queue.indexOf(existing) + 1;
+      const position = q.indexOf(existing) + 1;
       return Response.json(
-        { error: "duplicate", position, queueLength: queue.length },
+        { error: "duplicate", position, queueLength: q.length },
         { status: 409 },
       );
     }
@@ -113,13 +126,18 @@ export async function POST(req: Request) {
         : undefined,
     addedAt: new Date().toISOString(),
     ipHash,
+    // Audience uses this to DELETE their own row without bearer auth.
+    // Performer-added rows get one too for uniformity (the app already has
+    // bearer access, so it can ignore the field).
+    cancelToken: nanoid(16),
   };
 
-  const next = [...queue, item];
+  const next = [...q, item];
   await redis.set(KV_KEYS.queue, next);
 
   return Response.json({
     id: item.id,
+    cancelToken: item.cancelToken,
     position: next.length,
     queueLength: next.length,
   });

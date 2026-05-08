@@ -20,6 +20,12 @@ export type QueueItem = {
   addedAt: string;
   /** Internal: SHA-256(ip).slice(0,16) used for rate limiting. Stripped from public responses. */
   ipHash?: string;
+  /**
+   * Internal: short random token returned to the audience at POST time so
+   * they can DELETE their own item without bearer auth by sending it back
+   * in the `X-Cancel-Token` header. Stripped from all public responses.
+   */
+  cancelToken?: string;
 };
 
 export type State = {

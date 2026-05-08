@@ -1,9 +1,10 @@
-import { catalog } from "@/content/ktv-catalog";
+import { catalog as seedCatalog } from "@/content/ktv-catalog";
 import { isAuthorized } from "@/lib/ktv/auth";
 import { getRedis, KV_KEYS } from "@/lib/ktv/kv";
 import type {
   QueueEntryPublic,
   QueueItem,
+  Song,
   State,
   StatePublic,
 } from "@/lib/ktv/types";
@@ -32,19 +33,22 @@ export async function GET() {
       { status: 503, headers: NO_STORE_HEADERS },
     );
   }
-  // mget bills as a single Upstash command and returns both values in one
-  // round-trip (vs two separate .get calls = two commands).
-  const [state, queue] = await redis.mget<
-    [State | null, QueueItem[] | null]
-  >(KV_KEYS.state, KV_KEYS.queue);
+  // mget bills as a single Upstash command. Pulling all three keys in one
+  // round-trip keeps /state at one KV op regardless of the catalog living
+  // alongside the queue + state now.
+  const [state, queue, storedCatalog] = await redis.mget<
+    [State | null, QueueItem[] | null, Song[] | null]
+  >(KV_KEYS.state, KV_KEYS.queue, KV_KEYS.catalog);
   const s = state ?? DEFAULT_STATE;
   const q = queue ?? [];
+  const cat =
+    storedCatalog && storedCatalog.length > 0 ? storedCatalog : seedCatalog;
 
   let nowPlaying: StatePublic["nowPlaying"] = null;
   if (s.nowPlayingId) {
     const item = q.find((qi) => qi.id === s.nowPlayingId);
     if (item) {
-      const song = catalog.find((c) => c.id === item.songId);
+      const song = cat.find((c) => c.id === item.songId);
       if (song) {
         nowPlaying = {
           songId: song.id,
@@ -60,7 +64,7 @@ export async function GET() {
   const queuePublic: QueueEntryPublic[] = q
     .filter((qi) => qi.id !== s.nowPlayingId)
     .map((qi) => {
-      const song = catalog.find((c) => c.id === qi.songId);
+      const song = cat.find((c) => c.id === qi.songId);
       return {
         id: qi.id,
         songId: qi.songId,

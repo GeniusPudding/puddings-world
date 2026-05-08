@@ -1,10 +1,16 @@
 import type { Song } from "@/lib/ktv/types";
 
 // ---------------------------------------------------------------------------
-// Songbook for the street-KTV audience page.
-// Edit this file to add / remove songs you can perform; push to deploy.
-// `id` must be a stable URL-safe slug — the queue references songs by id,
-// so renaming an id mid-gig will orphan any pending requests.
+// Seed / fallback songbook for the street-KTV audience page.
+//
+// The live source of truth is Vercel KV (`ktv:catalog`), written by the
+// performer app via PUT /api/ktv/catalog whenever the local repertoire
+// changes. This file is what `loadCatalog()` falls back to when KV is
+// unset (local dev) or empty (first deploy, before the app has synced).
+//
+// Editing this file no longer affects production once the app has done
+// at least one sync — change the songbook in the app instead. Keep this
+// list short and roughly representative as the seed.
 // ---------------------------------------------------------------------------
 
 export const catalog: Song[] = [
