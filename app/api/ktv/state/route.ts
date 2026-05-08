@@ -1,7 +1,12 @@
 import { catalog } from "@/content/ktv-catalog";
 import { isAuthorized } from "@/lib/ktv/auth";
 import { getRedis, KV_KEYS } from "@/lib/ktv/kv";
-import type { QueueItem, State, StatePublic } from "@/lib/ktv/types";
+import type {
+  QueueEntryPublic,
+  QueueItem,
+  State,
+  StatePublic,
+} from "@/lib/ktv/types";
 
 const DEFAULT_STATE: State = {
   acceptingRequests: true,
@@ -41,11 +46,26 @@ export async function GET() {
     }
   }
 
+  // Strip PII (ipHash, requesterName, message) and exclude the now-playing
+  // item from the public 'up next' list.
+  const queuePublic: QueueEntryPublic[] = q
+    .filter((qi) => qi.id !== s.nowPlayingId)
+    .map((qi) => {
+      const song = catalog.find((c) => c.id === qi.songId);
+      return {
+        id: qi.id,
+        songId: qi.songId,
+        title: song?.title ?? qi.songId,
+        artist: song?.artist ?? "",
+        addedAt: qi.addedAt,
+      };
+    });
+
   const body: StatePublic = {
     acceptingRequests: s.acceptingRequests,
     nowPlayingId: s.nowPlayingId,
-    queueLength: q.length,
     nowPlaying,
+    queue: queuePublic,
   };
   return Response.json(body);
 }

@@ -28,10 +28,19 @@ export type State = {
   updatedAt: string;
 };
 
+export type QueueEntryPublic = {
+  id: string;
+  songId: string;
+  title: string;
+  artist: string;
+  addedAt: string;
+};
+
 export type StatePublic = {
   acceptingRequests: boolean;
   nowPlayingId: string | null;
-  queueLength: number;
   /** Joined catalog info for the now-playing song, when set. */
-  nowPlaying?: { songId: string; title: string; artist: string } | null;
+  nowPlaying: { songId: string; title: string; artist: string } | null;
+  /** Full queue (oldest → newest). PII fields stripped. */
+  queue: QueueEntryPublic[];
 };
