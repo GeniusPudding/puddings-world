@@ -106,5 +106,5 @@ export async function PATCH(req: Request) {
     updatedAt: new Date().toISOString(),
   };
   await redis.set(KV_KEYS.state, next);
-  return Response.json(next);
+  return new Response(null, { status: 204 });
 }

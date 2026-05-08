@@ -42,17 +42,28 @@ export async function GET(req: Request) {
   return Response.json(enriched);
 }
 
-/** POST /api/ktv/queue — anonymous, audience submits a request. */
+/**
+ * POST /api/ktv/queue — submit a song request.
+ *
+ * Public by default (anonymous audience). When a valid bearer token is
+ * present, treats the caller as the performer and skips audience-only
+ * checks (rate-limit, duplicate, not_accepting). This unblocks the
+ * performer self-add flow described in `app/CLAUDE.md §1.5.10`.
+ */
 export async function POST(req: Request) {
   const redis = getRedis();
   if (!redis) {
     return Response.json({ error: "kv_unavailable" }, { status: 503 });
   }
 
+  const isPerformer = isAuthorized(req);
+
   const ipHash = hashIp(clientIp(req));
-  const allowed = await checkAndStampRateLimit(ipHash);
-  if (!allowed) {
-    return Response.json({ error: "rate_limit" }, { status: 429 });
+  if (!isPerformer) {
+    const allowed = await checkAndStampRateLimit(ipHash);
+    if (!allowed) {
+      return Response.json({ error: "rate_limit" }, { status: 429 });
+    }
   }
 
   let body: { songId?: string; requesterName?: string; message?: string };
@@ -70,19 +81,23 @@ export async function POST(req: Request) {
     return Response.json({ error: "unknown_song" }, { status: 404 });
   }
 
-  const state = await redis.get<State>(KV_KEYS.state);
-  if (state && !state.acceptingRequests) {
-    return Response.json({ error: "not_accepting" }, { status: 403 });
+  if (!isPerformer) {
+    const state = await redis.get<State>(KV_KEYS.state);
+    if (state && !state.acceptingRequests) {
+      return Response.json({ error: "not_accepting" }, { status: 403 });
+    }
   }
 
   const queue = (await redis.get<QueueItem[]>(KV_KEYS.queue)) ?? [];
-  const existing = queue.find((q) => q.songId === body.songId);
-  if (existing) {
-    const position = queue.indexOf(existing) + 1;
-    return Response.json(
-      { error: "duplicate", position, queueLength: queue.length },
-      { status: 409 },
-    );
+  if (!isPerformer) {
+    const existing = queue.find((q) => q.songId === body.songId);
+    if (existing) {
+      const position = queue.indexOf(existing) + 1;
+      return Response.json(
+        { error: "duplicate", position, queueLength: queue.length },
+        { status: 409 },
+      );
+    }
   }
 
   const item: QueueItem = {

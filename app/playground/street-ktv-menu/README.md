@@ -11,6 +11,18 @@ back which song is currently playing, so the web shows that live too.
 The performer app itself lives in a separate repo
 (`~/Desktop/StreetPerformerMaster/`); only the audience web is here.
 
+## Single source of truth for the cross-end contract
+
+> **The HTTP contract, error-code catalog, and catalog-id alignment rules
+> across web + iOS + Android are defined in
+> `~/Desktop/StreetPerformerMaster/app/CLAUDE.md` §1.5.**
+>
+> If anything in this README disagrees with that file, that file wins —
+> open a PR there to evolve the contract, then sync this side. The
+> sister handoff doc `~/Desktop/StreetPerformerMaster/docs/HANDOFF_TO_PUDDINGS_WORLD.md`
+> covers the puddings-world-internal details (KV schema, wireframes)
+> and is intended to be retired into this README once stable.
+
 ## Where the things live
 
 | Thing | File / location | Edited by |
@@ -158,7 +170,9 @@ Authorization: Bearer <KTV_PERFORMER_KEY>
 { "acceptingRequests": false, "nowPlayingId": "abc123" }
 ```
 
-### `POST /api/ktv/queue` — public
+Returns `204 No Content` on success.
+
+### `POST /api/ktv/queue` — public (with optional bearer)
 
 Submit a song request.
 
@@ -175,6 +189,14 @@ Content-Type: application/json
 - 409 `duplicate` — that song already in queue (returns its position)
 - 429 `rate_limit` — same IP submitted within the last 30 seconds
 - 503 `kv_unavailable` — backend not provisioned (see Setup below)
+
+**Bearer bypass for performer self-add**: when the request carries
+`Authorization: Bearer <KTV_PERFORMER_KEY>`, the rate-limit, duplicate,
+and `not_accepting` checks are skipped. This unblocks the
+performer-app flow where the performer adds their own pick to the
+queue from inside their app (resolves the open gap noted in
+`app/CLAUDE.md §1.5.10`). The `unknown_song` and `bad_request` checks
+still apply.
 
 The body also accepts optional `requesterName` and `message` (≤ 30 /
 ≤ 200 chars), but the audience UI no longer sends them. They're kept
@@ -249,32 +271,42 @@ KTV_PERFORMER_KEY=<your-32-char-key>
 
 ## Performer app integration (handoff)
 
-The performer iOS / Android app needs to do these things:
+The performer iOS / Android app needs to do these things. The
+authoritative version (with iOS-/Android-specific code snippets) is
+`StreetPerformerMaster/app/CLAUDE.md §1.5.5`; the summary below is
+just an index for the web-side reader.
 
 1. **Open of gig:** clear the queue + open it.
    - `DELETE /api/ktv/queue` (auth)
    - `PATCH /api/ktv/state { acceptingRequests: true, nowPlayingId: null }` (auth)
 2. **Display QR:** print or show a QR for
-   `https://puddings-world.com/playground/street-ktv-menu` (no query
-   params needed in v0).
-3. **Poll the queue every ~3 s:** `GET /api/ktv/queue` (auth). On a
-   delta vs the previous poll, fire an in-app notification (toast,
-   sound, vibration) so the performer notices a new request without
-   staring at the screen.
+   `https://puddings-world.com/playground/street-ktv-menu/` (note
+   trailing slash). No query params needed in v0.
+3. **Poll the queue every ~3 s** in foreground, **30 s** in background:
+   `GET /api/ktv/queue` (auth). On a delta vs the previous poll, fire
+   an in-app notification (toast, sound, vibration) so the performer
+   notices a new request without staring at the screen.
 4. **Manual playback:** the performer taps an item to play. App calls
    `PATCH /api/ktv/state { nowPlayingId: <id> }` (auth), then starts
    audio playback locally / through whatever speaker is hooked up.
    **Do not auto-play** — see "Playback mode" above.
-5. **When a song finishes / is skipped:**
+5. **Performer self-add** (performer adding their own pick from the
+   in-app songbook): `POST /api/ktv/queue { songId }` **with the
+   bearer header**. Bearer-presence skips audience-only checks
+   (rate-limit, duplicate, not_accepting), so the same endpoint
+   handles both audience and performer paths.
+6. **When a song finishes / is skipped:**
    `DELETE /api/ktv/queue/<id>` (auth) and
    `PATCH /api/ktv/state { nowPlayingId: <next?.id or null> }`.
-6. **Pause taking new requests** (e.g. between sets):
+7. **Pause taking new requests** (e.g. between sets):
    `PATCH /api/ktv/state { acceptingRequests: false }`.
-7. **End of gig:** as step 1, plus
+8. **End of gig:** as step 1, plus
    `PATCH /api/ktv/state { acceptingRequests: false, nowPlayingId: null }`.
 
 Auth is a single shared bearer token (`KTV_PERFORMER_KEY`) baked into
-the app's settings. It must never leave the app's local storage.
+the app's settings (iOS `Resources/Config.xcconfig` → Info.plist;
+Android `local.properties` → BuildConfig). It must never leave the
+app's local storage.
 
 ### App-side load discipline
 
