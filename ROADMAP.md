@@ -6,11 +6,17 @@ date-stamped note in the Done log at the bottom.
 ## Foundations — shipped
 
 - [x] Next.js 15 + Tailwind v4, deployed on Vercel
-- [x] 7-page nav: home, about, interests, projects, services, playground, contact
+- [x] 8-page nav: home, about, interests, musings, projects, services, playground, contact
 - [x] Per-project dynamic detail pages (`/projects/[slug]`) with hero slot, long description, prev/next
-- [x] Weekly GitHub Actions cron → `data/activity.json` (stars, issues, latest commit / release, weekly commit count)
+- [x] `/musings` 3D coverflow carousel (Swiper) for poems / lyrics / dessert stories
+- [x] `/interests` data-driven 5-section structure (`content/interests.ts`)
+- [x] Weekly GitHub Actions cron → `data/activity.json` (stars, issues, latest commit / release, weekly commit count). Manually triggerable via Run workflow.
 - [x] Visitor-routing terminal prompt (`whoami`) on home
-- [x] Domain `puddings-world.com` bought (Cloudflare Registrar)
+- [x] Domain `puddings-world.com` live with HTTPS via Vercel + Cloudflare DNS-only
+- [x] SEO basics: favicon, OG image, sitemap, robots, footer
+- [x] Hero rebrand: `Pudding builds the world.` + iteration banner
+- [x] Home contact section (mailto geniuspuddingforgames@gmail.com)
+- [x] **`/playground/street-ktv-menu` v0** — audience-side queue for street-KTV gigs (catalog + tap-to-request + 30s rate limit + Vercel KV backend). **Needs:** Upstash Redis attached on Vercel + `KTV_PERFORMER_KEY` env var. Spec lives at `~/Desktop/StreetPerformerMaster/audience_web/CLAUDE.md`. Performer iOS / Android app still in design.
 
 ## Now — next sprint
 
