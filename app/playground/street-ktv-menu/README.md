@@ -321,9 +321,15 @@ in the contract for future re-enable.
 
 ### `GET /api/ktv/queue` — performer-only
 
-Full queue with joined catalog info (and internal fields for the
-performer's own UI). Anonymous callers should use `GET /api/ktv/state`
-instead.
+Returns the raw `QueueItem[]` per the cross-end spec
+(`StreetPerformerMaster/app/CLAUDE.md §1.5.3`). Internal fields
+(`ipHash`, `cancelToken`) are stripped; the app joins `songId` to
+title/artist on its side using the catalog it cached at startup. The
+response is `Cache-Control: no-store` so the performer always sees a
+fresh queue.
+
+Anonymous callers should use `GET /api/ktv/state` (which is the
+audience-facing read with public-cache + edge cache).
 
 ### `DELETE /api/ktv/queue` — performer-only
 

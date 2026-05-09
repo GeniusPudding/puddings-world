@@ -14,7 +14,16 @@ export const dynamic = "force-dynamic";
 const MAX_NAME_LEN = 30;
 const MAX_MESSAGE_LEN = 200;
 
-/** GET /api/ktv/queue — performer-only, returns full queue with metadata. */
+/**
+ * GET /api/ktv/queue — performer-only. Returns raw QueueItem[] per spec
+ * (StreetPerformerMaster app/CLAUDE.md §1.5.3). Internal fields (ipHash,
+ * cancelToken) are stripped; the app joins songId → title/artist itself
+ * using its cached catalog (rev 3 §1.5.5).
+ *
+ * Strict deserializers (e.g. Kotlin kotlinx.serialization with default
+ * ignoreUnknownKeys=false) would throw on extra fields, so this route
+ * keeps the response surface tight to exactly what the spec lists.
+ */
 export async function GET(req: Request) {
   if (!isAuthorized(req)) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
@@ -23,30 +32,11 @@ export async function GET(req: Request) {
   if (!redis) {
     return Response.json({ error: "kv_unavailable" }, { status: 503 });
   }
-  const [queue, storedCatalog] = await redis.mget<
-    [QueueItem[] | null, Song[] | null]
-  >(KV_KEYS.queue, KV_KEYS.catalog);
-  const q = queue ?? [];
-  const cat =
-    storedCatalog && storedCatalog.length > 0 ? storedCatalog : seedCatalog;
-  // Strip internal fields (ipHash, cancelToken) and join catalog info.
-  const enriched = q.map(
-    ({ ipHash: _ipHash, cancelToken: _cancelToken, ...item }) => {
-      const song = cat.find((c) => c.id === item.songId);
-      return {
-        ...item,
-        song: song
-          ? {
-              title: song.title,
-              artist: song.artist,
-              language: song.language,
-              durationSec: song.durationSec,
-            }
-          : null,
-      };
-    },
+  const queue = (await redis.get<QueueItem[]>(KV_KEYS.queue)) ?? [];
+  const stripped = queue.map(
+    ({ ipHash: _ipHash, cancelToken: _cancelToken, ...item }) => item,
   );
-  return Response.json(enriched);
+  return Response.json(stripped, { headers: { "Cache-Control": "no-store" } });
 }
 
 /**
