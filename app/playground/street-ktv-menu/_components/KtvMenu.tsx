@@ -29,18 +29,16 @@ type MyRequest = {
 };
 
 const LANG_LABEL: Record<Song["language"], string> = {
-  zh: "中文",
+  zh: "中",
   en: "EN",
   jp: "日",
   ko: "韓",
   other: "—",
 };
 
-// Audience polls /api/ktv/state every 1 s for near-instant queue
-// updates ("performer adds song" / "another audience adds song" / "next
-// song" all show up within ~1-3 s). Edge cache (s-maxage=2) collapses
-// 50 phones × 60 polls/min into ~30 origin hits/min, so KV cost stays
-// flat regardless of audience size.
+// Audience polls /api/ktv/state every 1 s for near-instant queue updates.
+// Edge cache (s-maxage=2) collapses the high poll rate at the CDN, so KV
+// cost stays flat regardless of audience size.
 const POLL_INTERVAL_MS = 1000;
 const MY_REQUESTS_KEY = "ktv:my-requests";
 // Keep newly-added rows around at least this long before allowing the
@@ -117,7 +115,7 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
     });
   }, [fetchStatus]);
 
-  // Poll state every few seconds so audience sees queue advance + now-playing.
+  // Poll state every second so audience sees queue advance + now-playing.
   // Pauses when the tab is hidden — backgrounded phones don't need to keep
   // hammering the API.
   useEffect(() => {
@@ -126,8 +124,6 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
 
     async function load() {
       try {
-        // Hits Vercel's edge cache (s-maxage=2) most of the time; default
-        // browser cache mode is fine.
         const res = await fetch("/api/ktv/state");
         if (!res.ok) {
           if (cancelled) return;
@@ -288,8 +284,6 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
   async function cancelMyRequest(id: string) {
     const entry = myRequests.find((r) => r.id === id);
     if (!entry) return;
-    // Optimistic: remove locally first, restore only if the server
-    // explicitly says "you don't own this" (401).
     setMyRequests((prev) => {
       const next = prev.filter((r) => r.id !== id);
       saveMyRequests(next);
@@ -300,10 +294,7 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
         method: "DELETE",
         headers: { "X-Cancel-Token": entry.cancelToken },
       });
-      // 204 = deleted, 404 = already gone (performer beat us to it). Both fine.
       if (!res.ok && res.status === 401) {
-        // Token mismatch (shouldn't happen) — restore the entry so the user
-        // can try again or at least see it.
         setMyRequests((prev) => {
           const next = [...prev, entry];
           saveMyRequests(next);
@@ -319,60 +310,47 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
   // ── Render ────────────────────────────────────────────────────────────
 
   if (fetchStatus.kind === "loading") {
-    return (
-      <main className="mx-auto flex min-h-[60vh] w-full max-w-md items-center justify-center px-6 py-16">
-        <p className="font-mono text-sm text-ink-muted">loading…</p>
-      </main>
-    );
+    return <LoadingScreen />;
   }
-
   if (fetchStatus.kind === "service_unavailable") {
-    return (
-      <main className="mx-auto flex min-h-[60vh] w-full max-w-md flex-col items-center justify-center px-6 py-16 text-center">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent-amber">
-          street ktv
-        </p>
-        <h1 className="mt-4 text-2xl font-semibold tracking-tight">
-          Service warming up
-        </h1>
-        <p className="mt-3 text-sm text-ink-secondary">
-          The performer hasn&apos;t connected the queue yet. Please try again
-          in a moment.
-        </p>
-      </main>
-    );
+    return <ServiceUnavailableScreen />;
   }
-
   if (fetchStatus.kind === "error") {
-    return (
-      <main className="mx-auto flex min-h-[60vh] w-full max-w-md flex-col items-center justify-center px-6 py-16 text-center">
-        <h1 className="text-xl font-semibold">Something went wrong</h1>
-        <p className="mt-2 font-mono text-xs text-ink-muted">
-          {fetchStatus.message}
-        </p>
-      </main>
-    );
+    return <ErrorScreen message={fetchStatus.message} />;
   }
 
   const { state } = fetchStatus;
   const closed = !state.acceptingRequests;
-  const queueEmpty = !state.nowPlaying && state.queue.length === 0;
+  const queueCount =
+    state.queue.length + (state.nowPlaying ? 1 : 0);
 
   return (
-    <main className="mx-auto w-full max-w-md px-5 pb-32 pt-10">
-      <header className="mb-6">
-        <p className="font-mono text-xs uppercase tracking-[0.25em] text-accent">
-          street ktv
-        </p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight">
+    <main className="mx-auto w-full max-w-md px-5 pb-32 pt-8 sm:max-w-lg sm:px-6 sm:pt-12">
+      {/* Compact header: brand mark + live status pill */}
+      <header className="mb-7">
+        <div className="flex items-center justify-between gap-3">
+          <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent">
+            street ktv
+          </p>
+          <LiveStatus
+            closed={closed}
+            songCount={catalog.length}
+            queueCount={queueCount}
+          />
+        </div>
+        <h1 className="mt-5 font-serif text-[2.25rem] font-semibold leading-[1.1] tracking-tight sm:text-5xl">
           Pick a song.
         </h1>
-        <p className="mt-2 text-sm text-ink-secondary">
-          Tap any song to add it to the live queue. Updates every few seconds.
+        <p className="mt-3 text-[15px] leading-relaxed text-ink-secondary">
+          Tap any song below to add it to the live queue. Updates within a second.
         </p>
         {closed && (
-          <div className="mt-4 rounded-md border border-accent-amber/40 bg-accent-amber/10 px-3 py-2 font-mono text-xs text-accent-amber">
-            queue closed — performer not accepting new requests right now
+          <div className="mt-5 flex items-start gap-2 rounded-lg border border-accent-amber/40 bg-accent-amber/10 px-3.5 py-2.5 text-[13px] text-accent-amber">
+            <span aria-hidden className="mt-0.5">⏸</span>
+            <span>
+              <span className="font-medium">Queue is paused.</span> The performer
+              isn’t accepting new requests right now.
+            </span>
           </div>
         )}
       </header>
@@ -383,58 +361,20 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
         onCancel={cancelMyRequest}
       />
 
-      <div className="sticky top-[68px] z-10 -mx-5 mb-4 bg-bg-base/85 px-5 py-3 backdrop-blur">
-        <input
-          type="search"
-          inputMode="search"
-          placeholder="search by title, artist, tag…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="w-full rounded-lg border border-bg-border bg-bg-panel px-4 py-3 text-base text-ink-primary placeholder:text-ink-muted focus:border-accent focus:outline-none"
-          aria-label="search songs"
-        />
+      {/* Sticky search — backdrop blur lets the song list scroll under it.
+          Top offset clears the site nav (which is also sticky `top-0`).
+          Mobile nav wraps to 2-3 rows so we leave more room there. */}
+      <div className="sticky top-[100px] z-10 -mx-5 mb-3 bg-bg-base/90 px-5 pb-3 pt-2 backdrop-blur-md sm:top-[60px] sm:-mx-6 sm:px-6">
+        <SearchBar value={query} onChange={setQuery} />
       </div>
 
-      <ul className="space-y-2">
-        {filtered.length === 0 && (
-          <li className="rounded-lg border border-bg-border bg-bg-panel/40 px-4 py-6 text-center font-mono text-sm text-ink-muted">
-            no matches for &ldquo;{query}&rdquo;
-          </li>
-        )}
-        {filtered.map((song) => {
-          const alreadyQueued = queuedSongIds.has(song.id);
-          return (
-            <li key={song.id}>
-              <button
-                type="button"
-                onClick={() => openSheet(song)}
-                disabled={closed || alreadyQueued}
-                className="flex w-full items-baseline justify-between gap-3 rounded-lg border border-bg-border bg-bg-panel px-4 py-3.5 text-left transition-colors hover:border-accent hover:bg-bg-raised disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-bg-border disabled:hover:bg-bg-panel"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-base text-ink-primary">
-                    {song.title}
-                  </div>
-                  <div className="mt-0.5 truncate font-mono text-xs text-ink-muted">
-                    {song.artist}
-                    {song.tags?.length
-                      ? ` · ${song.tags.slice(0, 2).join(" / ")}`
-                      : ""}
-                    {alreadyQueued && (
-                      <span className="ml-2 text-accent-amber">
-                        · already queued
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <span className="shrink-0 rounded border border-bg-border bg-bg-raised px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-ink-muted">
-                  {LANG_LABEL[song.language]}
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      <SongList
+        songs={filtered}
+        query={query}
+        queuedSongIds={queuedSongIds}
+        closed={closed}
+        onPick={openSheet}
+      />
 
       {selected && (
         <ConfirmSheet
@@ -448,6 +388,39 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
   );
 }
 
+// ── Header status ───────────────────────────────────────────────────────
+
+function LiveStatus({
+  closed,
+  songCount,
+  queueCount,
+}: {
+  closed: boolean;
+  songCount: number;
+  queueCount: number;
+}) {
+  if (closed) {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-accent-amber/30 bg-accent-amber/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-accent-amber">
+        <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-accent-amber" />
+        paused
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-accent-green/30 bg-accent-green/5 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-accent-green">
+      <span
+        aria-hidden
+        className="ktv-pulse h-1.5 w-1.5 rounded-full bg-accent-green"
+      />
+      live · {songCount} song{songCount === 1 ? "" : "s"}
+      {queueCount > 0 && <span> · {queueCount} queued</span>}
+    </span>
+  );
+}
+
+// ── Queue + Now Playing card ───────────────────────────────────────────
+
 function LiveQueue({
   state,
   myIds,
@@ -457,76 +430,91 @@ function LiveQueue({
   myIds: Set<string>;
   onCancel: (id: string) => void;
 }) {
-  const empty = !state.nowPlaying && state.queue.length === 0;
+  const { nowPlaying, queue } = state;
+  const empty = !nowPlaying && queue.length === 0;
 
   if (empty) {
     return (
-      <section className="mb-6 rounded-xl border border-dashed border-bg-border bg-bg-panel/40 px-4 py-5 text-center">
+      <section className="ktv-fade-in mb-7 rounded-2xl border border-dashed border-bg-border bg-bg-panel/40 px-5 py-7 text-center">
         <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink-muted">
           live queue
         </p>
-        <p className="mt-2 text-sm text-ink-secondary">
-          Queue is empty. Be the first to pick a song.
+        <p className="mt-2.5 text-[15px] text-ink-secondary">
+          Empty.
+        </p>
+        <p className="mt-1 text-[13px] text-ink-muted">
+          Be the first to pick a song.
         </p>
       </section>
     );
   }
 
   return (
-    <section className="mb-6 space-y-3">
-      {state.nowPlaying && (
-        <div className="rounded-xl border border-accent-green/40 bg-accent-green/5 px-4 py-3.5">
+    <section className="mb-7 space-y-3">
+      {nowPlaying && (
+        <div
+          className="ktv-fade-in relative overflow-hidden rounded-2xl border border-accent-green/40 px-5 py-4"
+          style={{
+            background:
+              "linear-gradient(135deg, color-mix(in srgb, var(--color-accent-green) 8%, transparent), color-mix(in srgb, var(--color-accent-green) 2%, transparent))",
+          }}
+        >
           <div className="flex items-center gap-2">
             <span
-              className="inline-block h-2 w-2 rounded-full bg-accent-green"
               aria-hidden
+              className="ktv-pulse inline-block h-2 w-2 rounded-full bg-accent-green"
             />
             <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent-green">
               now playing
             </p>
           </div>
-          <p className="mt-1.5 text-base text-ink-primary">
-            {state.nowPlaying.title}
+          <p className="mt-2 truncate text-lg font-medium leading-snug text-ink-primary">
+            {nowPlaying.title}
           </p>
-          <p className="font-mono text-xs text-ink-muted">
-            {state.nowPlaying.artist}
+          <p className="mt-0.5 truncate font-mono text-xs text-ink-muted">
+            {nowPlaying.artist}
           </p>
         </div>
       )}
 
-      {state.queue.length > 0 && (
-        <div className="rounded-xl border border-bg-border bg-bg-panel px-4 py-3.5">
-          <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink-muted">
-            up next ({state.queue.length})
-          </p>
-          <ol className="mt-2 space-y-1.5 text-sm">
-            {state.queue.slice(0, 5).map((q, i) => {
+      {queue.length > 0 && (
+        <div className="rounded-2xl border border-bg-border bg-bg-panel px-5 py-4">
+          <div className="flex items-center justify-between">
+            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink-muted">
+              up next
+            </p>
+            <span className="rounded-full bg-bg-raised px-2 py-0.5 font-mono text-[10px] text-ink-secondary">
+              {queue.length}
+            </span>
+          </div>
+          <ol className="mt-3 space-y-2.5">
+            {queue.slice(0, 5).map((q, i) => {
               const mine = myIds.has(q.id);
               return (
                 <li
                   key={q.id}
-                  className="flex items-center gap-2"
+                  className="ktv-fade-in flex items-center gap-3"
                 >
-                  <span className="shrink-0 font-mono text-[10px] text-ink-muted">
-                    {String(i + 1).padStart(2, "0")}.
+                  <span className="w-5 shrink-0 font-mono text-[11px] tabular-nums text-ink-muted">
+                    {String(i + 1).padStart(2, "0")}
                   </span>
-                  <span className="min-w-0 flex-1 truncate">
-                    <span className="text-ink-primary">{q.title}</span>
-                    <span className="ml-1 font-mono text-[10px] text-ink-muted">
-                      · {q.artist}
-                    </span>
-                    {mine && (
-                      <span className="ml-1.5 font-mono text-[10px] text-accent">
-                        · yours
-                      </span>
-                    )}
-                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[14px] text-ink-primary">
+                      {q.title}
+                    </p>
+                    <p className="mt-0.5 truncate font-mono text-[11px] text-ink-muted">
+                      {q.artist}
+                      {mine && (
+                        <span className="ml-1.5 text-accent">· yours</span>
+                      )}
+                    </p>
+                  </div>
                   {mine && (
                     <button
                       type="button"
                       onClick={() => onCancel(q.id)}
                       aria-label={`cancel ${q.title}`}
-                      className="-mr-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-bg-border bg-bg-raised font-mono text-xs text-ink-muted transition-colors hover:border-accent-red hover:text-accent-red"
+                      className="-mr-1 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-bg-border bg-bg-raised text-base text-ink-muted transition-colors hover:border-accent-red/50 hover:bg-accent-red/10 hover:text-accent-red active:scale-95"
                     >
                       ✕
                     </button>
@@ -534,9 +522,9 @@ function LiveQueue({
                 </li>
               );
             })}
-            {state.queue.length > 5 && (
-              <li className="font-mono text-[10px] text-ink-muted">
-                + {state.queue.length - 5} more queued
+            {queue.length > 5 && (
+              <li className="pt-1 font-mono text-[11px] text-ink-muted">
+                + {queue.length - 5} more queued
               </li>
             )}
           </ol>
@@ -545,6 +533,134 @@ function LiveQueue({
     </section>
   );
 }
+
+// ── Search ──────────────────────────────────────────────────────────────
+
+function SearchBar({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="relative">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-mono text-sm text-ink-muted"
+      >
+        ⌕
+      </span>
+      <input
+        type="search"
+        inputMode="search"
+        autoComplete="off"
+        autoCorrect="off"
+        spellCheck={false}
+        placeholder="search title, artist, tag…"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-xl border border-bg-border bg-bg-panel pl-10 pr-12 py-3.5 text-[15px] text-ink-primary placeholder:text-ink-muted focus:border-accent focus:bg-bg-raised focus:outline-none focus:ring-2 focus:ring-accent/20"
+        aria-label="search songs"
+      />
+      {value && (
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          aria-label="clear search"
+          className="absolute right-2 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-bg-raised hover:text-ink-primary active:scale-95"
+        >
+          ✕
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ── Songbook list ───────────────────────────────────────────────────────
+
+function SongList({
+  songs,
+  query,
+  queuedSongIds,
+  closed,
+  onPick,
+}: {
+  songs: Song[];
+  query: string;
+  queuedSongIds: Set<string>;
+  closed: boolean;
+  onPick: (s: Song) => void;
+}) {
+  if (songs.length === 0) {
+    return (
+      <div className="rounded-xl border border-dashed border-bg-border bg-bg-panel/30 px-4 py-10 text-center">
+        <p className="font-mono text-sm text-ink-muted">
+          no matches for &ldquo;{query}&rdquo;
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <ul className="space-y-2">
+      {songs.map((song) => {
+        const alreadyQueued = queuedSongIds.has(song.id);
+        const disabled = closed || alreadyQueued;
+        return (
+          <li key={song.id}>
+            <button
+              type="button"
+              onClick={() => onPick(song)}
+              disabled={disabled}
+              className="group flex w-full min-h-[60px] items-center justify-between gap-3 rounded-xl border border-bg-border bg-bg-panel px-4 py-3.5 text-left transition-all hover:border-accent/60 hover:bg-bg-raised active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-bg-border disabled:hover:bg-bg-panel disabled:active:scale-100"
+            >
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[15px] leading-tight text-ink-primary">
+                  {song.title}
+                </div>
+                <div className="mt-1 flex items-center gap-1.5 truncate font-mono text-[11px] text-ink-muted">
+                  <span className="truncate">{song.artist}</span>
+                  {song.tags && song.tags.length > 0 && (
+                    <>
+                      <span aria-hidden>·</span>
+                      <span className="truncate">
+                        {song.tags.slice(0, 2).join(" / ")}
+                      </span>
+                    </>
+                  )}
+                  {alreadyQueued && (
+                    <>
+                      <span aria-hidden>·</span>
+                      <span className="text-accent-amber">in queue</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              <LangChip lang={song.language} />
+              <span
+                aria-hidden
+                className="-mr-1 hidden text-ink-muted transition-colors group-hover:text-accent group-disabled:opacity-0 sm:inline"
+              >
+                ›
+              </span>
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function LangChip({ lang }: { lang: Song["language"] }) {
+  return (
+    <span className="shrink-0 rounded-md border border-bg-border bg-bg-raised px-1.5 py-0.5 font-mono text-[10px] tracking-wider text-ink-secondary">
+      {LANG_LABEL[lang]}
+    </span>
+  );
+}
+
+// ── Confirm bottom-sheet / modal ────────────────────────────────────────
 
 function ConfirmSheet({
   song,
@@ -563,51 +679,60 @@ function ConfirmSheet({
       role="dialog"
       aria-modal="true"
       aria-label="confirm song request"
-      className="fixed inset-0 z-50 flex items-end justify-center bg-bg-base/70 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-bg-base/75 backdrop-blur-sm sm:items-center"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-t-2xl border border-bg-border bg-bg-panel p-6 sm:rounded-2xl"
+        className="ktv-fade-in w-full max-w-md rounded-t-3xl border border-bg-border bg-bg-panel p-6 pb-8 sm:rounded-3xl sm:pb-6"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Grab handle for mobile bottom sheet */}
+        <div
+          aria-hidden
+          className="mx-auto mb-5 h-1 w-10 rounded-full bg-bg-border sm:hidden"
+        />
+
         {!submitted ? (
           <>
             <header>
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-muted">
+              <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink-muted">
                 add to queue?
               </p>
-              <h2 className="mt-1.5 text-2xl font-semibold tracking-tight">
+              <h2 className="mt-2 text-2xl font-semibold leading-tight tracking-tight">
                 {song.title}
               </h2>
-              <p className="mt-0.5 font-mono text-sm text-ink-muted">
+              <p className="mt-1 font-mono text-sm text-ink-secondary">
                 {song.artist}
               </p>
             </header>
 
             {submit.kind === "rate_limit" && (
-              <p className="mt-4 text-sm text-accent-amber">
-                Just sent one — give it 30 seconds and try again.
-              </p>
+              <FeedbackLine
+                tone="warn"
+                text="Just sent one — give it 30 seconds and try again."
+              />
             )}
             {submit.kind === "duplicate" && (
-              <p className="mt-4 text-sm text-accent-amber">
-                Already in queue — currently #{submit.position}.
-              </p>
+              <FeedbackLine
+                tone="warn"
+                text={`Already in queue — currently #${submit.position}.`}
+              />
             )}
             {submit.kind === "not_accepting" && (
-              <p className="mt-4 text-sm text-accent-amber">
-                Queue just closed. Catch the performer next set.
-              </p>
+              <FeedbackLine
+                tone="warn"
+                text="Queue just closed. Catch the performer next set."
+              />
             )}
             {submit.kind === "error" && (
-              <p className="mt-4 text-sm text-accent-red">{submit.message}</p>
+              <FeedbackLine tone="error" text={submit.message} />
             )}
 
             <div className="mt-7 flex gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 rounded-lg border border-bg-border bg-bg-raised py-3.5 font-mono text-sm text-ink-secondary transition-colors hover:text-ink-primary"
+                className="flex-1 rounded-xl border border-bg-border bg-bg-raised py-4 font-mono text-sm text-ink-secondary transition-colors hover:text-ink-primary active:scale-[0.99]"
               >
                 cancel
               </button>
@@ -615,32 +740,122 @@ function ConfirmSheet({
                 type="button"
                 onClick={onConfirm}
                 disabled={submit.kind === "submitting"}
-                className="flex-[2] rounded-lg border border-accent bg-accent/15 py-3.5 font-mono text-sm text-accent transition-colors hover:bg-accent/25 disabled:opacity-50"
+                className="flex-[2] rounded-xl border border-accent bg-accent/15 py-4 font-mono text-sm font-medium text-accent transition-all hover:bg-accent/25 active:scale-[0.99] disabled:opacity-50 disabled:active:scale-100"
               >
                 {submit.kind === "submitting" ? "sending…" : "confirm →"}
               </button>
             </div>
           </>
         ) : (
-          <div className="py-4 text-center">
-            <p className="font-mono text-3xl text-accent-green">✓</p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight">
+          <div className="py-2 text-center">
+            <div
+              aria-hidden
+              className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-accent-green/40 bg-accent-green/10 font-mono text-3xl text-accent-green"
+            >
+              ✓
+            </div>
+            <h2 className="mt-5 text-2xl font-semibold leading-tight tracking-tight">
               Added.
             </h2>
-            <p className="mt-2 text-sm text-ink-secondary">
-              <span className="text-ink-primary">{song.title}</span> queued at{" "}
-              <span className="font-mono text-accent">#{submit.position}</span>.
+            <p className="mt-2 text-[15px] text-ink-secondary">
+              <span className="text-ink-primary">{song.title}</span> is{" "}
+              <span className="font-mono text-accent">
+                #{submit.position}
+              </span>{" "}
+              in line.
             </p>
             <button
               type="button"
               onClick={onClose}
-              className="mt-6 w-full rounded-lg border border-bg-border bg-bg-raised py-3 font-mono text-sm text-ink-primary transition-colors hover:bg-bg-panel"
+              className="mt-7 w-full rounded-xl border border-bg-border bg-bg-raised py-4 font-mono text-sm text-ink-primary transition-colors hover:bg-bg-panel active:scale-[0.99]"
             >
-              pick another song →
+              pick another →
             </button>
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+function FeedbackLine({
+  tone,
+  text,
+}: {
+  tone: "warn" | "error";
+  text: string;
+}) {
+  const colors =
+    tone === "warn"
+      ? "border-accent-amber/40 bg-accent-amber/10 text-accent-amber"
+      : "border-accent-red/40 bg-accent-red/10 text-accent-red";
+  return (
+    <p
+      className={`mt-5 rounded-lg border px-3.5 py-2.5 text-[13px] ${colors}`}
+    >
+      {text}
+    </p>
+  );
+}
+
+// ── Boundary states ─────────────────────────────────────────────────────
+
+function LoadingScreen() {
+  return (
+    <main className="mx-auto w-full max-w-md px-5 pt-12 sm:max-w-lg sm:px-6">
+      <div className="flex items-center justify-between">
+        <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent">
+          street ktv
+        </p>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-bg-border bg-bg-panel px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-ink-muted" />
+          loading
+        </span>
+      </div>
+      <div className="mt-7 h-12 w-2/3 animate-pulse rounded-md bg-bg-panel" />
+      <div className="mt-3 h-4 w-3/4 animate-pulse rounded-md bg-bg-panel" />
+      <div className="mt-7 h-24 animate-pulse rounded-2xl bg-bg-panel" />
+      <div className="mt-3 h-12 animate-pulse rounded-xl bg-bg-panel" />
+      <div className="mt-3 space-y-2">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-[60px] animate-pulse rounded-xl bg-bg-panel"
+          />
+        ))}
+      </div>
+    </main>
+  );
+}
+
+function ServiceUnavailableScreen() {
+  return (
+    <main className="mx-auto flex min-h-[70vh] w-full max-w-md flex-col items-center justify-center px-6 text-center">
+      <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent-amber">
+        street ktv
+      </p>
+      <h1 className="mt-5 font-serif text-3xl font-semibold tracking-tight">
+        Warming up.
+      </h1>
+      <p className="mt-3 max-w-xs text-[15px] leading-relaxed text-ink-secondary">
+        The performer hasn’t connected the queue yet. Try again in a moment.
+      </p>
+    </main>
+  );
+}
+
+function ErrorScreen({ message }: { message: string }) {
+  return (
+    <main className="mx-auto flex min-h-[70vh] w-full max-w-md flex-col items-center justify-center px-6 text-center">
+      <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent-red">
+        something went wrong
+      </p>
+      <h1 className="mt-5 font-serif text-3xl font-semibold tracking-tight">
+        Couldn’t load.
+      </h1>
+      <p className="mt-3 max-w-xs font-mono text-xs text-ink-muted">
+        {message}
+      </p>
+    </main>
   );
 }

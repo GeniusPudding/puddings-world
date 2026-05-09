@@ -94,3 +94,34 @@ body {
   font-size: 16px;
   font-weight: 700;
 }
+
+/* ---------- Street KTV: live indicator pulse ---------- */
+@keyframes ktv-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent-green) 60%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+.ktv-pulse {
+  animation: ktv-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Subtle slide-up entrance for queue rows / now playing */
+@keyframes ktv-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.ktv-fade-in {
+  animation: ktv-fade-in 0.25s ease-out both;
+}
