@@ -115,8 +115,9 @@ it by id and will orphan if the slug disappears.
                                                               (bulk seed/reset — bearer)
 
    GET  /api/ktv/state ─────────► ktv:state ─────────────►  PATCH /api/ktv/state
-        (poll every 5s,                                       (set nowPlayingId,
-         public)                                               flip acceptingRequests)
+        (poll every 1s,                                       (set nowPlayingId,
+         edge-cached 2s,                                       flip acceptingRequests)
+         public)
 
    POST /api/ktv/queue ─────────► ktv:queue ─────────────►  GET  /api/ktv/queue
         (anonymous,                                           (poll every 3s,
@@ -490,15 +491,17 @@ down with three layers:
 
 ### Worst-case math
 
-A 2-hour gig with 50 simultaneous audience members polling every 5 s,
+A 2-hour gig with 50 simultaneous audience members polling every 1 s,
 all foregrounded, all hitting the same Vercel edge node:
 
 | Naive (no edge cache) | Optimized |
 |---|---|
-| 50 phones × 1440 polls × 2 KV ops = **144 000 ops** | edge serves cache; origin hits ≈ 30 / min × 120 min = 3600 origin requests × 1 op (mget) = **3600 ops** |
+| 50 phones × 7200 polls × 1 mget op = **360 000 ops** | edge serves cache; origin hits ≈ 30 / min × 120 min = 3600 origin requests × 1 op (mget) = **3600 ops** |
 
-That's ~40× reduction. Free tier daily limit (10 000) covers a couple
-gigs / day.
+That's a ~100× reduction. The KV op count doesn't grow with the audience
+poll frequency — once each 2 s window's first request populates the
+edge cache, every other phone in that window is served by the CDN. Free
+tier daily limit (10 000) still covers a couple of gigs / day.
 
 The performer app's `GET /api/ktv/queue` polling (one client, every 3 s)
 adds ~2400 ops per gig and is left uncached so the performer sees fresh
@@ -507,8 +510,8 @@ state quickly.
 ### What to watch in production
 
 - Upstash dashboard → **Usage** → daily commands. If close to 8000+,
-  raise `s-maxage` (e.g. to 3 s) or increase `POLL_INTERVAL_MS` (e.g.
-  to 7 s).
+  raise `s-maxage` (e.g. to 3 s) or back `POLL_INTERVAL_MS` off from
+  1 s toward 2-3 s.
 - Vercel dashboard → **Analytics → Function invocations** for
   `/api/ktv/state`. Should be much lower than client poll count
   thanks to the cache.

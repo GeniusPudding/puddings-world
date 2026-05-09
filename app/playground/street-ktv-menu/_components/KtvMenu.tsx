@@ -36,7 +36,12 @@ const LANG_LABEL: Record<Song["language"], string> = {
   other: "—",
 };
 
-const POLL_INTERVAL_MS = 5000;
+// Audience polls /api/ktv/state every 1 s for near-instant queue
+// updates ("performer adds song" / "another audience adds song" / "next
+// song" all show up within ~1-3 s). Edge cache (s-maxage=2) collapses
+// 50 phones × 60 polls/min into ~30 origin hits/min, so KV cost stays
+// flat regardless of audience size.
+const POLL_INTERVAL_MS = 1000;
 const MY_REQUESTS_KEY = "ktv:my-requests";
 // Keep newly-added rows around at least this long before allowing the
 // "not in live queue → prune" rule to drop them. Edge cache on /state can
