@@ -27,7 +27,7 @@ The performer app itself lives in a separate repo
 
 | Thing | File / location | Edited by |
 |---|---|---|
-| **Songbook** (catalog) — live | Vercel KV, key `ktv:catalog` | Performer app via `PUT /api/ktv/catalog` |
+| **Songbook** (catalog) — live | Vercel KV, key `ktv:catalog` | Performer app via `POST` / `DELETE` / `PUT` `/api/ktv/catalog`; one-shot seed via `tools/push_catalog_to_server.py` |
 | **Songbook** — seed / fallback | [`content/ktv-catalog.ts`](../../../content/ktv-catalog.ts) | You, only when seeding a fresh deploy |
 | Audience UI | [`page.tsx`](./page.tsx) + [`_components/KtvMenu.tsx`](./_components/KtvMenu.tsx) | Engineering |
 | API route handlers | [`app/api/ktv/`](../../api/ktv/) | Engineering |
@@ -37,11 +37,22 @@ The performer app itself lives in a separate repo
 
 ### Editing the songbook (live, post-deploy)
 
-The performer app owns the catalog. After processing new accompaniment
-files (Demucs → m4a → sync to phone), the app's sync script also calls
-`PUT /api/ktv/catalog` with the full list. The audience page revalidates
-within seconds (the PUT handler busts the page's `ktv-catalog` cache tag
-via `revalidateTag`).
+Catalog is fully KV-backed and shared between the audience web and the
+performer app. The performer app is the only writer; the audience web
+is read-only.
+
+Three ways the catalog gets mutated:
+
+- `POST /api/ktv/catalog` — performer adds or edits one song from inside
+  the app's songbook tab (upsert by id).
+- `DELETE /api/ktv/catalog/:id` — performer removes a song from inside
+  the app.
+- `PUT /api/ktv/catalog` — one-shot bulk seed / reset; called by the
+  performer's `tools/push_catalog_to_server.py` (in the StreetPerformer
+  repo) at first deploy or when restoring a known-good baseline.
+
+Every mutation calls `revalidateTag('ktv-catalog')`, so the audience
+page reflects changes within ~1 s.
 
 You should not need to touch this repo to add or remove songs.
 
@@ -94,9 +105,14 @@ it by id and will orphan if the slug disappears.
    Audience phone (web)            Vercel KV                Performer app
                                   (single source             (iOS / Android)
                                    of truth)
-   GET  /api/ktv/catalog ───────► ktv:catalog ───────────►  PUT  /api/ktv/catalog
-   (server component, ISR 30s,                                (sync script after
-    revalidated on PUT)                                        Demucs/encode, bearer)
+   GET  /api/ktv/catalog ◄─────── ktv:catalog ◄──────────►  GET  /api/ktv/catalog
+   (server component, ISR 30s,                                (on launch, cache locally)
+    revalidated on writes)                                  POST /api/ktv/catalog
+                                                              (upsert one — bearer)
+                                                            DELETE /api/ktv/catalog/:id
+                                                              (remove one — bearer)
+                                                            PUT /api/ktv/catalog
+                                                              (bulk seed/reset — bearer)
 
    GET  /api/ktv/state ─────────► ktv:state ─────────────►  PATCH /api/ktv/state
         (poll every 5s,                                       (set nowPlayingId,
@@ -104,11 +120,11 @@ it by id and will orphan if the slug disappears.
 
    POST /api/ktv/queue ─────────► ktv:queue ─────────────►  GET  /api/ktv/queue
         (anonymous,                                           (poll every 3s,
-         rate-limited)                                         bearer auth)
-                                                            DELETE /api/ktv/queue/:id
-                                                              (after singing it)
-                                                            DELETE /api/ktv/queue
-                                                              (clear all between gigs)
+         rate-limited;                                         bearer auth)
+         returns cancelToken)                               DELETE /api/ktv/queue/:id
+   DELETE /api/ktv/queue/:id                                  (after singing it)
+        (X-Cancel-Token,                                    DELETE /api/ktv/queue
+         audience self-cancel)                                (clear all between gigs)
 ```
 
 A typical request → playback round-trip:
@@ -163,48 +179,80 @@ All endpoints under `/api/ktv/`. All return JSON unless noted.
 
 ### `GET /api/ktv/catalog` — public
 
-Returns the live songbook. Edge-cached for 60 s
-(`Cache-Control: public, s-maxage=60, stale-while-revalidate=120`); the
-PUT handler calls `revalidateTag('ktv-catalog')` to publish updates
-without waiting for the cache to expire.
+Returns the live songbook as a raw `CatalogSong[]` array (matches the
+cross-end spec in `StreetPerformerMaster/app/CLAUDE.md §1.5.3`).
+Edge-cached for 60 s (`Cache-Control: public, s-maxage=60,
+stale-while-revalidate=120`); every catalog mutation calls
+`revalidateTag('ktv-catalog')` to publish within ~1 s.
 
 ```json
-{
-  "songs": [
-    { "id": "moon-tells-my-heart", "title": "月亮代表我的心", "artist": "鄧麗君",
-      "language": "zh", "key": "C", "durationSec": 220, "tags": ["ballad", "classic"] }
-  ]
-}
+[
+  { "id": "moon-tells-my-heart", "title": "月亮代表我的心", "artist": "鄧麗君",
+    "language": "zh", "key": "C", "durationSec": 220, "tags": ["ballad", "classic"] }
+]
 ```
 
 If KV is unset or empty, falls back to `content/ktv-catalog.ts`.
 
+### `POST /api/ktv/catalog` — performer-only
+
+Upsert one song by id (insert or replace). For runtime catalog edits
+from the performer app's songbook tab.
+
+```http
+POST /api/ktv/catalog
+Authorization: Bearer <KTV_PERFORMER_KEY>
+Content-Type: application/json
+
+{ "id": "moon-tells-my-heart", "title": "月亮代表我的心", "artist": "鄧麗君", "language": "zh", ... }
+```
+
+- 200 — returns the upserted Song row
+- 400 `bad_request` with `message` — validation failed
+- 401 `unauthorized` — missing / wrong bearer
+- 503 `kv_unavailable`
+
+### `DELETE /api/ktv/catalog/:id` — performer-only
+
+Removes one song from the catalog. **Does not cascade** into
+`ktv:queue` — rows in the live queue that reference this id stay there.
+The performer app decides whether to clean those up too.
+
+- 204 — removed
+- 404 `not_found` — id wasn't in the catalog
+- 401 `unauthorized`
+- 503 `kv_unavailable`
+
 ### `PUT /api/ktv/catalog` — performer-only
 
-Idempotent replace. The performer app sends the full list every sync;
-the server overwrites `ktv:catalog` with whatever it receives.
+Idempotent replace of the entire songbook. Used by the performer's
+`tools/push_catalog_to_server.py` for bulk seed / reset.
 
 ```http
 PUT /api/ktv/catalog
 Authorization: Bearer <KTV_PERFORMER_KEY>
 Content-Type: application/json
 
-{ "songs": [ { "id": "...", "title": "...", "artist": "...", "language": "zh", ... }, ... ] }
+[ { "id": "...", "title": "...", "artist": "...", "language": "zh", ... }, ... ]
 ```
 
-- 200 `{ count }` — replaced
+Body is a raw `CatalogSong[]` array per the spec; a `{ songs: [...] }`
+wrapper is also accepted for ergonomic backwards compat.
+
+- 200 — returns the upserted `CatalogSong[]`
 - 400 `bad_request` with `message` — validation failed (see below)
-- 401 `unauthorized` — missing / wrong bearer
-- 503 `kv_unavailable` — backend not provisioned
+- 401 `unauthorized`
+- 503 `kv_unavailable`
 
-Validation rules (any failure → 400 with explanation):
+Validation rules (apply to both `POST` body and each item under `PUT.songs`):
 
-- body must be `{ songs: Song[] }`
-- `id`: required, must match `/^[a-z0-9][a-z0-9-]{0,63}$/`, unique within payload
+- `id`: required, must match `/^[a-z0-9][a-z0-9-]{0,63}$/`; unique within
+  a `PUT` payload
 - `title`, `artist`: required non-empty strings
 - `language`: required, one of `zh | en | jp | ko | other`
-- `key`, `durationSec`, `tags`: optional, lightly validated
-- max `5000` songs per payload
+- `key`, `durationSec`, `tags`, `keyOffset`, `genderVariant`, `category`:
+  optional, lightly validated; unknown fields are silently dropped
+- `PUT` cap: 5000 songs per payload
 
 ### `GET /api/ktv/state` — public
 

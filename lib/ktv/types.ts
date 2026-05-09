@@ -6,10 +6,15 @@ export type Song = {
   title: string;
   artist: string;
   language: SongLanguage;
-  /** Optional performance key, e.g. "C major" / "Capo 3". */
+  /** Optional descriptive musical key, e.g. "C major" / "Capo 3". */
   key?: string;
   durationSec?: number;
   tags?: string[];
+  /** Performer's pitch transposition in semitones (e.g. -2 = down 2 semitones). */
+  keyOffset?: number;
+  genderVariant?: "female" | "male" | null;
+  /** Loose grouping label, e.g. "mandarin_pop". */
+  category?: string;
 };
 
 export type QueueItem = {
