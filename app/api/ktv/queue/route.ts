@@ -2,17 +2,22 @@ import { nanoid } from "nanoid";
 import { catalog as seedCatalog } from "@/content/ktv-catalog";
 import { isAuthorized } from "@/lib/ktv/auth";
 import { getRedis, KV_KEYS } from "@/lib/ktv/kv";
-import {
-  checkAndStampRateLimit,
-  clientIp,
-  hashIp,
-} from "@/lib/ktv/rate-limit";
+import { clientIp, hashIp } from "@/lib/ktv/rate-limit";
 import type { QueueItem, Song, State } from "@/lib/ktv/types";
 
 export const dynamic = "force-dynamic";
 
 const MAX_NAME_LEN = 30;
 const MAX_MESSAGE_LEN = 200;
+/**
+ * Per-IP cap on how many requests can sit in the live queue at once.
+ * Replaces the old "30 s cooldown per IP" rule: time-based was too
+ * irritating for a single audience member who knows several songs they
+ * want to add. Quota-based still prevents one person from monopolising
+ * the queue (anti-spam) without making them wait between submissions.
+ * Performer (bearer) bypasses this entirely.
+ */
+const MAX_QUEUED_PER_IP = 2;
 
 /**
  * GET /api/ktv/queue — performer-only. Returns raw QueueItem[] per spec
@@ -69,12 +74,6 @@ export async function POST(req: Request) {
   }
 
   const ipHash = hashIp(clientIp(req));
-  if (!isPerformer) {
-    const allowed = await checkAndStampRateLimit(ipHash);
-    if (!allowed) {
-      return Response.json({ error: "rate_limit" }, { status: 429 });
-    }
-  }
 
   // One round-trip for state + queue + catalog instead of three separate gets.
   const [state, queue, storedCatalog] = await redis.mget<
@@ -99,6 +98,17 @@ export async function POST(req: Request) {
       return Response.json(
         { error: "duplicate", position, queueLength: q.length },
         { status: 409 },
+      );
+    }
+    const mineInQueue = q.filter((qi) => qi.ipHash === ipHash).length;
+    if (mineInQueue >= MAX_QUEUED_PER_IP) {
+      return Response.json(
+        {
+          error: "quota_exceeded",
+          limit: MAX_QUEUED_PER_IP,
+          inQueue: mineInQueue,
+        },
+        { status: 429 },
       );
     }
   }

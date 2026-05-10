@@ -14,7 +14,7 @@ type SubmitStatus =
   | { kind: "submitting" }
   | { kind: "ok"; position: number }
   | { kind: "duplicate"; position: number }
-  | { kind: "rate_limit" }
+  | { kind: "quota"; limit: number; inQueue: number }
   | { kind: "not_accepting" }
   | { kind: "error"; message: string };
 
@@ -258,8 +258,12 @@ export function KtvMenu({ catalog }: { catalog: Song[] }) {
         return;
       }
       switch (body.error) {
-        case "rate_limit":
-          setSubmit({ kind: "rate_limit" });
+        case "quota_exceeded":
+          setSubmit({
+            kind: "quota",
+            limit: body.limit ?? 2,
+            inQueue: body.inQueue ?? 0,
+          });
           break;
         case "duplicate":
           setSubmit({ kind: "duplicate", position: body.position ?? 0 });
@@ -471,9 +475,6 @@ function LiveQueue({
           <p className="mt-2 truncate text-lg font-medium leading-snug text-ink-primary">
             {nowPlaying.title}
           </p>
-          <p className="mt-0.5 truncate font-mono text-xs text-ink-muted">
-            {nowPlaying.artist}
-          </p>
         </div>
       )}
 
@@ -501,11 +502,10 @@ function LiveQueue({
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[14px] text-ink-primary">
                       {q.title}
-                    </p>
-                    <p className="mt-0.5 truncate font-mono text-[11px] text-ink-muted">
-                      {q.artist}
                       {mine && (
-                        <span className="ml-1.5 text-accent">· yours</span>
+                        <span className="ml-2 font-mono text-[11px] text-accent">
+                          · yours
+                        </span>
                       )}
                     </p>
                   </div>
@@ -619,23 +619,23 @@ function SongList({
                 <div className="truncate text-[15px] leading-tight text-ink-primary">
                   {song.title}
                 </div>
-                <div className="mt-1 flex items-center gap-1.5 truncate font-mono text-[11px] text-ink-muted">
-                  <span className="truncate">{song.artist}</span>
-                  {song.tags && song.tags.length > 0 && (
-                    <>
-                      <span aria-hidden>·</span>
+                {(song.tags?.length || alreadyQueued) && (
+                  <div className="mt-1 flex items-center gap-1.5 truncate font-mono text-[11px] text-ink-muted">
+                    {song.tags && song.tags.length > 0 && (
                       <span className="truncate">
                         {song.tags.slice(0, 2).join(" / ")}
                       </span>
-                    </>
-                  )}
-                  {alreadyQueued && (
-                    <>
-                      <span aria-hidden>·</span>
-                      <span className="text-accent-amber">in queue</span>
-                    </>
-                  )}
-                </div>
+                    )}
+                    {alreadyQueued && (
+                      <>
+                        {song.tags?.length ? (
+                          <span aria-hidden>·</span>
+                        ) : null}
+                        <span className="text-accent-amber">in queue</span>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
               <LangChip lang={song.language} />
               <span
@@ -701,15 +701,12 @@ function ConfirmSheet({
               <h2 className="mt-2 text-2xl font-semibold leading-tight tracking-tight">
                 {song.title}
               </h2>
-              <p className="mt-1 font-mono text-sm text-ink-secondary">
-                {song.artist}
-              </p>
             </header>
 
-            {submit.kind === "rate_limit" && (
+            {submit.kind === "quota" && (
               <FeedbackLine
                 tone="warn"
-                text="Just sent one — give it 30 seconds and try again."
+                text={`You already have ${submit.inQueue} song${submit.inQueue === 1 ? "" : "s"} waiting (max ${submit.limit}). Cancel one or wait for it to play.`}
               />
             )}
             {submit.kind === "duplicate" && (

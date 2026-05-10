@@ -25,10 +25,7 @@ export const KV_KEYS = {
   queue: "ktv:queue",
   state: "ktv:state",
   catalog: "ktv:catalog",
-  rateLimit: (ipHash: string) => `ktv:rl:${ipHash}`,
 } as const;
-
-export const RATE_LIMIT_WINDOW_SECONDS = 30;
 
 /** Returns true if KV is configured and ready. Use to gate API responses. */
 export function kvAvailable(): boolean {

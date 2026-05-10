@@ -94,8 +94,9 @@ it by id and will orphan if the slug disappears.
   graceful 503).
 - **Bearer-token auth** for performer-only endpoints (`KTV_PERFORMER_KEY`
   env var, constant-time compare in `lib/ktv/auth.ts`).
-- **Rate-limit** via SHA-256 of client IP + Redis `SET NX EX` (atomic);
-  30-second cooldown per IP.
+- **Anti-spam quota** per IP: at most 2 rows in the live queue at once
+  per submitter (SHA-256(IP) tracked on each `QueueItem.ipHash`,
+  stripped from public responses). No time-based cooldown.
 - **Tailwind v4** for styles, sharing the main site's `@theme` tokens.
   No extra design system.
 
@@ -305,7 +306,11 @@ Content-Type: application/json
 - 403 `not_accepting` — performer closed the queue
 - 404 `unknown_song` — songId not in catalog
 - 409 `duplicate` — that song already in queue (returns its position)
-- 429 `rate_limit` — same IP submitted within the last 30 seconds
+- 429 `quota_exceeded` `{ limit, inQueue }` — this IP already has
+  `inQueue` rows in the live queue and `limit` is the cap (default 2).
+  Replaces the previous time-based 30-second cooldown — quota lets one
+  audience member add a few songs in quick succession without waiting,
+  but caps how much one IP can monopolise the queue.
 - 503 `kv_unavailable` — backend not provisioned (see Setup below)
 
 **Bearer bypass for performer self-add**: when the request carries
