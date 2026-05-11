@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-04T01:11:39.787Z",
+  "fetchedAt": "2026-05-11T01:16:59.780Z",
   "repos": {
     "puddingforhealth/FlowFusionBP": {
       "owner": "puddingforhealth",
@@ -91,12 +91,12 @@
       "stars": 1,
       "openIssues": 0,
       "defaultBranch": "main",
-      "weeklyCommits": 0,
+      "weeklyCommits": 3,
       "latestCommit": {
-        "sha": "e81fd3f",
-        "message": "Add Docker + Caddy deploy stack with AWS provisioning scripts",
-        "date": "2026-04-24T10:18:47Z",
-        "url": "https://github.com/GeniusPudding/InvisibleGo/commit/e81fd3fd330d538ed4f1fae77d64fac8ab6bb06e"
+        "sha": "3c359fe",
+        "message": "Make 3-illegal auto-skip a turn rotation, not a pass",
+        "date": "2026-05-08T16:53:28Z",
+        "url": "https://github.com/GeniusPudding/InvisibleGo/commit/3c359fe67e597dd813a68750236d0d0e1bae17e9"
       }
     },
     "GeniusPudding/reprise-studio": {
@@ -105,7 +105,7 @@
       "stars": 0,
       "openIssues": 0,
       "defaultBranch": "main",
-      "weeklyCommits": 4,
+      "weeklyCommits": 0,
       "latestCommit": {
         "sha": "2395d97",
         "message": "Fix TimeScrubber swallowing shortcut keys when slider has focus\n\nRange / checkbox / button inputs never produce text, so the early-return\nthat protects text-typing inputs was wrong to include them. After clicking\nthe slider, =/-/+/_/r etc were going to the input and getting eaten.",
@@ -116,15 +116,15 @@
     "GeniusPudding/Kaikou-Claude": {
       "owner": "GeniusPudding",
       "name": "Kaikou-Claude",
-      "stars": 3,
+      "stars": 4,
       "openIssues": 0,
       "defaultBranch": "main",
-      "weeklyCommits": 1,
+      "weeklyCommits": 2,
       "latestCommit": {
-        "sha": "9a9c9a5",
-        "message": "Fix Windows PowerShell profile auto-start (Layer 2)\n\n- Use Start-Process -WindowStyle Hidden for background daemon launch\n  (PowerShell has no & background operator like bash)\n- Fix string interpolation: $null was expanded in double-quoted strings\n- Uninstall: line-based filtering instead of fragile regex",
-        "date": "2026-04-27T04:38:14Z",
-        "url": "https://github.com/GeniusPudding/Kaikou-Claude/commit/9a9c9a529ae5efa27f511c8958a727e7aaea5c71"
+        "sha": "2dae311",
+        "message": "README cleanup; remove F9 from macOS hotkey\n\n- macOS: drop F9 backup, Cmd is the only hotkey (more focused UX).\n- Linux: F9 stays as primary.\n- Reorganize both READMEs to match section-by-section.\n- Update \"How it works\" diagram to show 3-layer startup (SessionStart\n  hook + preexec hook + self-heal), reflecting current architecture.\n- Remove redundant \"Features\" section; consolidate into Usage + How it\n  works.",
+        "date": "2026-05-06T05:48:36Z",
+        "url": "https://github.com/GeniusPudding/Kaikou-Claude/commit/2dae3111ad6258c667be80b40f48dd3325a67a6b"
       }
     },
     "GeniusPudding/SADroid": {
@@ -133,7 +133,7 @@
       "stars": 0,
       "openIssues": 0,
       "defaultBranch": "main",
-      "weeklyCommits": 1,
+      "weeklyCommits": 0,
       "latestCommit": {
         "sha": "dcd54e8",
         "message": "Move ApkSmith submodule from droidbot/ to project root\n\nThe submodule was unnecessarily nested at droidbot/ApkSmith/ — it is\na project-level dependency, not specific to the droidbot subdirectory.\n\nMoved to SADroid/ApkSmith/ and replaced the sys.path hacks in both\ndriver files with clean imports:\n\n  # Before (fragile, path-dependent)\n  sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'ApkSmith', 'src'))\n  from apksmith import instrument_apk  # noqa: E402\n\n  # After (standard pip package)\n  from apksmith import instrument_apk\n\nSetup: run `pip install -e ApkSmith/` from the SADroid root to make\nthe apksmith package available as a normal import.\n\nCo-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>",
