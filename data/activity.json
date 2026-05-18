@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-11T01:16:59.780Z",
+  "fetchedAt": "2026-05-18T01:19:32.681Z",
   "repos": {
     "puddingforhealth/FlowFusionBP": {
       "owner": "puddingforhealth",
@@ -91,7 +91,7 @@
       "stars": 1,
       "openIssues": 0,
       "defaultBranch": "main",
-      "weeklyCommits": 3,
+      "weeklyCommits": 0,
       "latestCommit": {
         "sha": "3c359fe",
         "message": "Make 3-illegal auto-skip a turn rotation, not a pass",
@@ -119,12 +119,12 @@
       "stars": 4,
       "openIssues": 0,
       "defaultBranch": "main",
-      "weeklyCommits": 2,
+      "weeklyCommits": 1,
       "latestCommit": {
-        "sha": "2dae311",
-        "message": "README cleanup; remove F9 from macOS hotkey\n\n- macOS: drop F9 backup, Cmd is the only hotkey (more focused UX).\n- Linux: F9 stays as primary.\n- Reorganize both READMEs to match section-by-section.\n- Update \"How it works\" diagram to show 3-layer startup (SessionStart\n  hook + preexec hook + self-heal), reflecting current architecture.\n- Remove redundant \"Features\" section; consolidate into Usage + How it\n  works.",
-        "date": "2026-05-06T05:48:36Z",
-        "url": "https://github.com/GeniusPudding/Kaikou-Claude/commit/2dae3111ad6258c667be80b40f48dd3325a67a6b"
+        "sha": "4e1cbc5",
+        "message": "Add ROADMAP: voice-invoked skills as next major direction\n\nCaptures the idea of having the daemon detect skill-invocation intent\nin the transcription (e.g. 切到詳答 → /listen detailed) and rewrite the\npaste instead of dropping raw text. Also parks several smaller ideas\nfor later triage.",
+        "date": "2026-05-12T18:35:39Z",
+        "url": "https://github.com/GeniusPudding/Kaikou-Claude/commit/4e1cbc5b5b62d353fe48dcec5ad9f464001495df"
       }
     },
     "GeniusPudding/SADroid": {
