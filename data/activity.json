@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-05-18T01:19:32.681Z",
+  "fetchedAt": "2026-05-25T01:22:27.442Z",
   "repos": {
     "puddingforhealth/FlowFusionBP": {
       "owner": "puddingforhealth",
@@ -119,12 +119,12 @@
       "stars": 4,
       "openIssues": 0,
       "defaultBranch": "main",
-      "weeklyCommits": 1,
+      "weeklyCommits": 4,
       "latestCommit": {
-        "sha": "4e1cbc5",
-        "message": "Add ROADMAP: voice-invoked skills as next major direction\n\nCaptures the idea of having the daemon detect skill-invocation intent\nin the transcription (e.g. 切到詳答 → /listen detailed) and rewrite the\npaste instead of dropping raw text. Also parks several smaller ideas\nfor later triage.",
-        "date": "2026-05-12T18:35:39Z",
-        "url": "https://github.com/GeniusPudding/Kaikou-Claude/commit/4e1cbc5b5b62d353fe48dcec5ad9f464001495df"
+        "sha": "b046b41",
+        "message": "Add GPU release/acquire scripts with CPU fallback and focus restore\n\nThe voice daemon used to keep its CUDA model resident in VRAM\nindefinitely, blocking other workloads (training, image gen, etc.)\nfrom using the GPU. The previous timer-based auto-unload tried to\nsolve this but interrupted 秒按秒錄 latency every few minutes and\ncould deadlock the transcribe path under GPU contention.\n\nReplace it with two explicit user-driven scripts and an in-daemon\nprimary/fallback model machinery:\n\n* scripts/release-gpu.{ps1,sh} writes a sentinel file. A background\n  watcher thread in the daemon sees the sentinel within ~1s, unloads\n  the CUDA primary from the GPU, lazy-loads a CPU small model, and\n  switches active transcription to it. Voice keeps working — just a\n  few seconds slower per utterance.\n\n* scripts/acquire-gpu.{ps1,sh} removes the sentinel. The watcher\n  reloads the primary onto the GPU (~1-2s warm) and switches back.\n\n* Both transitions are user-driven; the daemon never auto-acquires\n  because it has no way to tell whether the other workload is done.\n\n* If the daemon is launched (by SessionStart / preexec) while the\n  sentinel is already present, primary is skipped entirely and the\n  daemon boots straight into fallback — no VRAM spike.\n\n* CPU-only systems (Mac without CUDA) ignore the sentinel since\n  there's no GPU to release.\n\nAlso fixes a separate UX bug that became more noticeable with CPU\nfallback's longer transcription delay: the window that had focus\nwhen the user pressed the hotkey is now snapshotted at recording\nstart and restored before Ctrl+V / Cmd+V, so the paste lands in\nthe right window even if the user switched apps mid-transcription.\nWindows uses SetForegroundWindow + AttachThreadInput, macOS uses\nNSRunningApplication.activateWithOptions:, Linux uses xdotool\nwindowactivate --sync.\n\nRemoves the now-superseded VOICE_IDLE_UNLOAD_SEC env. Adds\nVOICE_FALLBACK_MODEL_SIZE and VOICE_FALLBACK_COMPUTE_TYPE for\ntuning the fallback model. Both READMEs, the install scripts'\ndefault .env template, and .env are updated accordingly.",
+        "date": "2026-05-21T10:13:43Z",
+        "url": "https://github.com/GeniusPudding/Kaikou-Claude/commit/b046b41dfeeb65cbe34fc26be72a1353a4479a8a"
       }
     },
     "GeniusPudding/SADroid": {
