@@ -31,14 +31,6 @@ export default function InterestsPage() {
         ))}
       </div>
 
-      <p className="mt-12 text-xs italic text-ink-muted">
-        Edit{" "}
-        <code className="rounded bg-bg-raised px-1 font-mono not-italic">
-          content/interests.ts
-        </code>
-        {" "}to add or change items. Each section: 3–5 items + an optional
-        &ldquo;why these&rdquo; one-liner.
-      </p>
     </main>
   );
 }
@@ -97,10 +89,7 @@ function Section({ section }: { section: InterestSection }) {
         </>
       ) : (
         <p className="mt-5 font-mono text-xs italic text-ink-muted">
-          (empty — open{" "}
-          <code className="not-italic">content/interests.ts</code>, find the{" "}
-          <code className="not-italic">{section.slug}</code> section, push items
-          into <code className="not-italic">items: [...]</code>)
+          Coming soon.
         </p>
       )}
     </section>

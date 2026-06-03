@@ -2,11 +2,10 @@ type Props = {
   totalProjects: number;
   live: number;
   shipped: number;
-  tbd: number;
   lastFetched: string | null;
 };
 
-export function Header({ totalProjects, live, shipped, tbd, lastFetched }: Props) {
+export function Header({ totalProjects, live, shipped, lastFetched }: Props) {
   return (
     <header>
       <h1 className="text-3xl font-semibold tracking-tight">Projects &amp; Research</h1>
@@ -16,11 +15,10 @@ export function Header({ totalProjects, live, shipped, tbd, lastFetched }: Props
         is refreshed weekly by a scheduled job.
       </p>
 
-      <dl className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <dl className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat label="Projects" value={totalProjects} />
         <Stat label="Active" value={live} accent="green" />
         <Stat label="Shipped" value={shipped} accent="blue" />
-        <Stat label="TBD" value={tbd} accent="muted" />
       </dl>
     </header>
   );

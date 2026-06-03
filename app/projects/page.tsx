@@ -14,7 +14,6 @@ export default async function ProjectsPage() {
   const allProjects = tracks.flatMap((t) => t.projects);
   const liveCount = allProjects.filter((p) => p.status === "active").length;
   const shippedCount = allProjects.filter((p) => p.status === "shipped").length;
-  const tbdCount = allProjects.filter((p) => p.status === "tbd").length;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-6 py-12">
@@ -22,7 +21,6 @@ export default async function ProjectsPage() {
         totalProjects={allProjects.length}
         live={liveCount}
         shipped={shippedCount}
-        tbd={tbdCount}
         lastFetched={activity.fetchedAt}
       />
 

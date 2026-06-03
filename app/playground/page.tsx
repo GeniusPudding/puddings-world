@@ -22,38 +22,21 @@ type Item = {
   external?: boolean;
 };
 
-// TODO: replace these placeholders with real things you've built or things
-// you find genuinely worth pointing people at. Keep the bar low — this page
-// is the "no pressure, just hang out" room of the site.
 const ITEMS: Item[] = [
   {
     tag: "game",
-    title: "InvisibleGo (web playable build)",
+    title: "Reverse Turing Test",
     blurb:
-      "Once a playable web build of InvisibleGo lands, link it here. Until then, point at the repo.",
-    href: "/projects/invisible-go",
-  },
-  {
-    tag: "demo",
-    title: "TODO — interactive EPG visualizer",
-    blurb:
-      "Embed a small visualizer that lets visitors scrub through a sample EPG signal and see the model's segmentation in real time.",
-    href: "#",
-  },
-  {
-    tag: "link",
-    title: "TODO — a curious paper / blog post worth sharing",
-    blurb:
-      "Drop links to things that pulled you off the road for an afternoon. One sentence on why each was good.",
-    href: "#",
+      "A live-talk party game for 20-30 phones. In 2050, silicon-based life rules the net — the last humans must pretend to be AI to survive. An AI judge scores everyone, the most AI-like get cut, and eliminated players become the jury for the final.",
+    href: "https://reverse-turing.puddings-world.com",
     external: true,
   },
   {
-    tag: "experiment",
-    title: "TODO — a half-finished side experiment",
+    tag: "game",
+    title: "InvisibleGo",
     blurb:
-      "Things that didn't graduate to /projects but were too fun to delete. Show your work, including the dead ends.",
-    href: "#",
+      "A partially-observable Go variant — you only see part of the board. Play against a trained RL agent.",
+    href: "/projects/invisible-go",
   },
 ];
 
@@ -108,17 +91,6 @@ export default function PlaygroundPage() {
         })}
       </ul>
 
-      <p className="mt-12 text-xs italic text-ink-muted">
-        Edit{" "}
-        <code className="rounded bg-bg-raised px-1 font-mono not-italic">
-          app/playground/page.tsx
-        </code>
-        {" "}to add or remove items. Tags available:{" "}
-        <code className="rounded bg-bg-raised px-1 font-mono not-italic">
-          game / demo / link / experiment
-        </code>
-        .
-      </p>
     </main>
   );
 }

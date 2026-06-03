@@ -84,11 +84,6 @@ export default function AboutPage() {
             </li>
           ))}
         </ul>
-        <p className="mt-6 text-xs italic text-ink-muted">
-          TODO: tighten this section in your own voice once you&apos;ve stewed
-          on it — the page reads better when it&apos;s phrased exactly the way
-          you&apos;d say it out loud.
-        </p>
       </section>
 
       <section className="mt-12 rounded-xl border border-accent/30 bg-accent/5 p-6 sm:p-8">
