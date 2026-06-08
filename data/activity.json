@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-06-01T01:29:09.933Z",
+  "fetchedAt": "2026-06-08T01:27:22.721Z",
   "repos": {
     "puddingforhealth/FlowFusionBP": {
       "owner": "puddingforhealth",
@@ -119,12 +119,12 @@
       "stars": 4,
       "openIssues": 0,
       "defaultBranch": "main",
-      "weeklyCommits": 0,
+      "weeklyCommits": 1,
       "latestCommit": {
-        "sha": "b046b41",
-        "message": "Add GPU release/acquire scripts with CPU fallback and focus restore\n\nThe voice daemon used to keep its CUDA model resident in VRAM\nindefinitely, blocking other workloads (training, image gen, etc.)\nfrom using the GPU. The previous timer-based auto-unload tried to\nsolve this but interrupted 秒按秒錄 latency every few minutes and\ncould deadlock the transcribe path under GPU contention.\n\nReplace it with two explicit user-driven scripts and an in-daemon\nprimary/fallback model machinery:\n\n* scripts/release-gpu.{ps1,sh} writes a sentinel file. A background\n  watcher thread in the daemon sees the sentinel within ~1s, unloads\n  the CUDA primary from the GPU, lazy-loads a CPU small model, and\n  switches active transcription to it. Voice keeps working — just a\n  few seconds slower per utterance.\n\n* scripts/acquire-gpu.{ps1,sh} removes the sentinel. The watcher\n  reloads the primary onto the GPU (~1-2s warm) and switches back.\n\n* Both transitions are user-driven; the daemon never auto-acquires\n  because it has no way to tell whether the other workload is done.\n\n* If the daemon is launched (by SessionStart / preexec) while the\n  sentinel is already present, primary is skipped entirely and the\n  daemon boots straight into fallback — no VRAM spike.\n\n* CPU-only systems (Mac without CUDA) ignore the sentinel since\n  there's no GPU to release.\n\nAlso fixes a separate UX bug that became more noticeable with CPU\nfallback's longer transcription delay: the window that had focus\nwhen the user pressed the hotkey is now snapshotted at recording\nstart and restored before Ctrl+V / Cmd+V, so the paste lands in\nthe right window even if the user switched apps mid-transcription.\nWindows uses SetForegroundWindow + AttachThreadInput, macOS uses\nNSRunningApplication.activateWithOptions:, Linux uses xdotool\nwindowactivate --sync.\n\nRemoves the now-superseded VOICE_IDLE_UNLOAD_SEC env. Adds\nVOICE_FALLBACK_MODEL_SIZE and VOICE_FALLBACK_COMPUTE_TYPE for\ntuning the fallback model. Both READMEs, the install scripts'\ndefault .env template, and .env are updated accordingly.",
-        "date": "2026-05-21T10:13:43Z",
-        "url": "https://github.com/GeniusPudding/Kaikou-Claude/commit/b046b41dfeeb65cbe34fc26be72a1353a4479a8a"
+        "sha": "827519c",
+        "message": "Capture paste target at key-down + drop paste if window changed\n\nVoice transcriptions were occasionally leaking into unrelated windows\n(chat apps, browsers, etc.) when the user pressed the hotkey in an AI\nagent window but had moved focus away by the time the transcription\nfinished. Two bugs combined to cause it:\n\n1. start_recording captured the destination HWND, but it was invoked\n   from the hold-threshold Timer 250ms after the actual key-down. Any\n   focus change during those 250ms (alt-tab, popup, etc.) meant the\n   wrong HWND got captured.\n\n2. _paste_and_submit trusted the captured HWND unconditionally — there\n   was no late guard against the user having actually closed or moved\n   away from the original window during the (longer) transcription\n   delay, especially on the CPU fallback path where short utterances\n   can still take a few seconds.\n\nTwo-part fix:\n\n* set_pending_target() is a new audio-module API that hotkey backends\n  call at key-down (windows._handle_space_down, _handle_f9_down, and\n  unix._on_press) to snapshot the foreground window immediately —\n  before any hold delay or recording state change. start_recording\n  prefers this snapshot over a fresh live capture.\n\n* is_voice_target_handle() in focus.py resolves an opaque handle back\n  to its owning PID and re-runs _is_voice_target on it. _paste_and_submit\n  calls this right before touching the clipboard; if the target no\n  longer looks like an AI-agent process tree, the transcription is\n  logged but neither the clipboard nor the keystroke injection runs.\n\nBelt-and-suspenders: the first fix removes the most common race, the\nsecond catches anything that slips past it (focus moved during the\ntranscription delay, window closed entirely, etc.).",
+        "date": "2026-06-03T11:59:11Z",
+        "url": "https://github.com/GeniusPudding/Kaikou-Claude/commit/827519c62e5139b6c66a814acd79713d142be00a"
       }
     },
     "GeniusPudding/SADroid": {
