@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-06-08T01:27:22.721Z",
+  "fetchedAt": "2026-06-15T01:31:38.052Z",
   "repos": {
     "puddingforhealth/FlowFusionBP": {
       "owner": "puddingforhealth",
@@ -119,7 +119,7 @@
       "stars": 4,
       "openIssues": 0,
       "defaultBranch": "main",
-      "weeklyCommits": 1,
+      "weeklyCommits": 0,
       "latestCommit": {
         "sha": "827519c",
         "message": "Capture paste target at key-down + drop paste if window changed\n\nVoice transcriptions were occasionally leaking into unrelated windows\n(chat apps, browsers, etc.) when the user pressed the hotkey in an AI\nagent window but had moved focus away by the time the transcription\nfinished. Two bugs combined to cause it:\n\n1. start_recording captured the destination HWND, but it was invoked\n   from the hold-threshold Timer 250ms after the actual key-down. Any\n   focus change during those 250ms (alt-tab, popup, etc.) meant the\n   wrong HWND got captured.\n\n2. _paste_and_submit trusted the captured HWND unconditionally — there\n   was no late guard against the user having actually closed or moved\n   away from the original window during the (longer) transcription\n   delay, especially on the CPU fallback path where short utterances\n   can still take a few seconds.\n\nTwo-part fix:\n\n* set_pending_target() is a new audio-module API that hotkey backends\n  call at key-down (windows._handle_space_down, _handle_f9_down, and\n  unix._on_press) to snapshot the foreground window immediately —\n  before any hold delay or recording state change. start_recording\n  prefers this snapshot over a fresh live capture.\n\n* is_voice_target_handle() in focus.py resolves an opaque handle back\n  to its owning PID and re-runs _is_voice_target on it. _paste_and_submit\n  calls this right before touching the clipboard; if the target no\n  longer looks like an AI-agent process tree, the transcription is\n  logged but neither the clipboard nor the keystroke injection runs.\n\nBelt-and-suspenders: the first fix removes the most common race, the\nsecond catches anything that slips past it (focus moved during the\ntranscription delay, window closed entirely, etc.).",
