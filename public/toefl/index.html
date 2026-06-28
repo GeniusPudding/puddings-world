@@ -160,6 +160,7 @@ textarea:focus { outline:none; border-color:var(--accent); }
   <button onclick="showPanel('writing')" id="nav-writing">Writing</button>
   <button onclick="showPanel('speaking')" id="nav-speaking">Speaking</button>
   <button onclick="showPanel('listening')" id="nav-listening">Listening</button>
+  <button onclick="showPanel('news')" id="nav-news">📰 News</button>
   <button onclick="showPanel('resources')" id="nav-resources">📚 Resources</button>
   <button onclick="showPanel('plan')" id="nav-plan">8-Week Plan</button>
   <button onclick="showPanel('about')" id="nav-about">About</button>
@@ -210,6 +211,164 @@ textarea:focus { outline:none; border-color:var(--accent); }
       <div class="stat-card"><div class="number" id="t-writing" style="color:var(--danger);">2.25</div><div class="label">Writing → 5.0</div></div>
     </div>
     <p class="text-sm text-dim" style="margin-top:0.5rem;">📊 Re-diagnose in 4 weeks to update these scores</p>
+  </div>
+</div>
+
+<!-- ====== NEWS READING ====== -->
+<div id="panel-news" class="panel">
+  <h2><span class="tag tag-r">News</span> Speed Reading on Real News</h2>
+  <p class="text-dim text-sm mb">News English (Economist, WSJ, Reuters) is denser than TOEFL prose. Train on real news to build reading speed and stamina.</p>
+
+  <!-- WPM stats -->
+  <div class="card" style="background: linear-gradient(135deg, var(--surface), var(--surface2));">
+    <div class="flex-between">
+      <div style="text-align:center;flex:1;">
+        <div class="number" id="news-current-wpm" style="font-size:1.6rem;">—</div>
+        <div style="font-size:0.75rem;color:var(--text-dim);">Last WPM</div>
+      </div>
+      <div style="text-align:center;flex:1;">
+        <div class="number" id="news-avg-wpm" style="font-size:1.6rem;color:var(--accent);">—</div>
+        <div style="font-size:0.75rem;color:var(--text-dim);">Avg WPM (last 10)</div>
+      </div>
+      <div style="text-align:center;flex:1;">
+        <div class="number" id="news-best-wpm" style="font-size:1.6rem;color:var(--accent3);">—</div>
+        <div style="font-size:0.75rem;color:var(--text-dim);">Best WPM</div>
+      </div>
+      <div style="text-align:center;flex:1;">
+        <div class="number" id="news-sessions" style="font-size:1.6rem;color:var(--accent2);">0</div>
+        <div style="font-size:0.75rem;color:var(--text-dim);">Sessions</div>
+      </div>
+    </div>
+    <p class="text-sm text-dim text-center" style="margin-top:0.5rem;">
+      🎯 Native fluent reader: 250–300 WPM · Academic target: 200+ WPM · TOEFL Reading allows ~140 WPM
+    </p>
+  </div>
+
+  <!-- Paste mode -->
+  <div class="card mt">
+    <h3>1. Paste & Practice</h3>
+    <p class="text-sm text-dim mb">Copy any article (Economist, WSJ, Reuters, BBC, NYT — anywhere) and paste it below. The trainer hides distractions, times you, and forces a comprehension check.</p>
+    <textarea id="news-input" placeholder="Paste article text here (or use 'Try sample' button below)..." rows="8" style="font-size:0.9rem;"></textarea>
+    <div class="flex-between mt">
+      <div>
+        <span class="text-sm text-dim">Words: <strong id="news-word-count">0</strong></span>
+        <span class="text-sm text-dim" style="margin-left:1rem;">Est. time @ 200 WPM: <strong id="news-est-time">—</strong></span>
+      </div>
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+        <button class="btn btn-secondary" onclick="loadSampleNews()" style="font-size:0.8rem;padding:0.4rem 0.8rem;">Try sample</button>
+        <button class="btn btn-success" onclick="startNewsReading()" style="font-size:0.85rem;">Start reading →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reading view (hidden until started) -->
+  <div class="card mt hidden" id="news-reading-view" style="background:var(--bg);">
+    <div class="flex-between mb">
+      <div class="timer" id="news-timer" style="font-size:1.5rem;">0:00</div>
+      <div style="display:flex;gap:0.5rem;">
+        <button class="btn btn-secondary" onclick="togglePacer()" id="news-pacer-btn" style="font-size:0.8rem;padding:0.4rem 0.8rem;">▶ Start pacer</button>
+        <button class="btn btn-success" onclick="finishNewsReading()" style="font-size:0.85rem;">Done reading ✓</button>
+      </div>
+    </div>
+    <div id="news-pacer-controls" class="hidden" style="margin-bottom:0.6rem;">
+      <label class="text-sm text-dim">Target WPM: <span id="pacer-wpm-label">220</span></label>
+      <input type="range" id="pacer-wpm-slider" min="120" max="400" value="220" step="20" oninput="updatePacerSpeed()" style="width:100%;">
+    </div>
+    <div id="news-display" style="font-size:1.05rem;line-height:1.9;max-height:65vh;overflow-y:auto;padding:1rem;background:var(--surface);border-radius:8px;"></div>
+  </div>
+
+  <!-- Comprehension check (hidden until done reading) -->
+  <div class="card mt hidden" id="news-check">
+    <h3>2. Force Active Reading — Self-Check</h3>
+    <p class="text-sm text-dim mb">Don't skip this. Answer in English to lock in what you read.</p>
+
+    <div style="margin-bottom:0.8rem;">
+      <label class="text-sm" style="display:block;margin-bottom:0.3rem;">📝 In 2-3 sentences, what was the main argument or finding?</label>
+      <textarea id="news-summary" rows="3" placeholder="Write your summary in English..." style="font-size:0.9rem;"></textarea>
+    </div>
+    <div style="margin-bottom:0.8rem;">
+      <label class="text-sm" style="display:block;margin-bottom:0.3rem;">🔍 List 2 specific facts or details you remember:</label>
+      <textarea id="news-details" rows="2" placeholder="1. ...&#10;2. ..." style="font-size:0.9rem;"></textarea>
+    </div>
+    <div style="margin-bottom:0.8rem;">
+      <label class="text-sm" style="display:block;margin-bottom:0.3rem;">📚 New vocabulary or phrases you noted (at least 3):</label>
+      <textarea id="news-vocab" rows="2" placeholder="ubiquitous = present everywhere..." style="font-size:0.9rem;"></textarea>
+    </div>
+    <div style="margin-bottom:0.8rem;">
+      <label class="text-sm" style="display:block;margin-bottom:0.3rem;">💭 What is the author's stance or perspective?</label>
+      <textarea id="news-stance" rows="2" placeholder="The author argues..." style="font-size:0.9rem;"></textarea>
+    </div>
+    <div class="flex-between">
+      <span class="text-sm text-dim" id="news-result-stats">—</span>
+      <button class="btn btn-success" onclick="submitNewsCheck()">Save session ✓</button>
+    </div>
+    <p class="text-sm" style="margin-top:0.5rem;color:var(--accent);">💡 Tip: paste your summary into Claude with "Did I get this right?" + the original article for instant AI feedback.</p>
+  </div>
+
+  <!-- Free quality news sources -->
+  <div class="card mt">
+    <h3>3. Free High-Quality News Sources</h3>
+    <p class="text-sm text-dim mb">Most TOEFL-equivalent dense writing is paywalled. Here is what's actually free and high-quality:</p>
+
+    <h4 style="font-size:0.9rem;color:var(--accent);margin-top:0.5rem;">Fully free</h4>
+    <ul style="list-style:none;padding:0;font-size:0.9rem;">
+      <li style="padding:0.3rem 0;"><a href="https://www.reuters.com/" target="_blank" style="color:var(--accent);">Reuters</a> — Global wire service, neutral, free</li>
+      <li style="padding:0.3rem 0;"><a href="https://apnews.com/" target="_blank" style="color:var(--accent);">Associated Press</a> — US wire service, free</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.bbc.com/news" target="_blank" style="color:var(--accent);">BBC News</a> — UK English, fully free</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.theguardian.com/" target="_blank" style="color:var(--accent);">The Guardian</a> — UK, free (donation-supported)</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.aljazeera.com/" target="_blank" style="color:var(--accent);">Al Jazeera English</a> — International perspective, free</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.npr.org/" target="_blank" style="color:var(--accent);">NPR</a> — US public radio, free articles + audio</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.cbc.ca/news" target="_blank" style="color:var(--accent);">CBC News</a> — Canadian, free</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.france24.com/en/" target="_blank" style="color:var(--accent);">France 24 English</a> — European perspective</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.dw.com/en/" target="_blank" style="color:var(--accent);">Deutsche Welle</a> — German news in English</li>
+    </ul>
+
+    <h4 style="font-size:0.9rem;color:var(--accent);margin-top:1rem;">Limited free (browse with 1 article/month or open in private window)</h4>
+    <ul style="list-style:none;padding:0;font-size:0.9rem;">
+      <li style="padding:0.3rem 0;"><a href="https://www.economist.com/" target="_blank" style="color:var(--accent);">The Economist</a> — Gold standard for dense analytical writing; some weekly free</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.wsj.com/" target="_blank" style="color:var(--accent);">Wall Street Journal</a> — Limited free; included in some Spotify/Apple subscriptions</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.nytimes.com/" target="_blank" style="color:var(--accent);">New York Times</a> — Limited free articles per month</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.ft.com/" target="_blank" style="color:var(--accent);">Financial Times</a> — Limited free</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.bloomberg.com/" target="_blank" style="color:var(--accent);">Bloomberg</a> — Limited free</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.theatlantic.com/" target="_blank" style="color:var(--accent);">The Atlantic</a> — Long-form essays, limited free</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.newyorker.com/" target="_blank" style="color:var(--accent);">The New Yorker</a> — Long-form essays, limited free</li>
+    </ul>
+
+    <h4 style="font-size:0.9rem;color:var(--accent);margin-top:1rem;">Science/tech-focused (academic English)</h4>
+    <ul style="list-style:none;padding:0;font-size:0.9rem;">
+      <li style="padding:0.3rem 0;"><a href="https://www.technologyreview.com/" target="_blank" style="color:var(--accent);">MIT Technology Review</a> — Some free, tech analysis</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.nature.com/news" target="_blank" style="color:var(--accent);">Nature News</a> — Free science news summaries</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.science.org/news" target="_blank" style="color:var(--accent);">Science News</a> — Free summaries from Science journal</li>
+      <li style="padding:0.3rem 0;"><a href="https://arstechnica.com/" target="_blank" style="color:var(--accent);">Ars Technica</a> — Free tech journalism</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.quantamagazine.org/" target="_blank" style="color:var(--accent);">Quanta Magazine</a> — Free, exceptional science writing</li>
+    </ul>
+
+    <h4 style="font-size:0.9rem;color:var(--accent);margin-top:1rem;">Aggregators (one-stop)</h4>
+    <ul style="list-style:none;padding:0;font-size:0.9rem;">
+      <li style="padding:0.3rem 0;"><a href="https://news.google.com/" target="_blank" style="color:var(--accent);">Google News</a> — Free aggregator, set language to English</li>
+      <li style="padding:0.3rem 0;"><a href="https://flipboard.com/" target="_blank" style="color:var(--accent);">Flipboard</a> — Curated free magazine-style feed</li>
+      <li style="padding:0.3rem 0;"><a href="https://feedly.com/" target="_blank" style="color:var(--accent);">Feedly</a> — RSS reader, follow specific outlets</li>
+    </ul>
+  </div>
+
+  <!-- Reading strategy -->
+  <div class="card mt">
+    <h3>4. How to Actually Improve (Not Just Consume)</h3>
+    <ol style="padding-left:1.2rem;color:var(--text-dim);font-size:0.9rem;">
+      <li style="padding:0.3rem 0;"><strong>Pick a difficulty stretch</strong> — if you're comfortable, level up (Reuters → Economist → New Yorker)</li>
+      <li style="padding:0.3rem 0;"><strong>Time your reading</strong> every time. Aim to improve WPM by 10% each month while maintaining comprehension</li>
+      <li style="padding:0.3rem 0;"><strong>Write a summary in English IMMEDIATELY</strong> after reading. Don't skip this. It's the highest-yield exercise.</li>
+      <li style="padding:0.3rem 0;"><strong>Mine 3-5 new vocab/phrases</strong> per article. Add to your Anki/Quizlet deck.</li>
+      <li style="padding:0.3rem 0;"><strong>Read the same article twice</strong> on tough days — first for gist, second for detail. Speed will jump.</li>
+      <li style="padding:0.3rem 0;"><strong>Set a daily quota</strong> (e.g. 1 article/day, 5 min summary) — habit beats intensity.</li>
+      <li style="padding:0.3rem 0;"><strong>Try the pacer mode</strong> above — it forces faster reading and trains your eye to stop subvocalizing.</li>
+    </ol>
+  </div>
+
+  <!-- Session history -->
+  <div class="card mt" id="news-history-card">
+    <h3>5. Your Reading History</h3>
+    <div id="news-history">No sessions yet — paste an article above to start.</div>
   </div>
 </div>
 
@@ -1897,6 +2056,182 @@ function updateTodayProgress() {
   document.getElementById('tasks-total').textContent = total;
 }
 
+// ===== NEWS READING =====
+const SAMPLE_NEWS = `Artificial intelligence is reshaping the labour market more rapidly than most economists predicted just three years ago. According to a recent analysis by the International Labour Organization, generative AI tools have already affected roughly 14 percent of jobs in advanced economies, with administrative and middle-management roles facing the most disruption. The pace of this transformation has surprised even the technology's most enthusiastic proponents.
+
+The dislocation is uneven. Workers in routine cognitive roles — paralegals, junior accountants, customer-service representatives — report the most immediate pressure. Meanwhile, demand for skilled professionals who can interpret, audit, and direct AI systems has surged. Salaries for these "AI-aware" specialists rose by an average of 23 percent last year, dwarfing wage growth in nearly every other category.
+
+Policy responses have lagged. While the European Union pushed through its AI Act in 2024, enforcement remains patchy and most non-European jurisdictions have produced little more than non-binding principles. Critics argue that voluntary commitments from leading developers are insufficient given the speed at which capabilities are advancing. Proponents counter that excessive regulation could entrench incumbents and stifle the very innovation societies need to harness.
+
+For workers, the practical advice from labour economists is straightforward but uncomfortable: continuous reskilling is no longer optional. Those who actively integrate AI tools into their workflow tend to see their productivity — and bargaining power — increase, while those who resist risk being left behind. The next decade, observers suggest, will reward adaptability above almost everything else.`;
+
+let newsTimerInterval = null;
+let newsStartTime = 0;
+let newsElapsedSeconds = 0;
+let newsWordCount = 0;
+let newsPacerInterval = null;
+let newsPacerWords = [];
+let newsPacerIndex = 0;
+
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('news-input');
+  if (inp) inp.addEventListener('input', updateNewsWordCount);
+});
+
+function updateNewsWordCount() {
+  const text = document.getElementById('news-input').value.trim();
+  const wc = text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
+  document.getElementById('news-word-count').textContent = wc;
+  const sec = Math.round(wc / 200 * 60);
+  document.getElementById('news-est-time').textContent = sec > 0 ? Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0') : '—';
+}
+
+function loadSampleNews() {
+  document.getElementById('news-input').value = SAMPLE_NEWS;
+  updateNewsWordCount();
+}
+
+function startNewsReading() {
+  const text = document.getElementById('news-input').value.trim();
+  if (!text) { alert('Paste an article first, or click "Try sample".'); return; }
+  newsWordCount = text.split(/\s+/).filter(w => w.length > 0).length;
+  if (newsWordCount < 50) { alert('Article too short — paste at least 50 words.'); return; }
+
+  document.getElementById('news-display').innerHTML = text.split('\n\n').map(p => '<p style="margin-bottom:1rem;">' + p.replace(/\n/g, '<br>') + '</p>').join('');
+  document.getElementById('news-reading-view').classList.remove('hidden');
+  document.getElementById('news-check').classList.add('hidden');
+  document.getElementById('news-reading-view').scrollIntoView({behavior: 'smooth', block: 'start'});
+
+  newsStartTime = Date.now();
+  newsElapsedSeconds = 0;
+  if (newsTimerInterval) clearInterval(newsTimerInterval);
+  newsTimerInterval = setInterval(() => {
+    newsElapsedSeconds = Math.floor((Date.now() - newsStartTime) / 1000);
+    const m = Math.floor(newsElapsedSeconds / 60);
+    const s = newsElapsedSeconds % 60;
+    document.getElementById('news-timer').textContent = m + ':' + String(s).padStart(2,'0');
+  }, 500);
+
+  newsPacerWords = text.split(/\s+/);
+  newsPacerIndex = 0;
+  document.getElementById('news-pacer-btn').textContent = '▶ Start pacer';
+  document.getElementById('news-pacer-controls').classList.add('hidden');
+  if (newsPacerInterval) clearInterval(newsPacerInterval);
+}
+
+function togglePacer() {
+  const btn = document.getElementById('news-pacer-btn');
+  const ctrl = document.getElementById('news-pacer-controls');
+  if (newsPacerInterval) {
+    clearInterval(newsPacerInterval);
+    newsPacerInterval = null;
+    btn.textContent = '▶ Resume pacer';
+    return;
+  }
+  ctrl.classList.remove('hidden');
+  btn.textContent = '⏸ Pause pacer';
+  startPacer();
+}
+
+function startPacer() {
+  const wpm = parseInt(document.getElementById('pacer-wpm-slider').value);
+  const interval = Math.round(60000 / wpm);
+  if (newsPacerInterval) clearInterval(newsPacerInterval);
+  newsPacerInterval = setInterval(() => {
+    if (newsPacerIndex >= newsPacerWords.length) {
+      clearInterval(newsPacerInterval);
+      newsPacerInterval = null;
+      document.getElementById('news-pacer-btn').textContent = '✓ Pacer done';
+      return;
+    }
+    highlightPacerWord(newsPacerIndex);
+    newsPacerIndex++;
+  }, interval);
+}
+
+function highlightPacerWord(idx) {
+  const display = document.getElementById('news-display');
+  const text = newsPacerWords.map((w, i) => i === idx ? '<mark style="background:var(--accent);color:var(--bg);padding:0 2px;border-radius:2px;">' + w + '</mark>' : w).join(' ');
+  display.innerHTML = '<p>' + text + '</p>';
+  const mark = display.querySelector('mark');
+  if (mark) mark.scrollIntoView({block: 'center', behavior: 'smooth'});
+}
+
+function updatePacerSpeed() {
+  const wpm = document.getElementById('pacer-wpm-slider').value;
+  document.getElementById('pacer-wpm-label').textContent = wpm;
+  if (newsPacerInterval) {
+    clearInterval(newsPacerInterval);
+    startPacer();
+  }
+}
+
+function finishNewsReading() {
+  if (newsTimerInterval) { clearInterval(newsTimerInterval); newsTimerInterval = null; }
+  if (newsPacerInterval) { clearInterval(newsPacerInterval); newsPacerInterval = null; }
+  const minutes = newsElapsedSeconds / 60;
+  const wpm = minutes > 0 ? Math.round(newsWordCount / minutes) : 0;
+  document.getElementById('news-result-stats').innerHTML = `📊 <strong>${newsWordCount}</strong> words in <strong>${Math.floor(newsElapsedSeconds/60)}:${String(newsElapsedSeconds%60).padStart(2,'0')}</strong> → <strong style="color:var(--accent3);">${wpm} WPM</strong>`;
+  document.getElementById('news-check').classList.remove('hidden');
+  document.getElementById('news-check').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function submitNewsCheck() {
+  const summary = document.getElementById('news-summary').value.trim();
+  if (summary.length < 20) { alert('Write at least a real summary (20+ chars). This is the most important step.'); return; }
+  const minutes = newsElapsedSeconds / 60;
+  const wpm = minutes > 0 ? Math.round(newsWordCount / minutes) : 0;
+
+  if (!stats.newsSessions) stats.newsSessions = [];
+  stats.newsSessions.push({
+    date: new Date().toISOString().slice(0,10),
+    words: newsWordCount,
+    seconds: newsElapsedSeconds,
+    wpm: wpm
+  });
+  if (stats.newsSessions.length > 50) stats.newsSessions = stats.newsSessions.slice(-50);
+  saveStat();
+  recordActivity('reading');
+
+  document.getElementById('news-input').value = '';
+  document.getElementById('news-summary').value = '';
+  document.getElementById('news-details').value = '';
+  document.getElementById('news-vocab').value = '';
+  document.getElementById('news-stance').value = '';
+  document.getElementById('news-reading-view').classList.add('hidden');
+  document.getElementById('news-check').classList.add('hidden');
+  updateNewsWordCount();
+  renderNewsStats();
+  alert(`Saved! ${wpm} WPM logged.`);
+}
+
+function renderNewsStats() {
+  const sessions = stats.newsSessions || [];
+  if (sessions.length === 0) {
+    document.getElementById('news-history').innerHTML = '<p class="text-sm text-dim">No sessions yet — paste an article above to start.</p>';
+    document.getElementById('news-sessions').textContent = '0';
+    return;
+  }
+  const last = sessions[sessions.length - 1];
+  const last10 = sessions.slice(-10);
+  const avg = Math.round(last10.reduce((s, x) => s + x.wpm, 0) / last10.length);
+  const best = Math.max(...sessions.map(s => s.wpm));
+
+  document.getElementById('news-current-wpm').textContent = last.wpm;
+  document.getElementById('news-avg-wpm').textContent = avg;
+  document.getElementById('news-best-wpm').textContent = best;
+  document.getElementById('news-sessions').textContent = sessions.length;
+
+  const recent = sessions.slice(-10).reverse();
+  let html = '<table style="width:100%;font-size:0.85rem;"><thead><tr><th>Date</th><th>Words</th><th>Time</th><th>WPM</th></tr></thead><tbody>';
+  recent.forEach(s => {
+    const m = Math.floor(s.seconds/60), sec = s.seconds%60;
+    html += `<tr><td>${s.date}</td><td>${s.words}</td><td>${m}:${String(sec).padStart(2,'0')}</td><td><strong style="color:var(--accent);">${s.wpm}</strong></td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('news-history').innerHTML = html;
+}
+
 // ===== INIT =====
 updateDashboard();
 loadTodayTasks();
@@ -1904,6 +2239,8 @@ loadReading();
 nextVocab();
 loadWriting();
 loadSpeaking();
+renderNewsStats();
+updateNewsWordCount();
 </script>
 </body>
 </html>
