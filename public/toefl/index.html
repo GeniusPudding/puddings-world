@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="TOEFL">
-<link rel="manifest" href="/toefl/manifest.json">
+<link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%230f172a'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle' fill='%2338bdf8' font-family='Segoe UI,sans-serif' font-weight='700'%3ET%3C/text%3E%3C/svg%3E">
 <title>TOEFL Trainer — Daily Practice Assistant</title>
 <style>
@@ -878,33 +878,28 @@ window.addEventListener('appinstalled', () => dismissInstall());
 // ===== SERVICE WORKER (offline support) =====
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/toefl/sw.js', {scope: '/toefl/'}).catch(err => console.log('SW failed:', err));
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed:', err));
   });
 }
 
-// ===== DAILY REMINDER (browser notifications) =====
 function requestNotificationPermission() {
-  if (!('Notification' in window)) {
-    alert('This browser does not support notifications');
-    return;
-  }
+  if (!('Notification' in window)) { alert('This browser does not support notifications'); return; }
   Notification.requestPermission().then(perm => {
     if (perm === 'granted') {
-      new Notification('TOEFL Trainer', {body: 'Reminders enabled! I will remind you daily.', icon: '/toefl/manifest.json'});
+      new Notification('TOEFL Trainer', {body: 'Reminders enabled — I will nudge you daily.'});
       localStorage.setItem('notif-enabled', '1');
       scheduleNextReminder();
-      document.getElementById('notif-btn').textContent = '🔔 Reminders ON';
+      const btn = document.getElementById('notif-btn');
+      if (btn) btn.textContent = '🔔 Reminders ON';
     }
   });
 }
-
 function scheduleNextReminder() {
   const hour = parseInt(localStorage.getItem('notif-hour') || '20');
   const now = new Date();
   const next = new Date();
   next.setHours(hour, 0, 0, 0);
   if (next <= now) next.setDate(next.getDate() + 1);
-  const delay = next - now;
   setTimeout(() => {
     if (Notification.permission === 'granted') {
       const phase = getWeekPhase();
@@ -913,18 +908,14 @@ function scheduleNextReminder() {
       if (done < total) {
         new Notification('TOEFL Daily Trainer', {
           body: `${phase.label}: ${done}/${total} tasks done today. Tap to continue.`,
-          icon: '/toefl/manifest.json',
-          badge: '/toefl/manifest.json',
-          tag: 'daily-reminder',
-          requireInteraction: false
+          tag: 'daily-reminder'
         });
       }
     }
     scheduleNextReminder();
-  }, delay);
+  }, next - now);
 }
-
-if (localStorage.getItem('notif-enabled') === '1' && Notification.permission === 'granted') {
+if (localStorage.getItem('notif-enabled') === '1' && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
   scheduleNextReminder();
 }
 
