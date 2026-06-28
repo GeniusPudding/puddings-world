@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TOEFL">
+<link rel="manifest" href="/toefl/manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%230f172a'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle' fill='%2338bdf8' font-family='Segoe UI,sans-serif' font-weight='700'%3ET%3C/text%3E%3C/svg%3E">
+<title>TOEFL Trainer — Daily Practice Assistant</title>
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --surface2: #334155;
+  --accent: #38bdf8; --accent2: #818cf8; --accent3: #34d399; --warn: #fbbf24; --danger: #f87171;
+  --text: #e2e8f0; --text-dim: #94a3b8; --border: #475569;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI',-apple-system,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+.container { max-width:900px; margin:0 auto; padding:1.5rem; }
+
+header { text-align:center; padding:2rem 1rem 1rem; }
+header h1 { font-size:1.8rem; }
+header h1 span { color:var(--accent); }
+header p { color:var(--text-dim); font-size:0.95rem; margin-top:0.3rem; }
+
+nav { display:flex; gap:0.4rem; justify-content:center; padding:0.8rem; background:var(--surface);
+  border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; flex-wrap:wrap; }
+nav button { background:var(--surface2); color:var(--text-dim); border:1px solid var(--border);
+  padding:0.5rem 1rem; border-radius:6px; cursor:pointer; font-size:0.85rem; transition:all 0.2s; }
+nav button:hover, nav button.active { background:var(--accent); color:var(--bg); border-color:var(--accent); font-weight:600; }
+
+.panel { display:none; margin:1.5rem 0; }
+.panel.active { display:block; }
+
+h2 { font-size:1.4rem; margin-bottom:1rem; color:var(--accent); }
+h3 { font-size:1.1rem; margin:1.2rem 0 0.6rem; color:var(--accent2); }
+
+.card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.5rem; margin:1rem 0; }
+.card-sm { padding:1rem; margin:0.5rem 0; }
+
+button.btn { background:var(--accent); color:var(--bg); border:none; padding:0.6rem 1.2rem;
+  border-radius:6px; cursor:pointer; font-size:0.9rem; font-weight:600; transition:all 0.2s; }
+button.btn:hover { opacity:0.85; transform:translateY(-1px); }
+button.btn-secondary { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
+button.btn-secondary:hover { border-color:var(--accent); }
+button.btn-warn { background:var(--warn); color:#000; }
+button.btn-danger { background:var(--danger); color:#000; }
+button.btn-success { background:var(--accent3); color:#000; }
+
+textarea { width:100%; background:var(--surface2); color:var(--text); border:1px solid var(--border);
+  border-radius:8px; padding:1rem; font-size:0.95rem; font-family:inherit; resize:vertical; min-height:120px; }
+textarea:focus { outline:none; border-color:var(--accent); }
+
+.passage { background:var(--surface2); border-radius:8px; padding:1.5rem; margin:1rem 0;
+  font-size:0.95rem; line-height:1.8; max-height:400px; overflow-y:auto; }
+
+.quiz-option { display:block; background:var(--surface2); border:1px solid var(--border);
+  border-radius:6px; padding:0.8rem 1rem; margin:0.4rem 0; cursor:pointer; transition:all 0.2s; width:100%; text-align:left; color:var(--text); font-size:0.9rem; }
+.quiz-option:hover { border-color:var(--accent); }
+.quiz-option.selected { border-color:var(--accent); background:rgba(56,189,248,0.1); }
+.quiz-option.correct { border-color:var(--accent3); background:rgba(52,211,153,0.15); }
+.quiz-option.wrong { border-color:var(--danger); background:rgba(248,113,113,0.15); }
+
+.timer { font-size:2rem; font-weight:700; color:var(--warn); text-align:center; font-family:'Courier New',monospace; }
+.timer.danger { color:var(--danger); }
+
+.progress-bar { height:6px; background:var(--surface2); border-radius:3px; overflow:hidden; margin:0.5rem 0; }
+.progress-fill { height:100%; background:var(--accent3); border-radius:3px; transition:width 0.3s; }
+
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:0.8rem; margin:1rem 0; }
+.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1rem; text-align:center; }
+.stat-card .number { font-size:1.8rem; font-weight:700; color:var(--accent); }
+.stat-card .label { font-size:0.8rem; color:var(--text-dim); margin-top:0.2rem; }
+
+.vocab-card { perspective:1000px; height:200px; cursor:pointer; margin:1rem 0; }
+.vocab-inner { position:relative; width:100%; height:100%; transition:transform 0.6s; transform-style:preserve-3d; }
+.vocab-card.flipped .vocab-inner { transform:rotateY(180deg); }
+.vocab-front, .vocab-back { position:absolute; width:100%; height:100%; backface-visibility:hidden;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.5rem; }
+.vocab-back { transform:rotateY(180deg); }
+.vocab-word { font-size:1.6rem; font-weight:700; color:var(--accent); }
+.vocab-hint { font-size:0.85rem; color:var(--text-dim); margin-top:0.5rem; }
+
+.tag { display:inline-block; padding:0.15rem 0.5rem; border-radius:4px; font-size:0.75rem; margin:0.1rem; }
+.tag-r { background:#1e3a5f; color:#7dd3fc; }
+.tag-l { background:#4a2c6e; color:#c4b5fd; }
+.tag-s { background:#065f46; color:#6ee7b7; }
+.tag-w { background:#5c3d1e; color:#fcd34d; }
+
+.hidden { display:none !important; }
+.mb { margin-bottom:1rem; }
+.mt { margin-top:1rem; }
+.text-dim { color:var(--text-dim); }
+.text-sm { font-size:0.85rem; }
+.text-center { text-align:center; }
+.flex-between { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; }
+
+@media(max-width:600px) {
+  .container { padding:0.8rem; }
+  header { padding:1.2rem 0.5rem 0.5rem; }
+  header h1 { font-size:1.3rem; }
+  header p { font-size:0.8rem; }
+  .stats-grid { grid-template-columns:repeat(2,1fr); gap:0.5rem; }
+  .stat-card { padding:0.6rem; }
+  .stat-card .number { font-size:1.4rem; }
+  .stat-card .label { font-size:0.7rem; }
+  nav { gap:0.25rem; padding:0.5rem; overflow-x:auto; flex-wrap:nowrap; justify-content:flex-start; -webkit-overflow-scrolling:touch; }
+  nav button { padding:0.4rem 0.7rem; font-size:0.75rem; white-space:nowrap; flex-shrink:0; }
+  .card { padding:1rem; }
+  h2 { font-size:1.2rem; }
+  h3 { font-size:1rem; }
+  button.btn { padding:0.7rem 1rem; font-size:0.85rem; }
+  .timer { font-size:1.6rem; }
+  .passage { padding:1rem; font-size:0.9rem; max-height:300px; }
+  .quiz-option { padding:0.7rem 0.8rem; font-size:0.85rem; }
+  textarea { font-size:16px; }
+  .vocab-card { height:180px; }
+  .vocab-word { font-size:1.4rem; }
+}
+
+#install-banner {
+  position:fixed; bottom:1rem; left:1rem; right:1rem; max-width:400px; margin:0 auto;
+  background:var(--accent); color:var(--bg); padding:0.8rem 1rem; border-radius:10px;
+  display:none; align-items:center; justify-content:space-between; gap:0.5rem;
+  box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:1000; font-size:0.9rem; font-weight:600;
+}
+#install-banner.show { display:flex; }
+#install-banner button { background:rgba(0,0,0,0.2); color:var(--bg); border:none;
+  padding:0.4rem 0.8rem; border-radius:6px; cursor:pointer; font-weight:700; }
+
+@supports (padding: max(0px)) {
+  body { padding-bottom: env(safe-area-inset-bottom); }
+  nav { padding-top: max(0.8rem, env(safe-area-inset-top)); }
+}
+</style>
+</head>
+<body>
+
+<div id="install-banner">
+  <span>📱 Install as app</span>
+  <div style="display:flex;gap:0.4rem;">
+    <button onclick="installPWA()">Install</button>
+    <button onclick="dismissInstall()">✕</button>
+  </div>
+</div>
+
+<header>
+  <h1>📝 TOEFL <span>Daily Trainer</span></h1>
+  <p>Target score 5.0/6.0 (old: 100/120) — works offline, installable</p>
+</header>
+
+<nav>
+  <button onclick="showPanel('today')" id="nav-today" class="active">📅 Today</button>
+  <button onclick="showPanel('dashboard')" id="nav-dashboard">Dashboard</button>
+  <button onclick="showPanel('reading')" id="nav-reading">Reading</button>
+  <button onclick="showPanel('vocab')" id="nav-vocab">Vocabulary</button>
+  <button onclick="showPanel('writing')" id="nav-writing">Writing</button>
+  <button onclick="showPanel('speaking')" id="nav-speaking">Speaking</button>
+  <button onclick="showPanel('listening')" id="nav-listening">Listening</button>
+  <button onclick="showPanel('plan')" id="nav-plan">8-Week Plan</button>
+</nav>
+
+<div class="container">
+
+<!-- ====== TODAY (NEW) ====== -->
+<div id="panel-today" class="panel active">
+  <div class="flex-between mb">
+    <h2 style="margin:0;">📅 Today's Plan</h2>
+    <span class="tag tag-w" id="today-phase">Week 1 — Foundation</span>
+  </div>
+
+  <div class="card" style="background: linear-gradient(135deg, var(--surface), var(--surface2));">
+    <div class="flex-between">
+      <div>
+        <div style="font-size:0.85rem; color:var(--text-dim);">Start date</div>
+        <div style="font-size:1.1rem; font-weight:600;">2026-06-02</div>
+      </div>
+      <div style="text-align:center;">
+        <div class="number" id="today-streak" style="font-size:2rem; color:var(--accent3);">0</div>
+        <div style="font-size:0.75rem; color:var(--text-dim);">Day streak 🔥</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:0.85rem; color:var(--text-dim);">Days to deadline</div>
+        <div style="font-size:1.1rem; font-weight:600; color:var(--warn);" id="days-left">—</div>
+      </div>
+    </div>
+    <div class="progress-bar" style="margin-top:1rem;">
+      <div class="progress-fill" id="today-progress" style="width:0%;"></div>
+    </div>
+    <div class="text-center text-sm text-dim" style="margin-top:0.3rem;"><span id="tasks-done">0</span>/<span id="tasks-total">5</span> tasks completed today</div>
+    <div class="text-center" style="margin-top:0.8rem;">
+      <button class="btn btn-secondary" id="notif-btn" onclick="requestNotificationPermission()" style="font-size:0.8rem;padding:0.4rem 0.8rem;">🔔 Enable daily reminders</button>
+    </div>
+  </div>
+
+  <h3>Today's Tasks (~75 min)</h3>
+  <div id="today-tasks"></div>
+
+  <div class="card mt">
+    <h3>🎯 Your Targets</h3>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="number" id="t-reading" style="color:var(--accent3);">3.75</div><div class="label">Reading → 5.0</div></div>
+      <div class="stat-card"><div class="number" id="t-listening" style="color:var(--warn);">3.25</div><div class="label">Listening → 5.0</div></div>
+      <div class="stat-card"><div class="number" id="t-speaking" style="color:var(--danger);">2.25</div><div class="label">Speaking → 5.0</div></div>
+      <div class="stat-card"><div class="number" id="t-writing" style="color:var(--danger);">2.25</div><div class="label">Writing → 5.0</div></div>
+    </div>
+    <p class="text-sm text-dim" style="margin-top:0.5rem;">📊 Re-diagnose in 4 weeks to update these scores</p>
+  </div>
+</div>
+
+<!-- ====== 8-WEEK PLAN ====== -->
+<div id="panel-plan" class="panel">
+  <h2>📚 Your 8-Week Plan</h2>
+  <p class="text-dim text-sm mb">Customized based on your level: Reading B2, Listening B1-B2, Speaking A2, Writing A2-B1. Target: 5.0/6.0 by March 2027.</p>
+
+  <div class="card">
+    <h3>Weeks 1–2: Foundation 🏗</h3>
+    <p class="text-dim text-sm" style="margin-bottom:0.5rem;">Build raw input capacity. Vocabulary, structure, listening warm-up.</p>
+    <ul style="font-size:0.85rem; padding-left:1.2rem; color:var(--text-dim);">
+      <li>Vocab: 10 words/day (Level 1–2)</li>
+      <li>Reading: 1 short passage + 5 Qs</li>
+      <li>Listening: TED-Ed 5 min (no subtitles → notes → with subtitles → 3-sentence summary)</li>
+      <li>Speaking: SHADOWING only (repeat what you hear, don't produce original yet)</li>
+      <li>Writing: 5 English sentences/day with varied structure</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Weeks 3–4: Templates 📝</h3>
+    <p class="text-dim text-sm" style="margin-bottom:0.5rem;">Memorize speaking/writing formulas. Start producing original output.</p>
+    <ul style="font-size:0.85rem; padding-left:1.2rem; color:var(--text-dim);">
+      <li>Vocab: Level 2–3</li>
+      <li>Reading: Medium passage, timed</li>
+      <li>Listening: NPR Short Wave + dictation paragraph</li>
+      <li>Speaking: Task 1 template (Position → Reason 1 → Reason 2 → Conclusion), record yourself</li>
+      <li>Writing: 5-paragraph essay structure, 1 prompt/day</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Weeks 5–6: Integrated 🎯</h3>
+    <p class="text-dim text-sm" style="margin-bottom:0.5rem;">Full TOEFL-format sections, dictation drills.</p>
+    <ul style="font-size:0.85rem; padding-left:1.2rem; color:var(--text-dim);">
+      <li>Full TOEFL reading passage (700 words) + 10 Qs</li>
+      <li>Full TOEFL lecture (5 min) + 6 Qs, ONE listen only</li>
+      <li>Speaking: 15s prep + 45s actual answer</li>
+      <li>Writing: 10 min plan + 20 min write (300 words)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Weeks 7–8: Mock & Refine 🏆</h3>
+    <p class="text-dim text-sm" style="margin-bottom:0.5rem;">Full mock tests, weak-spot remediation.</p>
+    <ul style="font-size:0.85rem; padding-left:1.2rem; color:var(--text-dim);">
+      <li>Mon/Wed/Fri: Full TOEFL section practice (alternating)</li>
+      <li>Tue/Thu: Targeted weakness drilling</li>
+      <li>Sat: Full mock test (~2 hours)</li>
+      <li>Sun: Mock review + plan next week</li>
+    </ul>
+    <p class="text-sm mt" style="color:var(--accent);">🎯 Week 8 end: Take ETS official sample test → re-diagnose → next cycle</p>
+  </div>
+
+  <div class="card" style="border-left: 4px solid var(--warn);">
+    <h3>⚠️ Reality Check</h3>
+    <p class="text-sm text-dim">At your current level, hitting 5.0 in 3 months is unrealistic. Realistic path:</p>
+    <ul style="font-size:0.85rem; padding-left:1.2rem; color:var(--text-dim); margin-top:0.5rem;">
+      <li>3 months → 4.0 (old ~80)</li>
+      <li>6 months → 4.5 (old ~90)</li>
+      <li>9 months → 5.0 (old ~100) ✓ Georgia Tech, Imperial</li>
+    </ul>
+    <p class="text-sm mt" style="color:var(--accent3);">→ Target Fall 2027 admissions (Mar 1, 2027 deadline). Spring 2027 too aggressive.</p>
+  </div>
+</div>
+
+<!-- ====== DASHBOARD ====== -->
+<div id="panel-dashboard" class="panel">
+  <h2>Your Progress</h2>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="number" id="stat-streak">0</div><div class="label">Day Streak</div></div>
+    <div class="stat-card"><div class="number" id="stat-reading">0</div><div class="label">Reading Done</div></div>
+    <div class="stat-card"><div class="number" id="stat-vocab">0</div><div class="label">Vocab Learned</div></div>
+    <div class="stat-card"><div class="number" id="stat-writing">0</div><div class="label">Essays Written</div></div>
+    <div class="stat-card"><div class="number" id="stat-speaking">0</div><div class="label">Speaking Done</div></div>
+    <div class="stat-card"><div class="number" id="stat-total">0</div><div class="label">Total Sessions</div></div>
+  </div>
+
+  <div class="card">
+    <h3>Today's Recommended Practice</h3>
+    <p class="text-dim text-sm mb">A balanced daily session takes about 30–45 minutes. Do at least one activity per day to maintain your streak.</p>
+    <div id="daily-plan"></div>
+  </div>
+
+  <div class="card">
+    <h3>Quick Links to Free Mock Tests</h3>
+    <ul style="list-style:none; padding:0;">
+      <li style="padding:0.4rem 0;"><a href="https://www.ets.org/toefl/test-takers/ibt/prepare/sample-test-jan-2026-1.html" target="_blank" style="color:var(--accent);">ETS Official Sample Test 1 (2026 format)</a></li>
+      <li style="padding:0.4rem 0;"><a href="https://www.ets.org/toefl/test-takers/ibt/prepare/sample-test-jan-2026-2.html" target="_blank" style="color:var(--accent);">ETS Official Sample Test 2 (2026 format)</a></li>
+      <li style="padding:0.4rem 0;"><a href="https://toefl.magoosh.com/practice_tests/free" target="_blank" style="color:var(--accent);">Magoosh Free Practice Test (ETS real questions)</a></li>
+      <li style="padding:0.4rem 0;"><a href="https://www.toeflmocktests.com/practice-tests/full-test/" target="_blank" style="color:var(--accent);">TOEFLMockTests — 16 Full-Length Free Tests</a></li>
+      <li style="padding:0.4rem 0;"><a href="https://www.testglider.com/toefl/en/mock-tests" target="_blank" style="color:var(--accent);">TestGlider — Free Mock + Score</a></li>
+      <li style="padding:0.4rem 0;"><a href="https://www.myspeakingscore.com/" target="_blank" style="color:var(--accent);">My Speaking Score (ETS licensed scoring)</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ====== READING ====== -->
+<div id="panel-reading" class="panel">
+  <h2><span class="tag tag-r">Reading</span> Academic Reading Practice</h2>
+  <p class="text-dim text-sm mb">Read the passage carefully, then answer the questions. The TOEFL Reading section tests comprehension of academic texts.</p>
+  <div class="flex-between mb">
+    <button class="btn" onclick="loadReading()">New Passage</button>
+    <span class="text-dim text-sm" id="reading-progress"></span>
+  </div>
+  <div id="reading-area"></div>
+</div>
+
+<!-- ====== VOCABULARY ====== -->
+<div id="panel-vocab" class="panel">
+  <h2><span class="tag tag-r">Vocab</span> Academic Vocabulary Flashcards</h2>
+  <p class="text-dim text-sm mb">Click the card to flip. Rate your recall to optimize review schedule. These are high-frequency TOEFL academic words.</p>
+  <div class="flex-between mb">
+    <button class="btn" onclick="nextVocab()">Next Word</button>
+    <span class="text-dim text-sm" id="vocab-progress"></span>
+  </div>
+  <div class="vocab-card" id="vocab-card" onclick="flipVocab()">
+    <div class="vocab-inner" id="vocab-inner">
+      <div class="vocab-front">
+        <div class="vocab-word" id="vocab-word">—</div>
+        <div class="vocab-hint" id="vocab-pos"></div>
+        <div class="vocab-hint" style="margin-top:1rem;">Click to reveal definition</div>
+      </div>
+      <div class="vocab-back">
+        <div id="vocab-def" style="font-size:1.1rem; text-align:center;"></div>
+        <div id="vocab-example" style="font-size:0.85rem; color:var(--text-dim); margin-top:0.8rem; font-style:italic; text-align:center;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="flex-between mt" id="vocab-buttons" style="justify-content:center; gap:1rem;">
+    <button class="btn btn-danger" onclick="rateVocab('hard')">Hard — Again</button>
+    <button class="btn btn-warn" onclick="rateVocab('medium')">Medium — Got It</button>
+    <button class="btn btn-success" onclick="rateVocab('easy')">Easy — Knew It</button>
+  </div>
+</div>
+
+<!-- ====== WRITING ====== -->
+<div id="panel-writing" class="panel">
+  <h2><span class="tag tag-w">Writing</span> Independent Writing Practice</h2>
+  <p class="text-dim text-sm mb">You have 10 minutes to write a response. Aim for 150–300 words. Focus on clear thesis, supporting points, and conclusion.</p>
+  <div class="flex-between mb">
+    <button class="btn" onclick="loadWriting()">New Prompt</button>
+    <div class="timer" id="writing-timer">10:00</div>
+  </div>
+  <div class="card" id="writing-prompt-area"></div>
+  <textarea id="writing-input" placeholder="Start writing your response here..." rows="12"></textarea>
+  <div class="flex-between mt">
+    <span class="text-dim text-sm">Word count: <strong id="word-count">0</strong></span>
+    <div style="display:flex; gap:0.5rem;">
+      <button class="btn btn-secondary" onclick="toggleWritingTimer()">Start / Pause Timer</button>
+      <button class="btn btn-success" onclick="submitWriting()">Submit & Self-Evaluate</button>
+    </div>
+  </div>
+  <div id="writing-eval" class="card hidden mt"></div>
+</div>
+
+<!-- ====== SPEAKING ====== -->
+<div id="panel-speaking" class="panel">
+  <h2><span class="tag tag-s">Speaking</span> Speaking Practice</h2>
+  <p class="text-dim text-sm mb">Read the prompt, prepare for 15 seconds, then speak for 45 seconds. Record yourself (use your phone) and listen back.</p>
+  <div class="flex-between mb">
+    <button class="btn" onclick="loadSpeaking()">New Prompt</button>
+  </div>
+  <div class="card" id="speaking-prompt-area"></div>
+  <div class="text-center mt">
+    <div class="timer" id="speaking-timer">—</div>
+    <p class="text-dim text-sm" id="speaking-phase"></p>
+  </div>
+  <div class="flex-between mt" style="justify-content:center; gap:1rem;">
+    <button class="btn btn-warn" onclick="startSpeakingPrep()">Start Prep (15s)</button>
+    <button class="btn btn-success" onclick="startSpeakingRecord()">Start Speaking (45s)</button>
+  </div>
+  <div class="card mt">
+    <h3>Speaking Self-Evaluation Checklist</h3>
+    <ul style="padding-left:1.2rem; color:var(--text-dim); font-size:0.9rem;">
+      <li>Did I directly address the question?</li>
+      <li>Was my answer organized (intro → points → conclusion)?</li>
+      <li>Did I speak fluently without long pauses?</li>
+      <li>Did I use varied vocabulary (not repeating the same words)?</li>
+      <li>Was my pronunciation clear and understandable?</li>
+      <li>Did I use specific examples or details?</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ====== LISTENING ====== -->
+<div id="panel-listening" class="panel">
+  <h2><span class="tag tag-l">Listening</span> Listening Practice Guide</h2>
+  <p class="text-dim text-sm mb">TOEFL Listening requires sustained attention to academic lectures and conversations. Here's how to practice daily.</p>
+
+  <div class="card">
+    <h3>Free Listening Resources</h3>
+    <ul style="list-style:none; padding:0;">
+      <li style="padding:0.5rem 0;"><a href="https://www.ets.org/toefl/test-takers/ibt/prepare/sample-test-jan-2026-1.html" target="_blank" style="color:var(--accent);">ETS Official Listening Sample (2026)</a> — Start here</li>
+      <li style="padding:0.5rem 0;"><a href="https://www.toeflmocktests.com/practice-tests/" target="_blank" style="color:var(--accent);">TOEFLMockTests Listening Section</a> — Free full sections</li>
+      <li style="padding:0.5rem 0;"><strong style="color:var(--accent2);">TED Talks</strong> — Academic topics, 10–18 min, enable subtitles initially</li>
+      <li style="padding:0.5rem 0;"><strong style="color:var(--accent2);">BBC Learning English</strong> — 6-Minute English, structured listening</li>
+      <li style="padding:0.5rem 0;"><strong style="color:var(--accent2);">NPR Short Wave</strong> — Science podcast, ~10 min episodes</li>
+      <li style="padding:0.5rem 0;"><strong style="color:var(--accent2);">Crash Course (YouTube)</strong> — Academic subjects, fast-paced, great for note-taking practice</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Daily Listening Drill (15 min)</h3>
+    <ol style="padding-left:1.2rem; color:var(--text-dim); font-size:0.9rem;">
+      <li style="padding:0.3rem 0;"><strong>Pick a TED Talk or podcast episode</strong> (5–10 min)</li>
+      <li style="padding:0.3rem 0;"><strong>Listen once WITHOUT subtitles.</strong> Take notes on: main idea, key details, speaker's opinion</li>
+      <li style="padding:0.3rem 0;"><strong>Listen again WITH subtitles.</strong> Check what you missed</li>
+      <li style="padding:0.3rem 0;"><strong>Write a 3-sentence summary</strong> of what you heard</li>
+      <li style="padding:0.3rem 0;"><strong>Note 3 new words/phrases</strong> you didn't know — add them to your vocab list</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Note-Taking Practice</h3>
+    <p class="text-dim text-sm mb">In the TOEFL Listening section, you can take notes. Practice using abbreviations and symbols:</p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.3rem; font-size:0.85rem; color:var(--text-dim);">
+      <span>→ = leads to / causes</span><span>↑ = increase</span>
+      <span>← = comes from</span><span>↓ = decrease</span>
+      <span>≈ = approximately</span><span>∴ = therefore</span>
+      <span>≠ = not equal / different</span><span>e.g. = for example</span>
+      <span>b/c = because</span><span>w/ = with</span>
+      <span>govt = government</span><span>dev = development</span>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ===== DATA =====
+const VOCAB = [
+  {word:"ubiquitous",pos:"adj.",def:"Present, appearing, or found everywhere",ex:"Smartphones have become ubiquitous in modern society."},
+  {word:"empirical",pos:"adj.",def:"Based on observation or experience rather than theory",ex:"The study relied on empirical data collected over five years."},
+  {word:"proliferate",pos:"v.",def:"To increase rapidly in number; spread widely",ex:"Social media platforms have proliferated in the last decade."},
+  {word:"paradigm",pos:"n.",def:"A typical example, pattern, or model of something",ex:"The discovery shifted the scientific paradigm entirely."},
+  {word:"inherent",pos:"adj.",def:"Existing as a natural or basic part of something",ex:"There are inherent risks in any surgical procedure."},
+  {word:"mitigate",pos:"v.",def:"To make less severe, serious, or painful",ex:"The government introduced measures to mitigate the effects of inflation."},
+  {word:"substantiate",pos:"v.",def:"To provide evidence to support or prove the truth of",ex:"The researchers were unable to substantiate their initial claims."},
+  {word:"unprecedented",pos:"adj.",def:"Never done or known before",ex:"The pandemic caused unprecedented disruption to global supply chains."},
+  {word:"ambiguous",pos:"adj.",def:"Open to more than one interpretation; not clear",ex:"The results of the experiment were ambiguous and required further analysis."},
+  {word:"deteriorate",pos:"v.",def:"To become progressively worse",ex:"Air quality continues to deteriorate in many urban areas."},
+  {word:"comprehensive",pos:"adj.",def:"Including all or nearly all elements or aspects",ex:"The report provides a comprehensive overview of climate change impacts."},
+  {word:"phenomenon",pos:"n.",def:"A fact or situation observed to exist or happen",ex:"Scientists struggled to explain the unusual phenomenon."},
+  {word:"hypothetical",pos:"adj.",def:"Based on a suggested idea, not necessarily real or true",ex:"The professor presented a hypothetical scenario to illustrate the concept."},
+  {word:"allocate",pos:"v.",def:"To distribute resources or duties for a particular purpose",ex:"The university allocated additional funding for AI research."},
+  {word:"fluctuate",pos:"v.",def:"To rise and fall irregularly in number or amount",ex:"Oil prices tend to fluctuate based on geopolitical events."},
+  {word:"conducive",pos:"adj.",def:"Making a certain situation or outcome likely or possible",ex:"A quiet environment is more conducive to focused study."},
+  {word:"albeit",pos:"conj.",def:"Although; even though",ex:"The project was successful, albeit over budget."},
+  {word:"pragmatic",pos:"adj.",def:"Dealing with things sensibly and realistically",ex:"The team took a pragmatic approach to solving the problem."},
+  {word:"exacerbate",pos:"v.",def:"To make a problem or bad situation worse",ex:"Deforestation has exacerbated the effects of soil erosion."},
+  {word:"scrutinize",pos:"v.",def:"To examine or inspect closely and thoroughly",ex:"The committee will scrutinize every detail of the proposal."},
+  {word:"discrepancy",pos:"n.",def:"A lack of compatibility or similarity between two or more facts",ex:"There was a significant discrepancy between the two reports."},
+  {word:"catalyst",pos:"n.",def:"Something that causes an important event to happen",ex:"The invention of the printing press was a catalyst for social change."},
+  {word:"concurrent",pos:"adj.",def:"Existing, happening, or done at the same time",ex:"The two experiments were conducted on concurrent timelines."},
+  {word:"rudimentary",pos:"adj.",def:"Involving or limited to basic principles; at an early stage",ex:"The student had only a rudimentary understanding of the topic."},
+  {word:"analogous",pos:"adj.",def:"Comparable in certain respects; similar",ex:"The human brain is often considered analogous to a computer."},
+  {word:"disseminate",pos:"v.",def:"To spread information widely",ex:"The findings were disseminated through academic journals."},
+  {word:"elicit",pos:"v.",def:"To draw out a response or reaction from someone",ex:"The survey was designed to elicit honest feedback from participants."},
+  {word:"infer",pos:"v.",def:"To deduce or conclude from evidence and reasoning",ex:"From the data, we can infer that temperature affects reaction speed."},
+  {word:"arbitrary",pos:"adj.",def:"Based on random choice rather than reason or system",ex:"The selection criteria seemed entirely arbitrary."},
+  {word:"resilient",pos:"adj.",def:"Able to recover quickly from difficult conditions",ex:"Coral reefs are surprisingly resilient when given time to recover."},
+  {word:"plausible",pos:"adj.",def:"Seeming reasonable or probable",ex:"The theory is plausible but lacks experimental support."},
+  {word:"constrain",pos:"v.",def:"To restrict or limit",ex:"Budget limitations constrained the scope of the research."},
+  {word:"synthesize",pos:"v.",def:"To combine components into a connected whole",ex:"The paper synthesizes findings from multiple disciplines."},
+  {word:"tangible",pos:"adj.",def:"Clear and definite; real; able to be touched",ex:"The program produced tangible improvements in student performance."},
+  {word:"offset",pos:"v.",def:"To counterbalance or compensate for",ex:"The gains in efficiency offset the higher initial costs."},
+  {word:"undermine",pos:"v.",def:"To damage or weaken, especially gradually",ex:"Corruption can undermine public trust in institutions."},
+  {word:"accumulate",pos:"v.",def:"To gather together or acquire an increasing amount",ex:"Greenhouse gases accumulate in the atmosphere over time."},
+  {word:"volatile",pos:"adj.",def:"Liable to change rapidly and unpredictably",ex:"The stock market has been extremely volatile this quarter."},
+  {word:"supplement",pos:"v.",def:"To add an extra element to enhance or complete",ex:"The textbook is supplemented with online exercises."},
+  {word:"remnant",pos:"n.",def:"A small remaining quantity; a surviving trace",ex:"Archaeologists found remnants of an ancient civilization."}
+];
+
+const READINGS = [
+  {title:"The Urban Heat Island Effect",
+   text:`Cities tend to experience higher temperatures than surrounding rural areas, a phenomenon known as the urban heat island (UHI) effect. This temperature difference, which can reach 5-10°C in some cases, results from several factors related to urbanization.
+
+The primary cause is the replacement of natural vegetation with dark, heat-absorbing surfaces such as asphalt roads and concrete buildings. These materials have low albedo, meaning they reflect less solar radiation and instead absorb and store heat during the day, gradually releasing it at night. This explains why urban areas often remain warmer than rural areas even after sunset.
+
+Another contributing factor is the reduction of evapotranspiration in cities. In natural landscapes, plants release water vapor through their leaves, a process that has a cooling effect on the surrounding air. In densely built environments, this natural cooling mechanism is largely absent. Additionally, human activities in cities generate substantial waste heat through transportation, industrial processes, and air conditioning systems.
+
+The UHI effect has significant implications for urban residents. It increases energy consumption for cooling, elevates heat-related health risks, and can worsen air quality by promoting the formation of ground-level ozone. Various mitigation strategies have been proposed, including increasing urban green spaces, using reflective building materials, and implementing cool roof technologies.
+
+Recent research has also explored the relationship between the UHI effect and urban planning. Studies suggest that cities with more compact, high-rise development patterns may experience different heat island characteristics compared to sprawling low-rise cities. Understanding these dynamics is essential for designing cities that are resilient to rising global temperatures.`,
+   questions:[
+     {q:"What is the primary cause of the urban heat island effect?",
+      options:["Increased population density","Dark, heat-absorbing surfaces replacing vegetation","Industrial pollution","Lack of wind in urban areas"],
+      answer:1},
+     {q:"According to the passage, why do urban areas remain warm at night?",
+      options:["Air conditioning systems release heat","Cars continue to produce emissions","Materials release heat they absorbed during the day","Streetlights generate warmth"],
+      answer:2},
+     {q:"What role does evapotranspiration play in the UHI effect?",
+      options:["It increases temperatures in cities","Its absence in cities removes a natural cooling mechanism","It causes humidity that traps heat","It reflects solar radiation"],
+      answer:1},
+     {q:"The word 'mitigate' in paragraph 4 is closest in meaning to:",
+      options:["Eliminate completely","Make worse","Reduce the severity of","Study in detail"],
+      answer:2},
+     {q:"What can be inferred about compact high-rise cities?",
+      options:["They always have worse heat islands","They experience heat island effects differently than sprawling cities","They are immune to the UHI effect","They require more green spaces"],
+      answer:1}
+   ]},
+  {title:"Neuroplasticity: The Brain's Ability to Change",
+   text:`For much of the twentieth century, scientists believed that the adult brain was essentially fixed — that its structure and function were determined during early development and remained largely unchanged thereafter. This view, known as the "static brain" model, suggested that once critical periods of development had passed, the brain had limited capacity for reorganization. However, research over the past several decades has fundamentally challenged this assumption.
+
+Neuroplasticity, also called brain plasticity, refers to the brain's ability to reorganize itself by forming new neural connections throughout life. This process allows neurons in the brain to compensate for injury and adjust their activities in response to new situations or changes in the environment. Neuroplasticity occurs at multiple levels, from cellular changes involving individual neurons to large-scale cortical remapping.
+
+One of the most compelling demonstrations of neuroplasticity comes from studies of individuals who have lost a sense, such as sight. Research has shown that in people who are blind from birth, the visual cortex — the brain region normally dedicated to processing visual information — is repurposed to process auditory and tactile information. This suggests that the brain's organization is not rigidly predetermined but is instead shaped by experience and usage.
+
+The implications of neuroplasticity extend beyond recovery from injury. Educational research has shown that learning new skills, such as playing a musical instrument or acquiring a second language, physically changes the brain's structure. Musicians, for instance, tend to have larger areas of the brain devoted to motor control and auditory processing compared to non-musicians.
+
+Understanding neuroplasticity has also transformed approaches to rehabilitation after stroke or traumatic brain injury. Therapies that leverage the brain's plastic nature — such as constraint-induced movement therapy, which forces patients to use affected limbs — have shown remarkable success in helping patients regain lost functions.`,
+   questions:[
+     {q:"What was the 'static brain' model?",
+      options:["The brain changes constantly throughout life","The adult brain's structure is essentially fixed after development","The brain can only change during sleep","Brain cells die and are never replaced"],
+      answer:1},
+     {q:"What happens to the visual cortex in people blind from birth?",
+      options:["It becomes inactive","It shrinks over time","It is repurposed for auditory and tactile processing","It develops normally but is unused"],
+      answer:2},
+     {q:"The word 'compelling' in paragraph 3 is closest in meaning to:",
+      options:["Confusing","Convincing","Controversial","Complicated"],
+      answer:1},
+     {q:"According to the passage, what physical change occurs in musicians' brains?",
+      options:["Their brains weigh more","They have larger motor control and auditory processing areas","Their visual cortex is larger","They have more brain cells"],
+      answer:1},
+     {q:"What is constraint-induced movement therapy?",
+      options:["A therapy that restricts brain activity","A therapy that forces use of affected limbs to promote recovery","A surgical procedure to repair neural pathways","A medication that enhances neuroplasticity"],
+      answer:1}
+   ]},
+  {title:"The Economics of Renewable Energy Transition",
+   text:`The global energy landscape is undergoing a profound transformation as countries increasingly shift from fossil fuels to renewable energy sources. This transition, driven by concerns about climate change and energy security, presents both economic opportunities and challenges that vary significantly across different nations and regions.
+
+Solar photovoltaic (PV) technology has experienced perhaps the most dramatic cost reduction of any energy technology in history. Between 2010 and 2025, the cost of solar PV fell by approximately 90 percent, making it the cheapest source of new electricity generation in most parts of the world. This cost decline follows a pattern known as the learning curve: as cumulative production doubles, costs decrease by a predictable percentage. For solar panels, this rate has been approximately 20-25 percent per doubling.
+
+Wind energy has followed a similar, though less dramatic, trajectory. Onshore wind costs have fallen by roughly 70 percent over the same period, while offshore wind — once considered prohibitively expensive — has become increasingly competitive. These cost reductions have been driven by technological improvements, economies of scale in manufacturing, and more efficient installation processes.
+
+However, the transition to renewable energy faces several economic challenges. Perhaps the most significant is the intermittency problem: solar panels only generate electricity when the sun shines, and wind turbines only operate when the wind blows. This variability necessitates investment in energy storage technologies, grid infrastructure upgrades, and backup power systems, all of which add costs that are not reflected in the simple per-kilowatt-hour price of renewable generation.
+
+Furthermore, the transition creates distributional impacts that must be managed. Communities dependent on fossil fuel industries face job losses and economic disruption. Managing this "just transition" — ensuring that the benefits and burdens of the energy transition are shared equitably — has become a central policy challenge for governments worldwide.`,
+   questions:[
+     {q:"By how much did solar PV costs fall between 2010 and 2025?",
+      options:["Approximately 50%","Approximately 70%","Approximately 90%","Approximately 95%"],
+      answer:2},
+     {q:"What is the 'learning curve' as described in the passage?",
+      options:["The time it takes to learn to install solar panels","A predictable cost decrease as cumulative production doubles","The rate at which new technologies are adopted","The education required for renewable energy jobs"],
+      answer:1},
+     {q:"What is identified as the most significant challenge for renewable energy?",
+      options:["High manufacturing costs","Lack of public support","Intermittency of energy generation","Limited raw materials"],
+      answer:2},
+     {q:"The word 'prohibitively' in paragraph 3 is closest in meaning to:",
+      options:["Illegally","Excessively, preventing use","Slightly","Temporarily"],
+      answer:1},
+     {q:"What does 'just transition' refer to?",
+      options:["A quick switch from fossil fuels","Fair distribution of benefits and burdens of energy transition","Government subsidies for renewable energy","International agreements on emissions"],
+      answer:1}
+   ]}
+];
+
+const WRITING_PROMPTS = [
+  {topic:"Do you agree or disagree with the following statement? It is better to learn from online courses than from traditional classroom settings. Use specific reasons and examples to support your answer.",type:"Independent"},
+  {topic:"Some people believe that technology has made our lives more complicated rather than simpler. Do you agree or disagree? Use specific reasons and examples to support your answer.",type:"Independent"},
+  {topic:"Do you agree or disagree with the following statement? Working professionals should prioritize gaining advanced degrees over gaining work experience. Use specific reasons and examples to support your answer.",type:"Independent"},
+  {topic:"Some people prefer to work on one project at a time, while others prefer to work on multiple projects simultaneously. Which approach do you prefer and why?",type:"Independent"},
+  {topic:"Do you agree or disagree? The most important quality of a good teacher is the ability to make complex topics easy to understand. Use specific reasons and examples.",type:"Independent"},
+  {topic:"Some people think that the best way to learn a new language is to live in a country where it is spoken. Others think you can learn effectively through courses and self-study. Which view do you support?",type:"Independent"},
+  {topic:"Do you agree or disagree with the following statement? Universities should require all students to take courses outside their major field of study.",type:"Independent"},
+  {topic:"Is it more important for a company to invest in improving its products or in improving its customer service? Give reasons and examples.",type:"Independent"}
+];
+
+const SPEAKING_PROMPTS = [
+  {task:"Task 1 — Personal Choice",prompt:"Some people prefer to study alone, while others prefer to study in groups. Which do you prefer and why? Include specific reasons and details."},
+  {task:"Task 1 — Personal Choice",prompt:"If you could change one thing about your hometown, what would it be and why?"},
+  {task:"Task 1 — Personal Choice",prompt:"Do you think it is better to take risks or play it safe when making important life decisions? Explain why."},
+  {task:"Task 1 — Personal Choice",prompt:"Talk about a skill that you think everyone should learn. Why is this skill important?"},
+  {task:"Task 1 — Personal Choice",prompt:"Some people prefer jobs with a fixed schedule, while others prefer flexible working hours. Which do you prefer? Explain your choice."},
+  {task:"Task 1 — Personal Choice",prompt:"Describe a challenge you faced and explain how you overcame it."},
+  {task:"Task 1 — Personal Choice",prompt:"Do you agree or disagree: People learn more from their failures than from their successes. Explain why."},
+  {task:"Task 1 — Personal Choice",prompt:"If you had extra free time every day, how would you use it? Why?"}
+];
+
+// ===== STATE =====
+let stats = JSON.parse(localStorage.getItem('toefl-stats') || '{}');
+if (!stats.streak) stats = {streak:0, reading:0, vocab:0, writing:0, speaking:0, total:0, lastDate:'', vocabSeen:[], vocabHard:[]};
+
+let currentReading = null;
+let currentVocabIdx = -1;
+let writingTimerInterval = null;
+let writingSeconds = 600;
+let writingRunning = false;
+let speakingTimerInterval = null;
+
+// ===== NAVIGATION =====
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+}
+
+// ===== DASHBOARD =====
+function updateDashboard() {
+  const today = new Date().toISOString().slice(0,10);
+  if (stats.lastDate && stats.lastDate !== today) {
+    const last = new Date(stats.lastDate); const now = new Date(today);
+    const diff = (now - last) / (1000*60*60*24);
+    if (diff > 1) stats.streak = 0;
+  }
+  document.getElementById('stat-streak').textContent = stats.streak;
+  document.getElementById('stat-reading').textContent = stats.reading;
+  document.getElementById('stat-vocab').textContent = stats.vocab;
+  document.getElementById('stat-writing').textContent = stats.writing;
+  document.getElementById('stat-speaking').textContent = stats.speaking;
+  document.getElementById('stat-total').textContent = stats.total;
+
+  const plan = document.getElementById('daily-plan');
+  plan.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.5rem;">
+      <button class="btn btn-secondary" onclick="showPanel('vocab')" style="padding:1rem;">
+        <span class="tag tag-r">10 min</span> Vocabulary — 10 words
+      </button>
+      <button class="btn btn-secondary" onclick="showPanel('reading')" style="padding:1rem;">
+        <span class="tag tag-r">10 min</span> Reading — 1 passage
+      </button>
+      <button class="btn btn-secondary" onclick="showPanel('writing')" style="padding:1rem;">
+        <span class="tag tag-w">10 min</span> Writing — 1 prompt
+      </button>
+      <button class="btn btn-secondary" onclick="showPanel('speaking')" style="padding:1rem;">
+        <span class="tag tag-s">5 min</span> Speaking — 2 prompts
+      </button>
+      <button class="btn btn-secondary" onclick="showPanel('listening')" style="padding:1rem;">
+        <span class="tag tag-l">15 min</span> Listening — TED/podcast
+      </button>
+    </div>`;
+  saveStat();
+}
+
+function recordActivity(type) {
+  const today = new Date().toISOString().slice(0,10);
+  if (stats.lastDate !== today) { stats.streak++; stats.lastDate = today; }
+  stats[type]++;
+  stats.total++;
+  saveStat();
+  updateDashboard();
+}
+
+function saveStat() { localStorage.setItem('toefl-stats', JSON.stringify(stats)); }
+
+// ===== READING =====
+function loadReading() {
+  const r = READINGS[Math.floor(Math.random()*READINGS.length)];
+  currentReading = r;
+  const area = document.getElementById('reading-area');
+  let html = `<h3>${r.title}</h3><div class="passage">${r.text.split('\n\n').map(p=>'<p style="margin-bottom:1rem;">'+p+'</p>').join('')}</div>`;
+  html += '<h3>Questions</h3>';
+  r.questions.forEach((q,qi) => {
+    html += `<div class="card card-sm" id="rq-${qi}"><p style="font-weight:600;margin-bottom:0.5rem;">${qi+1}. ${q.q}</p>`;
+    q.options.forEach((opt,oi) => {
+      html += `<button class="quiz-option" onclick="checkReading(${qi},${oi})" id="rq-${qi}-${oi}">${String.fromCharCode(65+oi)}) ${opt}</button>`;
+    });
+    html += `<p class="text-dim text-sm hidden mt" id="rq-${qi}-fb"></p></div>`;
+  });
+  area.innerHTML = html;
+  document.getElementById('reading-progress').textContent = `Passages completed: ${stats.reading}`;
+}
+
+function checkReading(qi, oi) {
+  const q = currentReading.questions[qi];
+  const allBtns = document.querySelectorAll(`#rq-${qi} .quiz-option`);
+  allBtns.forEach((b,i) => {
+    b.onclick = null;
+    if (i === q.answer) b.classList.add('correct');
+    if (i === oi && oi !== q.answer) b.classList.add('wrong');
+  });
+  const fb = document.getElementById(`rq-${qi}-fb`);
+  fb.classList.remove('hidden');
+  fb.textContent = oi === q.answer ? '✓ Correct!' : `✗ The correct answer is ${String.fromCharCode(65+q.answer)}.`;
+  fb.style.color = oi === q.answer ? 'var(--accent3)' : 'var(--danger)';
+
+  const allAnswered = currentReading.questions.every((_,i) => {
+    return document.querySelector(`#rq-${i} .quiz-option.correct`) || document.querySelector(`#rq-${i} .quiz-option.wrong`);
+  });
+  if (allAnswered) recordActivity('reading');
+}
+
+// ===== VOCABULARY =====
+function nextVocab() {
+  const available = VOCAB.filter((_,i) => !stats.vocabSeen.includes(i) || stats.vocabHard.includes(i));
+  if (available.length === 0) { stats.vocabSeen = []; stats.vocabHard = []; saveStat(); }
+
+  const hardFirst = VOCAB.findIndex((_,i) => stats.vocabHard.includes(i));
+  if (hardFirst >= 0 && Math.random() < 0.5) {
+    currentVocabIdx = hardFirst;
+  } else {
+    let idx;
+    do { idx = Math.floor(Math.random()*VOCAB.length); } while (stats.vocabSeen.includes(idx) && VOCAB.filter((_,i) => !stats.vocabSeen.includes(i)).length > 0);
+    currentVocabIdx = idx;
+  }
+
+  const v = VOCAB[currentVocabIdx];
+  document.getElementById('vocab-word').textContent = v.word;
+  document.getElementById('vocab-pos').textContent = v.pos;
+  document.getElementById('vocab-def').textContent = v.def;
+  document.getElementById('vocab-example').textContent = `"${v.ex}"`;
+  document.getElementById('vocab-card').classList.remove('flipped');
+  document.getElementById('vocab-progress').textContent = `Learned: ${stats.vocab} / ${VOCAB.length}`;
+}
+
+function flipVocab() { document.getElementById('vocab-card').classList.toggle('flipped'); }
+
+function rateVocab(level) {
+  if (currentVocabIdx < 0) return;
+  if (!stats.vocabSeen.includes(currentVocabIdx)) {
+    stats.vocabSeen.push(currentVocabIdx);
+    recordActivity('vocab');
+  }
+  if (level === 'hard') {
+    if (!stats.vocabHard.includes(currentVocabIdx)) stats.vocabHard.push(currentVocabIdx);
+  } else {
+    stats.vocabHard = stats.vocabHard.filter(i => i !== currentVocabIdx);
+  }
+  saveStat();
+  nextVocab();
+}
+
+// ===== WRITING =====
+function loadWriting() {
+  const p = WRITING_PROMPTS[Math.floor(Math.random()*WRITING_PROMPTS.length)];
+  document.getElementById('writing-prompt-area').innerHTML = `<span class="tag tag-w">${p.type}</span><p style="margin-top:0.5rem;font-size:1rem;">${p.topic}</p>`;
+  document.getElementById('writing-input').value = '';
+  document.getElementById('word-count').textContent = '0';
+  document.getElementById('writing-eval').classList.add('hidden');
+  writingSeconds = 600;
+  writingRunning = false;
+  if (writingTimerInterval) clearInterval(writingTimerInterval);
+  updateWritingTimer();
+}
+
+function updateWritingTimer() {
+  const m = Math.floor(writingSeconds/60); const s = writingSeconds%60;
+  const el = document.getElementById('writing-timer');
+  el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+  el.classList.toggle('danger', writingSeconds < 60);
+}
+
+function toggleWritingTimer() {
+  if (writingRunning) {
+    clearInterval(writingTimerInterval); writingRunning = false;
+  } else {
+    writingRunning = true;
+    writingTimerInterval = setInterval(() => {
+      if (writingSeconds > 0) { writingSeconds--; updateWritingTimer(); }
+      else { clearInterval(writingTimerInterval); writingRunning = false; }
+    }, 1000);
+  }
+}
+
+function submitWriting() {
+  const text = document.getElementById('writing-input').value.trim();
+  if (!text) return;
+  const words = text.split(/\s+/).filter(w => w.length > 0).length;
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+  const avgWordsPerSentence = sentences > 0 ? (words/sentences).toFixed(1) : 0;
+
+  const evalEl = document.getElementById('writing-eval');
+  evalEl.classList.remove('hidden');
+  evalEl.innerHTML = `
+    <h3>Self-Evaluation</h3>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="number">${words}</div><div class="label">Words</div></div>
+      <div class="stat-card"><div class="number">${sentences}</div><div class="label">Sentences</div></div>
+      <div class="stat-card"><div class="number">${avgWordsPerSentence}</div><div class="label">Avg words/sentence</div></div>
+    </div>
+    <p class="text-dim text-sm" style="margin:0.5rem 0;">${words < 150 ? '⚠ Try to write at least 150 words.' : words > 300 ? '⚠ Good length, but keep it under 300 for the exam.' : '✓ Good word count for TOEFL writing.'}</p>
+    <h3>Checklist — Rate Yourself</h3>
+    <ul style="padding-left:1.2rem; color:var(--text-dim); font-size:0.9rem;">
+      <li>☐ Does your essay have a clear thesis statement?</li>
+      <li>☐ Do you have 2–3 supporting points with examples?</li>
+      <li>☐ Is each paragraph focused on one main idea?</li>
+      <li>☐ Did you use transition words (However, Furthermore, In addition)?</li>
+      <li>☐ Is your conclusion a restatement of your position?</li>
+      <li>☐ Did you vary your sentence structure (simple + complex)?</li>
+      <li>☐ Did you avoid repeating the same words?</li>
+    </ul>
+    <p class="text-sm mt" style="color:var(--accent);">💡 Tip: Copy your essay and paste it into Claude or ChatGPT for detailed grammar and structure feedback.</p>`;
+  recordActivity('writing');
+}
+
+document.getElementById('writing-input').addEventListener('input', function() {
+  const words = this.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+  document.getElementById('word-count').textContent = words;
+});
+
+// ===== SPEAKING =====
+function loadSpeaking() {
+  const p = SPEAKING_PROMPTS[Math.floor(Math.random()*SPEAKING_PROMPTS.length)];
+  document.getElementById('speaking-prompt-area').innerHTML = `<span class="tag tag-s">${p.task}</span><p style="margin-top:0.5rem;font-size:1rem;">${p.prompt}</p>`;
+  document.getElementById('speaking-timer').textContent = '—';
+  document.getElementById('speaking-phase').textContent = '';
+  if (speakingTimerInterval) clearInterval(speakingTimerInterval);
+}
+
+function startSpeakingPrep() {
+  if (speakingTimerInterval) clearInterval(speakingTimerInterval);
+  let sec = 15;
+  const timer = document.getElementById('speaking-timer');
+  const phase = document.getElementById('speaking-phase');
+  phase.textContent = 'PREPARATION — organize your thoughts';
+  timer.textContent = sec;
+  timer.classList.remove('danger');
+  speakingTimerInterval = setInterval(() => {
+    sec--;
+    timer.textContent = sec;
+    if (sec <= 5) timer.classList.add('danger');
+    if (sec <= 0) {
+      clearInterval(speakingTimerInterval);
+      timer.textContent = '0';
+      phase.textContent = 'Prep time over! Click "Start Speaking"';
+      try { new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==').play(); } catch(e){}
+    }
+  }, 1000);
+}
+
+function startSpeakingRecord() {
+  if (speakingTimerInterval) clearInterval(speakingTimerInterval);
+  let sec = 45;
+  const timer = document.getElementById('speaking-timer');
+  const phase = document.getElementById('speaking-phase');
+  phase.textContent = 'SPEAKING — talk now!';
+  timer.textContent = sec;
+  timer.classList.remove('danger');
+  speakingTimerInterval = setInterval(() => {
+    sec--;
+    timer.textContent = sec;
+    if (sec <= 10) timer.classList.add('danger');
+    if (sec <= 0) {
+      clearInterval(speakingTimerInterval);
+      timer.textContent = 'DONE';
+      phase.textContent = 'Time\'s up! How did you do?';
+      recordActivity('speaking');
+    }
+  }, 1000);
+}
+
+// ===== PWA INSTALL =====
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  if (!localStorage.getItem('install-dismissed')) {
+    document.getElementById('install-banner').classList.add('show');
+  }
+});
+function installPWA() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(() => {
+    deferredInstallPrompt = null;
+    dismissInstall();
+  });
+}
+function dismissInstall() {
+  document.getElementById('install-banner').classList.remove('show');
+  localStorage.setItem('install-dismissed', '1');
+}
+window.addEventListener('appinstalled', () => dismissInstall());
+
+// ===== SERVICE WORKER (offline support) =====
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/toefl/sw.js', {scope: '/toefl/'}).catch(err => console.log('SW failed:', err));
+  });
+}
+
+// ===== DAILY REMINDER (browser notifications) =====
+function requestNotificationPermission() {
+  if (!('Notification' in window)) {
+    alert('This browser does not support notifications');
+    return;
+  }
+  Notification.requestPermission().then(perm => {
+    if (perm === 'granted') {
+      new Notification('TOEFL Trainer', {body: 'Reminders enabled! I will remind you daily.', icon: '/toefl/manifest.json'});
+      localStorage.setItem('notif-enabled', '1');
+      scheduleNextReminder();
+      document.getElementById('notif-btn').textContent = '🔔 Reminders ON';
+    }
+  });
+}
+
+function scheduleNextReminder() {
+  const hour = parseInt(localStorage.getItem('notif-hour') || '20');
+  const now = new Date();
+  const next = new Date();
+  next.setHours(hour, 0, 0, 0);
+  if (next <= now) next.setDate(next.getDate() + 1);
+  const delay = next - now;
+  setTimeout(() => {
+    if (Notification.permission === 'granted') {
+      const phase = getWeekPhase();
+      const done = stats.todayChecks ? stats.todayChecks.done.length : 0;
+      const total = WEEKLY_TASKS[phase.phase].length;
+      if (done < total) {
+        new Notification('TOEFL Daily Trainer', {
+          body: `${phase.label}: ${done}/${total} tasks done today. Tap to continue.`,
+          icon: '/toefl/manifest.json',
+          badge: '/toefl/manifest.json',
+          tag: 'daily-reminder',
+          requireInteraction: false
+        });
+      }
+    }
+    scheduleNextReminder();
+  }, delay);
+}
+
+if (localStorage.getItem('notif-enabled') === '1' && Notification.permission === 'granted') {
+  scheduleNextReminder();
+}
+
+// ===== TODAY VIEW =====
+const PLAN_START_DATE = '2026-06-02';
+const TARGET_DEADLINE = '2027-03-01';
+
+const WEEKLY_TASKS = {
+  foundation: [
+    {id:'vocab', icon:'📚', title:'Vocabulary — 10 flashcards', time:'5 min', detail:'Level 1–2 words. Use Vocabulary tab.', target:'vocab'},
+    {id:'reading', icon:'📖', title:'Reading — 1 short passage', time:'15 min', detail:'1 academic passage + 5 questions. Use Reading tab.', target:'reading'},
+    {id:'listening', icon:'👂', title:'Listening — TED-Ed 5 min', time:'20 min', detail:'Watch WITHOUT subtitles → notes → watch WITH → 3-sentence summary', link:'https://www.youtube.com/c/teded'},
+    {id:'speaking', icon:'🗣', title:'Speaking — Shadowing', time:'15 min', detail:'Pick 2-min TED segment, repeat each sentence after speaker (shadowing). NOT original output yet.', link:'https://www.ted.com/talks'},
+    {id:'writing', icon:'✍️', title:'Writing — 5 varied sentences', time:'20 min', detail:'Write 5 English sentences about your day. Mix simple, compound, complex structures.', target:'writing'}
+  ],
+  templates: [
+    {id:'vocab', icon:'📚', title:'Vocabulary — 10 flashcards', time:'5 min', detail:'Level 2–3 words.', target:'vocab'},
+    {id:'reading', icon:'📖', title:'Reading — Timed medium passage', time:'15 min', detail:'Time yourself. Aim for under 15 min for passage + Qs.', target:'reading'},
+    {id:'listening', icon:'👂', title:'Listening — NPR Short Wave + dictation', time:'20 min', detail:'Listen to one episode (~10 min) once, then dictate one paragraph from memory.', link:'https://www.npr.org/podcasts/510351/short-wave'},
+    {id:'speaking', icon:'🗣', title:'Speaking — Task 1 template', time:'15 min', detail:'Use template: Position (5s) → Reason 1 + ex (15s) → Reason 2 + ex (15s) → Conclusion (10s). Record yourself.', target:'speaking'},
+    {id:'writing', icon:'✍️', title:'Writing — Independent essay', time:'20 min', detail:'5-paragraph structure: intro + 2 body + counterargument + conclusion. 1 prompt.', target:'writing'}
+  ],
+  integrated: [
+    {id:'vocab', icon:'📚', title:'Vocabulary — 10 flashcards', time:'5 min', detail:'Level 3 + connectors.', target:'vocab'},
+    {id:'reading', icon:'📖', title:'Reading — Full TOEFL passage', time:'20 min', detail:'700-word passage + 10 questions, strictly timed.', target:'reading'},
+    {id:'listening', icon:'👂', title:'Listening — TOEFL lecture', time:'20 min', detail:'5-min lecture + 6 questions, ONE listen only, take notes.', link:'https://www.ets.org/toefl/test-takers/ibt/prepare/sample-test-jan-2026-1.html'},
+    {id:'speaking', icon:'🗣', title:'Speaking — Full TOEFL Task 1', time:'15 min', detail:'15s prep + 45s speaking. Record. Repeat 2x.', target:'speaking'},
+    {id:'writing', icon:'✍️', title:'Writing — Full Independent', time:'20 min', detail:'10 min planning + 20 min writing. Target 300 words.', target:'writing'}
+  ],
+  mock: [
+    {id:'mock_section', icon:'🏆', title:'Full TOEFL section', time:'30 min', detail:'Alternating: Mon-Reading, Wed-Listening, Fri-Speaking. Today: see Plan tab.'},
+    {id:'weakness', icon:'🎯', title:'Targeted weakness drill', time:'20 min', detail:'Tue/Thu: focus on what you got wrong this week.'},
+    {id:'vocab', icon:'📚', title:'Vocabulary review', time:'5 min', detail:'Review marked-Hard words.', target:'vocab'},
+    {id:'speaking', icon:'🗣', title:'Speaking — daily forced output', time:'10 min', detail:'1 Task 1 + 1 Task 2 prompt, record both.', target:'speaking'},
+    {id:'writing', icon:'✍️', title:'Writing — keep daily', time:'15 min', detail:'1 short prompt to stay sharp.', target:'writing'}
+  ]
+};
+
+function getWeekPhase() {
+  const start = new Date(PLAN_START_DATE);
+  const today = new Date(new Date().toISOString().slice(0,10));
+  const daysDiff = Math.floor((today - start) / (1000*60*60*24));
+  const weekNum = Math.floor(daysDiff / 7) + 1;
+  if (weekNum <= 2) return {week: weekNum, phase: 'foundation', label: `Week ${weekNum} — Foundation 🏗`};
+  if (weekNum <= 4) return {week: weekNum, phase: 'templates', label: `Week ${weekNum} — Templates 📝`};
+  if (weekNum <= 6) return {week: weekNum, phase: 'integrated', label: `Week ${weekNum} — Integrated 🎯`};
+  if (weekNum <= 8) return {week: weekNum, phase: 'mock', label: `Week ${weekNum} — Mock & Refine 🏆`};
+  return {week: weekNum, phase: 'mock', label: `Week ${weekNum} — Maintenance / Re-diagnose`};
+}
+
+function getDaysToDeadline() {
+  const deadline = new Date(TARGET_DEADLINE);
+  const today = new Date(new Date().toISOString().slice(0,10));
+  return Math.max(0, Math.floor((deadline - today) / (1000*60*60*24)));
+}
+
+function loadTodayTasks() {
+  const phase = getWeekPhase();
+  document.getElementById('today-phase').textContent = phase.label;
+  document.getElementById('today-streak').textContent = stats.streak || 0;
+  document.getElementById('days-left').textContent = getDaysToDeadline() + ' days';
+
+  const today = new Date().toISOString().slice(0,10);
+  if (!stats.todayChecks || stats.todayChecks.date !== today) {
+    stats.todayChecks = {date: today, done: []};
+    saveStat();
+  }
+
+  const tasks = WEEKLY_TASKS[phase.phase];
+  const container = document.getElementById('today-tasks');
+  let html = '';
+  tasks.forEach(t => {
+    const done = stats.todayChecks.done.includes(t.id);
+    html += `<div class="card card-sm" style="display:flex;align-items:flex-start;gap:0.8rem;${done?'opacity:0.6;background:rgba(52,211,153,0.05);':''}">
+      <input type="checkbox" ${done?'checked':''} onchange="toggleTask('${t.id}')" style="width:22px;height:22px;margin-top:0.2rem;cursor:pointer;accent-color:var(--accent3);">
+      <div style="flex:1;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.3rem;">
+          <strong style="font-size:0.95rem;${done?'text-decoration:line-through;':''}">${t.icon} ${t.title}</strong>
+          <span class="tag tag-r">${t.time}</span>
+        </div>
+        <p style="font-size:0.82rem;color:var(--text-dim);margin-top:0.3rem;">${t.detail}</p>
+        ${t.target ? `<button class="btn btn-secondary" style="margin-top:0.5rem;font-size:0.8rem;padding:0.4rem 0.8rem;" onclick="showPanel('${t.target}')">Open ${t.target} tab →</button>` : ''}
+        ${t.link ? `<a href="${t.link}" target="_blank" style="display:inline-block;margin-top:0.5rem;font-size:0.8rem;color:var(--accent);">Open resource →</a>` : ''}
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+  updateTodayProgress();
+}
+
+function toggleTask(id) {
+  const today = new Date().toISOString().slice(0,10);
+  if (!stats.todayChecks || stats.todayChecks.date !== today) {
+    stats.todayChecks = {date: today, done: []};
+  }
+  const idx = stats.todayChecks.done.indexOf(id);
+  if (idx >= 0) {
+    stats.todayChecks.done.splice(idx, 1);
+  } else {
+    stats.todayChecks.done.push(id);
+    if (stats.lastDate !== today && stats.todayChecks.done.length === 1) {
+      stats.streak = (stats.streak || 0) + 1;
+      stats.lastDate = today;
+    }
+  }
+  saveStat();
+  loadTodayTasks();
+}
+
+function updateTodayProgress() {
+  const phase = getWeekPhase();
+  const tasks = WEEKLY_TASKS[phase.phase];
+  const done = stats.todayChecks ? stats.todayChecks.done.length : 0;
+  const total = tasks.length;
+  const pct = total > 0 ? (done/total*100) : 0;
+  document.getElementById('today-progress').style.width = pct + '%';
+  document.getElementById('tasks-done').textContent = done;
+  document.getElementById('tasks-total').textContent = total;
+}
+
+// ===== INIT =====
+updateDashboard();
+loadTodayTasks();
+loadReading();
+nextVocab();
+loadWriting();
+loadSpeaking();
+</script>
+</body>
+</html>

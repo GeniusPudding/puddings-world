@@ -93,7 +93,27 @@ export default function ServicesPage() {
         ))}
       </div>
 
-      <section className="mt-16 rounded-xl border border-accent/30 bg-accent/5 p-6 sm:p-8">
+      <section className="mt-16 rounded-xl border border-bg-border bg-bg-panel p-6 sm:p-8">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink-muted">
+          personal tools
+        </p>
+        <h2 className="mt-2 text-lg font-semibold tracking-tight">
+          TOEFL Daily Trainer
+        </h2>
+        <p className="mt-3 text-sm leading-relaxed text-ink-secondary">
+          Self-hosted PWA for 2026 TOEFL iBT preparation — installable on any
+          device, works offline, daily reminders. Built for personal use, but
+          public.
+        </p>
+        <Link
+          href="/services/toefl-trainer"
+          className="mt-5 inline-block rounded-md border border-bg-border bg-bg-raised px-4 py-2 font-mono text-sm text-ink-secondary transition-colors hover:border-accent/40 hover:text-accent"
+        >
+          Open trainer →
+        </Link>
+      </section>
+
+      <section className="mt-8 rounded-xl border border-accent/30 bg-accent/5 p-6 sm:p-8">
         <h2 className="text-lg font-semibold tracking-tight">
           Looking for something else?
         </h2>
