@@ -368,7 +368,7 @@ textarea:focus { outline:none; border-color:var(--accent); }
 <!-- ====== SPEAKING ====== -->
 <div id="panel-speaking" class="panel">
   <h2><span class="tag tag-s">Speaking</span> Speaking Practice</h2>
-  <p class="text-dim text-sm mb">Read the prompt, prepare for 15 seconds, then speak for 45 seconds. Record yourself (use your phone) and listen back.</p>
+  <p class="text-dim text-sm mb">15s prep, 45s answer. The browser records your voice — listen back and self-evaluate.</p>
   <div class="flex-between mb">
     <button class="btn" onclick="loadSpeaking()">New Prompt</button>
   </div>
@@ -377,9 +377,15 @@ textarea:focus { outline:none; border-color:var(--accent); }
     <div class="timer" id="speaking-timer">—</div>
     <p class="text-dim text-sm" id="speaking-phase"></p>
   </div>
-  <div class="flex-between mt" style="justify-content:center; gap:1rem;">
-    <button class="btn btn-warn" onclick="startSpeakingPrep()">Start Prep (15s)</button>
-    <button class="btn btn-success" onclick="startSpeakingRecord()">Start Speaking (45s)</button>
+  <div class="flex-between mt" style="justify-content:center; gap:0.5rem; flex-wrap:wrap;">
+    <button class="btn btn-warn" onclick="startSpeakingPrep()">1. Prep (15s)</button>
+    <button class="btn btn-success" onclick="startSpeakingRecord()">2. Speak + Record (45s)</button>
+    <button class="btn btn-secondary" onclick="stopSpeakingRecord()">Stop Early</button>
+  </div>
+  <div id="speaking-playback" class="card mt hidden">
+    <h3>🎧 Your Recording</h3>
+    <audio id="speaking-audio" controls style="width:100%; margin-top:0.5rem;"></audio>
+    <p class="text-sm text-dim mt">Listen back. Did you address the question? Fluent? Clear pronunciation? <a id="speaking-download" download="toefl-speaking.webm" style="color:var(--accent);">Download recording ↓</a></p>
   </div>
   <div class="card mt">
     <h3>Speaking Self-Evaluation Checklist</h3>
@@ -480,7 +486,91 @@ const VOCAB = [
   {word:"accumulate",pos:"v.",def:"To gather together or acquire an increasing amount",ex:"Greenhouse gases accumulate in the atmosphere over time."},
   {word:"volatile",pos:"adj.",def:"Liable to change rapidly and unpredictably",ex:"The stock market has been extremely volatile this quarter."},
   {word:"supplement",pos:"v.",def:"To add an extra element to enhance or complete",ex:"The textbook is supplemented with online exercises."},
-  {word:"remnant",pos:"n.",def:"A small remaining quantity; a surviving trace",ex:"Archaeologists found remnants of an ancient civilization."}
+  {word:"remnant",pos:"n.",def:"A small remaining quantity; a surviving trace",ex:"Archaeologists found remnants of an ancient civilization."},
+  {word:"advocate",pos:"v./n.",def:"To publicly recommend or support",ex:"The senator advocates for stricter environmental regulations."},
+  {word:"alleviate",pos:"v.",def:"To make less severe; ease pain or burden",ex:"Aspirin can alleviate mild headaches."},
+  {word:"ascertain",pos:"v.",def:"To find out for certain; verify",ex:"Detectives worked to ascertain the cause of the accident."},
+  {word:"benevolent",pos:"adj.",def:"Well-meaning and kindly",ex:"The benevolent donor funded the entire library."},
+  {word:"coherent",pos:"adj.",def:"Logical and consistent",ex:"Her argument was clear and coherent throughout."},
+  {word:"compelling",pos:"adj.",def:"Evoking interest, attention, or admiration",ex:"The evidence is compelling but not conclusive."},
+  {word:"conform",pos:"v.",def:"To comply with rules, standards, or expectations",ex:"All products must conform to safety regulations."},
+  {word:"contradict",pos:"v.",def:"To deny the truth of by asserting the opposite",ex:"The new data contradicts the original hypothesis."},
+  {word:"converge",pos:"v.",def:"To come together from different directions",ex:"The two streams converge at the base of the mountain."},
+  {word:"correlate",pos:"v.",def:"To have a mutual relationship or connection",ex:"Income tends to correlate with education level."},
+  {word:"credible",pos:"adj.",def:"Able to be believed; trustworthy",ex:"The witness gave a credible account of events."},
+  {word:"deficiency",pos:"n.",def:"A lack or shortage",ex:"Vitamin D deficiency is common in colder climates."},
+  {word:"delineate",pos:"v.",def:"To describe or portray precisely",ex:"The treaty clearly delineates the borders of the two nations."},
+  {word:"derive",pos:"v.",def:"To obtain something from a specified source",ex:"The word 'history' derives from the Greek 'historia'."},
+  {word:"deviate",pos:"v.",def:"To depart from an established course",ex:"The experiment's results did not deviate from expectations."},
+  {word:"diminish",pos:"v.",def:"To make or become less",ex:"His enthusiasm diminished as the project dragged on."},
+  {word:"distort",pos:"v.",def:"To pull or twist out of shape; misrepresent",ex:"The article distorts the original findings."},
+  {word:"diverge",pos:"v.",def:"To separate from another route, especially of paths",ex:"The two species diverged from a common ancestor."},
+  {word:"dormant",pos:"adj.",def:"Inactive but capable of becoming active",ex:"The volcano has been dormant for over a century."},
+  {word:"endeavor",pos:"v./n.",def:"To try hard to achieve something; an attempt",ex:"Scientists endeavor to understand the origins of the universe."},
+  {word:"enhance",pos:"v.",def:"To intensify, increase, or further improve",ex:"Adding visuals can enhance a presentation."},
+  {word:"erode",pos:"v.",def:"To gradually wear away",ex:"Constant criticism eroded the team's morale."},
+  {word:"facilitate",pos:"v.",def:"To make an action or process easier",ex:"Technology facilitates remote collaboration."},
+  {word:"feasible",pos:"adj.",def:"Possible to do easily or conveniently",ex:"A solar-powered car is now technologically feasible."},
+  {word:"fluctuation",pos:"n.",def:"An irregular rising and falling in number",ex:"Currency fluctuations affected the company's profits."},
+  {word:"foster",pos:"v.",def:"To encourage development of something desirable",ex:"Good schools foster creativity and curiosity."},
+  {word:"fundamental",pos:"adj.",def:"Forming a necessary base or core",ex:"Trust is fundamental to any healthy relationship."},
+  {word:"hinder",pos:"v.",def:"To create difficulties resulting in delay or obstruction",ex:"Heavy rain hindered rescue operations."},
+  {word:"impede",pos:"v.",def:"To delay or prevent by obstructing",ex:"Bureaucratic delays impeded the project's launch."},
+  {word:"implication",pos:"n.",def:"A possible significance or consequence",ex:"The findings have major implications for public policy."},
+  {word:"indicative",pos:"adj.",def:"Serving as a sign or indication",ex:"Rising temperatures are indicative of climate change."},
+  {word:"inevitable",pos:"adj.",def:"Certain to happen; unavoidable",ex:"Some delays are inevitable in large projects."},
+  {word:"integral",pos:"adj.",def:"Necessary to make a whole complete; essential",ex:"Teamwork is an integral part of our culture."},
+  {word:"intricate",pos:"adj.",def:"Very complicated or detailed",ex:"The clock has an intricate mechanism."},
+  {word:"intrinsic",pos:"adj.",def:"Belonging naturally; essential",ex:"Creativity is intrinsic to good design."},
+  {word:"justify",pos:"v.",def:"To show or prove to be right or reasonable",ex:"Can you justify spending so much on advertising?"},
+  {word:"meticulous",pos:"adj.",def:"Showing great attention to detail",ex:"She kept meticulous records of all transactions."},
+  {word:"negligible",pos:"adj.",def:"So small or unimportant as to be not worth considering",ex:"The cost difference is negligible."},
+  {word:"nuanced",pos:"adj.",def:"Characterized by subtle distinctions",ex:"The film offers a nuanced portrayal of the conflict."},
+  {word:"perceive",pos:"v.",def:"To become aware or conscious of",ex:"How customers perceive your brand matters more than reality."},
+  {word:"persistent",pos:"adj.",def:"Continuing firmly despite difficulty",ex:"Persistent effort eventually paid off."},
+  {word:"pertinent",pos:"adj.",def:"Relevant or applicable to a particular matter",ex:"Please limit your questions to pertinent topics."},
+  {word:"precede",pos:"v.",def:"To come before in time, order, or position",ex:"A short briefing will precede the main session."},
+  {word:"predominantly",pos:"adv.",def:"Mainly; for the most part",ex:"The audience was predominantly young professionals."},
+  {word:"presume",pos:"v.",def:"To suppose that something is true without certain proof",ex:"I presume you've read the report."},
+  {word:"profound",pos:"adj.",def:"Very great or intense; deep",ex:"Her work had a profound impact on the field."},
+  {word:"prominent",pos:"adj.",def:"Important; famous; standing out",ex:"He is a prominent figure in modern architecture."},
+  {word:"prone",pos:"adj.",def:"Likely to do or suffer from something",ex:"Coastal areas are prone to flooding."},
+  {word:"reciprocal",pos:"adj.",def:"Given, felt, or done in return",ex:"The two countries signed a reciprocal trade agreement."},
+  {word:"refute",pos:"v.",def:"To prove a statement to be wrong",ex:"The lawyer refuted the witness's testimony."},
+  {word:"reinforce",pos:"v.",def:"To strengthen or support",ex:"Practice reinforces what you learn in class."},
+  {word:"relinquish",pos:"v.",def:"To voluntarily give up",ex:"He relinquished control of the company to his daughter."},
+  {word:"render",pos:"v.",def:"To cause to be or become; provide",ex:"The injury rendered him unable to compete."},
+  {word:"reluctant",pos:"adj.",def:"Unwilling and hesitant",ex:"She was reluctant to share her personal data."},
+  {word:"reside",pos:"v.",def:"To live in a particular place",ex:"He resides in a small village near the coast."},
+  {word:"sceptical",pos:"adj.",def:"Not easily convinced; having doubts",ex:"Many experts remain sceptical of the claims."},
+  {word:"scrutiny",pos:"n.",def:"Critical observation or examination",ex:"The proposal came under intense scrutiny."},
+  {word:"seek",pos:"v.",def:"To attempt to find or obtain",ex:"Many seek advice before making major decisions."},
+  {word:"sequential",pos:"adj.",def:"Forming or following a logical order",ex:"Programming requires sequential thinking."},
+  {word:"speculate",pos:"v.",def:"To form a theory without firm evidence",ex:"Analysts speculate about the merger's outcome."},
+  {word:"sporadic",pos:"adj.",def:"Occurring at irregular intervals",ex:"There were sporadic outbursts of applause."},
+  {word:"static",pos:"adj.",def:"Lacking in movement or change",ex:"Wages have remained static for years."},
+  {word:"sustain",pos:"v.",def:"To support physically or mentally; maintain",ex:"The economy cannot sustain such rapid growth."},
+  {word:"trivial",pos:"adj.",def:"Of little value or importance",ex:"Don't argue over trivial details."},
+  {word:"underlying",pos:"adj.",def:"Real but not immediately obvious",ex:"We need to address the underlying causes, not just symptoms."},
+  {word:"validate",pos:"v.",def:"To check or prove the accuracy of",ex:"The experiment validated the original theory."},
+  {word:"versatile",pos:"adj.",def:"Able to adapt or be adapted to many functions",ex:"Cotton is a versatile fabric for many climates."},
+  {word:"viable",pos:"adj.",def:"Capable of working successfully; feasible",ex:"Solar power is a viable energy source in sunny regions."},
+  {word:"vigorous",pos:"adj.",def:"Strong, healthy, and full of energy",ex:"The candidate launched a vigorous campaign."},
+  {word:"virtually",pos:"adv.",def:"Nearly; almost",ex:"The two products are virtually identical."},
+  {word:"warrant",pos:"v.",def:"To justify or make necessary",ex:"These findings warrant further investigation."},
+  {word:"yield",pos:"v./n.",def:"To produce or provide; the amount produced",ex:"The investment yielded a 12% annual return."},
+  {word:"abundant",pos:"adj.",def:"Existing in large quantities; plentiful",ex:"Solar energy is abundant in desert regions."},
+  {word:"adverse",pos:"adj.",def:"Preventing success; harmful",ex:"The drug has few adverse effects."},
+  {word:"affluent",pos:"adj.",def:"Wealthy; having abundant resources",ex:"The neighborhood has become increasingly affluent."},
+  {word:"akin",pos:"adj.",def:"Of similar character",ex:"His thinking is akin to that of his mentor."},
+  {word:"anticipate",pos:"v.",def:"To regard as probable; expect",ex:"We anticipate strong demand for the new product."},
+  {word:"apparent",pos:"adj.",def:"Clearly visible or understood",ex:"It was apparent that he was not telling the truth."},
+  {word:"apt",pos:"adj.",def:"Appropriate or suitable",ex:"That was an apt description of the situation."},
+  {word:"articulate",pos:"v./adj.",def:"To express clearly; fluent in expression",ex:"She can articulate complex ideas simply."},
+  {word:"attain",pos:"v.",def:"To succeed in achieving",ex:"Few athletes ever attain this level of skill."},
+  {word:"attribute",pos:"v./n.",def:"To regard as caused by; a quality",ex:"He attributes his success to hard work."},
+  {word:"compromise",pos:"v./n.",def:"To accept lower standards; a middle ground",ex:"Both sides must compromise to reach an agreement."},
+  {word:"deplete",pos:"v.",def:"To reduce significantly in number or amount",ex:"Overfishing has depleted local fish populations."}
 ];
 
 const READINGS = [
@@ -564,6 +654,87 @@ Furthermore, the transition creates distributional impacts that must be managed.
      {q:"What does 'just transition' refer to?",
       options:["A quick switch from fossil fuels","Fair distribution of benefits and burdens of energy transition","Government subsidies for renewable energy","International agreements on emissions"],
       answer:1}
+   ]},
+  {title:"Migration Patterns of Monarch Butterflies",
+   text:`The annual migration of monarch butterflies represents one of the most remarkable journeys in the natural world. Each year, hundreds of millions of these insects travel thousands of kilometers from their summer breeding grounds in southern Canada and the northern United States to overwintering sites in central Mexico and coastal California.
+
+What makes this migration particularly extraordinary is that no individual butterfly completes the entire round trip. The monarchs that fly south in autumn are the great-great-grandchildren of those that left Mexico the previous spring. Yet somehow, despite never having seen their destination, these butterflies navigate with remarkable precision to the same forest groves their ancestors used.
+
+Scientists have long puzzled over how monarchs accomplish this navigational feat. Research has revealed that they use a combination of cues. They orient themselves using the position of the sun, compensating for its movement across the sky throughout the day with an internal circadian clock. Recent studies have also shown that monarchs can detect Earth's magnetic field, which they use as a backup compass when the sun is obscured by clouds.
+
+The monarch migration faces increasing threats. The oyamel fir forests in Mexico, where eastern monarchs overwinter, have been reduced by illegal logging. Climate change is altering weather patterns along migration routes, and the widespread use of herbicides has destroyed milkweed, the only plant on which monarch caterpillars can feed. As a result, monarch populations have declined by more than 80 percent over the past two decades.
+
+Conservation efforts now span the entire migratory range, involving cooperation between Canada, the United States, and Mexico. Citizen scientists track individual butterflies by attaching tiny tags to their wings, and millions of people have planted milkweed gardens to help restore monarch habitat.`,
+   questions:[
+     {q:"What makes the monarch migration unusual compared to other animal migrations?",
+      options:["The distance traveled is unusually long","No single butterfly completes the entire round trip","Monarchs migrate only at night","They use only landmarks for navigation"],
+      answer:1},
+     {q:"According to the passage, monarchs primarily navigate using:",
+      options:["Star positions","The sun and an internal clock","Wind patterns","Other butterflies"],
+      answer:1},
+     {q:"What is the backup navigation method used when the sun is hidden?",
+      options:["Following other butterflies","Detecting Earth's magnetic field","Memorizing the landscape","Using ocean currents"],
+      answer:1},
+     {q:"By how much have monarch populations declined in the past two decades?",
+      options:["More than 50 percent","More than 80 percent","Almost 95 percent","About 30 percent"],
+      answer:1},
+     {q:"The word 'compensating' in paragraph 3 most nearly means:",
+      options:["Apologizing","Adjusting for","Replacing entirely","Ignoring"],
+      answer:1}
+   ]},
+  {title:"The Origins of Agriculture",
+   text:`The transition from hunting and gathering to agriculture, which occurred independently in several parts of the world between 12,000 and 5,000 years ago, represents one of the most significant transformations in human history. This shift fundamentally altered not only how humans obtained food, but also how societies were organized, where people lived, and how they understood their relationship with the natural world.
+
+The earliest evidence of agriculture comes from the Fertile Crescent in the Middle East, where archaeological remains suggest that humans began cultivating wheat and barley around 10,000 BCE. Similar transitions occurred independently in China, where rice and millet were domesticated, in Mesoamerica, where maize, beans, and squash were developed, and in the Andes, where potatoes and quinoa were first cultivated.
+
+Why humans made this shift remains a subject of considerable debate. Some scholars argue that climate change at the end of the last Ice Age created favorable conditions for certain plant species, making cultivation more attractive than continued reliance on wild food sources. Others point to population pressure as the driving force, suggesting that as human numbers grew, hunting and gathering could no longer sustain communities.
+
+The consequences of agricultural adoption were profound and often contradictory. On one hand, agriculture allowed for larger, more stable populations and the development of complex civilizations with specialized labor, written records, and monumental architecture. On the other hand, evidence from skeletal remains indicates that early agricultural populations were often shorter, less healthy, and more disease-prone than their hunter-gatherer ancestors. Reliance on a narrow range of staple crops meant that crop failures could lead to widespread famine.
+
+Despite these costs, agriculture spread rapidly because agricultural societies could support larger populations than hunter-gatherer societies, eventually displacing or absorbing them. The agricultural revolution thus set humanity on a trajectory that would lead to cities, states, and, eventually, the industrial and digital revolutions that shape our world today.`,
+   questions:[
+     {q:"In which region did agriculture first develop, according to the passage?",
+      options:["China","The Andes","The Fertile Crescent","Mesoamerica"],
+      answer:2},
+     {q:"What does the passage suggest about why humans adopted agriculture?",
+      options:["The reasons are well understood","It was due to a single factor","Scholars debate multiple possible causes","Religious beliefs drove the change"],
+      answer:2},
+     {q:"According to the passage, early agricultural populations were often:",
+      options:["Healthier than hunter-gatherers","Less healthy than hunter-gatherers","The same in health as hunter-gatherers","Unable to be studied"],
+      answer:1},
+     {q:"Why did agriculture spread despite its disadvantages?",
+      options:["It was easier than hunting","It supported larger populations","Hunters were forced to convert","The climate required it"],
+      answer:1},
+     {q:"The word 'profound' in paragraph 4 most nearly means:",
+      options:["Surprising","Deeply significant","Quickly reversed","Unintended"],
+      answer:1}
+   ]},
+  {title:"How CRISPR Changed Biology",
+   text:`Before 2012, editing the DNA of living cells was a slow, expensive, and unreliable process. Researchers used techniques that often took years to develop for a single target and rarely worked on multiple genes at once. Then, a discovery rooted in obscure bacterial immunity transformed the field almost overnight.
+
+CRISPR, which stands for Clustered Regularly Interspaced Short Palindromic Repeats, was originally identified as a strange pattern of repeated DNA sequences in bacteria. For years, its function remained mysterious. By the early 2000s, researchers had established that CRISPR sequences, paired with proteins known as Cas, formed part of an immune system that bacteria use to defend against viruses. The system stores fragments of viral DNA as a kind of memory and uses them to recognize and cut up the same viruses if they attack again.
+
+In 2012, a research team led by Jennifer Doudna and Emmanuelle Charpentier demonstrated that this bacterial system could be reprogrammed to cut any DNA sequence in any organism, not just viral DNA in bacteria. By designing a short guide RNA that matched the target sequence, scientists could direct the Cas9 protein to make precise cuts in genomes ranging from yeast to plants to human cells. This insight earned the two researchers the 2020 Nobel Prize in Chemistry.
+
+The implications have rippled across nearly every area of biology. Researchers can now disable specific genes in laboratory animals to study what those genes do, create crops resistant to disease, and develop potential treatments for inherited disorders such as sickle cell anemia. Clinical trials using CRISPR to treat genetic diseases have already produced encouraging early results, with some patients showing dramatic improvement.
+
+CRISPR has also generated significant ethical debate. The possibility of editing human embryos to prevent genetic disease — or to enhance traits — raises difficult questions about safety, consent, and the boundary between treatment and enhancement. In 2018, a Chinese scientist's announcement that he had edited the genomes of twin girls drew widespread international condemnation, illustrating how rapidly the technology has outpaced agreement on how to use it responsibly.`,
+   questions:[
+     {q:"What was CRISPR originally identified as?",
+      options:["A new kind of medicine","A repeated DNA pattern in bacteria","A virus that attacks humans","A laboratory tool"],
+      answer:1},
+     {q:"What natural function does CRISPR serve in bacteria?",
+      options:["Helps bacteria reproduce","Acts as part of an immune system","Stores genetic memory of nutrients","Helps bacteria move"],
+      answer:1},
+     {q:"Why was the 2012 work by Doudna and Charpentier important?",
+      options:["They discovered CRISPR for the first time","They showed CRISPR could edit DNA in any organism","They invented a new kind of bacteria","They cured a major disease"],
+      answer:1},
+     {q:"According to the passage, what reaction did the 2018 embryo editing announcement receive?",
+      options:["Strong international support","Widespread condemnation","Indifference","Cautious approval"],
+      answer:1},
+     {q:"The word 'rippled' in paragraph 4 most nearly means:",
+      options:["Spread outward","Disappeared","Confused","Slowed down"],
+      answer:0}
    ]}
 ];
 
@@ -575,7 +746,24 @@ const WRITING_PROMPTS = [
   {topic:"Do you agree or disagree? The most important quality of a good teacher is the ability to make complex topics easy to understand. Use specific reasons and examples.",type:"Independent"},
   {topic:"Some people think that the best way to learn a new language is to live in a country where it is spoken. Others think you can learn effectively through courses and self-study. Which view do you support?",type:"Independent"},
   {topic:"Do you agree or disagree with the following statement? Universities should require all students to take courses outside their major field of study.",type:"Independent"},
-  {topic:"Is it more important for a company to invest in improving its products or in improving its customer service? Give reasons and examples.",type:"Independent"}
+  {topic:"Is it more important for a company to invest in improving its products or in improving its customer service? Give reasons and examples.",type:"Independent"},
+  {topic:"Do you agree or disagree: Children today spend too much time on electronic devices. What are the consequences and what should be done?",type:"Independent"},
+  {topic:"Some governments give financial support to artists. Others believe this money should be spent on health and education. Which view do you support?",type:"Independent"},
+  {topic:"Do you agree or disagree: Social media has had a mostly positive impact on society. Give specific reasons.",type:"Independent"},
+  {topic:"Some people prefer to live in a place where they grew up. Others prefer moving to a new city or country. Which do you think is better?",type:"Independent"},
+  {topic:"Do you agree or disagree: Universities should focus on practical skills rather than theoretical knowledge.",type:"Independent"},
+  {topic:"Some companies require employees to wear uniforms. Others allow employees to choose their own clothing. Which policy do you prefer and why?",type:"Independent"},
+  {topic:"Do you agree or disagree: Reducing the working week to four days would improve people's lives more than it would harm the economy.",type:"Independent"},
+  {topic:"Some students choose a university based on its reputation. Others choose based on which programs are offered. Which is more important?",type:"Independent"},
+  {topic:"Do you agree or disagree: Artificial intelligence will create more job opportunities than it eliminates over the next 20 years.",type:"Independent"},
+  {topic:"Some people exercise alone. Others prefer group classes or team sports. Which do you prefer and why?",type:"Independent"},
+  {topic:"Do you agree or disagree: Cities should ban private cars from downtown areas to reduce pollution.",type:"Independent"},
+  {topic:"Some people think failure is the best teacher. Others believe success teaches us more. Which do you agree with?",type:"Independent"},
+  {topic:"Do you agree or disagree: It is better to have a small group of close friends than many casual acquaintances.",type:"Independent"},
+  {topic:"Some people read fiction for entertainment. Others prefer non-fiction to learn. Which type of reading do you prefer and why?",type:"Independent"},
+  {topic:"Do you agree or disagree: Governments should spend more on space exploration than on solving problems on Earth.",type:"Independent"},
+  {topic:"Some employees prefer working remotely. Others find it harder to stay productive at home. Which environment do you think is more effective?",type:"Independent"},
+  {topic:"Do you agree or disagree: Public libraries are still essential in the age of the internet.",type:"Independent"}
 ];
 
 const SPEAKING_PROMPTS = [
@@ -586,7 +774,23 @@ const SPEAKING_PROMPTS = [
   {task:"Task 1 — Personal Choice",prompt:"Some people prefer jobs with a fixed schedule, while others prefer flexible working hours. Which do you prefer? Explain your choice."},
   {task:"Task 1 — Personal Choice",prompt:"Describe a challenge you faced and explain how you overcame it."},
   {task:"Task 1 — Personal Choice",prompt:"Do you agree or disagree: People learn more from their failures than from their successes. Explain why."},
-  {task:"Task 1 — Personal Choice",prompt:"If you had extra free time every day, how would you use it? Why?"}
+  {task:"Task 1 — Personal Choice",prompt:"If you had extra free time every day, how would you use it? Why?"},
+  {task:"Task 1 — Personal Choice",prompt:"What is one piece of technology you would find difficult to live without, and why?"},
+  {task:"Task 1 — Personal Choice",prompt:"Describe a teacher who had a big influence on you. Explain how they changed your thinking."},
+  {task:"Task 1 — Personal Choice",prompt:"Do you prefer reading books or watching films? Give specific reasons for your preference."},
+  {task:"Task 1 — Personal Choice",prompt:"Talk about a hobby you enjoy. Why is it meaningful to you?"},
+  {task:"Task 1 — Personal Choice",prompt:"If you could live in any country for one year, which would you choose and why?"},
+  {task:"Task 1 — Personal Choice",prompt:"Some people enjoy planning every detail; others prefer to be spontaneous. Which describes you?"},
+  {task:"Task 1 — Personal Choice",prompt:"Describe a time when you had to make a difficult decision. What did you do?"},
+  {task:"Task 1 — Personal Choice",prompt:"Do you think university students should work part-time during their studies? Why or why not?"},
+  {task:"Task 1 — Personal Choice",prompt:"What is one habit you would like to change about yourself, and how would you go about changing it?"},
+  {task:"Task 1 — Personal Choice",prompt:"Describe a place you find relaxing. Why does it have that effect on you?"},
+  {task:"Task 1 — Personal Choice",prompt:"Do you think social media improves or harms friendships? Give specific examples."},
+  {task:"Task 1 — Personal Choice",prompt:"If you had to teach a class for one hour, what subject would you choose and why?"},
+  {task:"Task 2 — Agree/Disagree",prompt:"Some people believe homework helps students learn. Others say it causes too much stress. What is your view?"},
+  {task:"Task 2 — Agree/Disagree",prompt:"Should governments invest more in public transportation than in building roads?"},
+  {task:"Task 2 — Agree/Disagree",prompt:"Some say that creativity is more important than knowledge for success. Do you agree?"},
+  {task:"Task 2 — Agree/Disagree",prompt:"Is it better to have a job you love with low pay, or one you don't enjoy with high pay?"}
 ];
 
 // ===== STATE =====
@@ -810,6 +1014,10 @@ function loadSpeaking() {
   if (speakingTimerInterval) clearInterval(speakingTimerInterval);
 }
 
+let speakingMediaRecorder = null;
+let speakingChunks = [];
+let speakingStream = null;
+
 function startSpeakingPrep() {
   if (speakingTimerInterval) clearInterval(speakingTimerInterval);
   let sec = 15;
@@ -825,18 +1033,46 @@ function startSpeakingPrep() {
     if (sec <= 0) {
       clearInterval(speakingTimerInterval);
       timer.textContent = '0';
-      phase.textContent = 'Prep time over! Click "Start Speaking"';
-      try { new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==').play(); } catch(e){}
+      phase.textContent = 'Prep over — click "Speak + Record"';
     }
   }, 1000);
 }
 
-function startSpeakingRecord() {
+async function startSpeakingRecord() {
   if (speakingTimerInterval) clearInterval(speakingTimerInterval);
-  let sec = 45;
   const timer = document.getElementById('speaking-timer');
   const phase = document.getElementById('speaking-phase');
-  phase.textContent = 'SPEAKING — talk now!';
+  const playback = document.getElementById('speaking-playback');
+  playback.classList.add('hidden');
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    phase.textContent = '⚠️ Browser does not support recording. Use phone voice memo instead.';
+    return;
+  }
+
+  try {
+    speakingStream = await navigator.mediaDevices.getUserMedia({audio: true});
+  } catch (err) {
+    phase.textContent = '⚠️ Mic permission denied. Click 🔒 in address bar to enable, then retry.';
+    return;
+  }
+
+  speakingChunks = [];
+  speakingMediaRecorder = new MediaRecorder(speakingStream);
+  speakingMediaRecorder.ondataavailable = e => { if (e.data.size > 0) speakingChunks.push(e.data); };
+  speakingMediaRecorder.onstop = () => {
+    const blob = new Blob(speakingChunks, {type: speakingMediaRecorder.mimeType || 'audio/webm'});
+    const url = URL.createObjectURL(blob);
+    document.getElementById('speaking-audio').src = url;
+    document.getElementById('speaking-download').href = url;
+    playback.classList.remove('hidden');
+    if (speakingStream) { speakingStream.getTracks().forEach(t => t.stop()); speakingStream = null; }
+    recordActivity('speaking');
+  };
+  speakingMediaRecorder.start();
+
+  let sec = 45;
+  phase.textContent = '🔴 RECORDING — speak now!';
   timer.textContent = sec;
   timer.classList.remove('danger');
   speakingTimerInterval = setInterval(() => {
@@ -846,10 +1082,21 @@ function startSpeakingRecord() {
     if (sec <= 0) {
       clearInterval(speakingTimerInterval);
       timer.textContent = 'DONE';
-      phase.textContent = 'Time\'s up! How did you do?';
-      recordActivity('speaking');
+      phase.textContent = 'Recording saved — listen back below 👇';
+      if (speakingMediaRecorder && speakingMediaRecorder.state === 'recording') {
+        speakingMediaRecorder.stop();
+      }
     }
   }, 1000);
+}
+
+function stopSpeakingRecord() {
+  if (speakingTimerInterval) clearInterval(speakingTimerInterval);
+  if (speakingMediaRecorder && speakingMediaRecorder.state === 'recording') {
+    speakingMediaRecorder.stop();
+    document.getElementById('speaking-timer').textContent = 'DONE';
+    document.getElementById('speaking-phase').textContent = 'Stopped early — listen back below 👇';
+  }
 }
 
 // ===== PWA INSTALL =====
