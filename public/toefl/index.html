@@ -160,7 +160,9 @@ textarea:focus { outline:none; border-color:var(--accent); }
   <button onclick="showPanel('writing')" id="nav-writing">Writing</button>
   <button onclick="showPanel('speaking')" id="nav-speaking">Speaking</button>
   <button onclick="showPanel('listening')" id="nav-listening">Listening</button>
+  <button onclick="showPanel('resources')" id="nav-resources">📚 Resources</button>
   <button onclick="showPanel('plan')" id="nav-plan">8-Week Plan</button>
+  <button onclick="showPanel('about')" id="nav-about">About</button>
 </nav>
 
 <div class="container">
@@ -208,6 +210,152 @@ textarea:focus { outline:none; border-color:var(--accent); }
       <div class="stat-card"><div class="number" id="t-writing" style="color:var(--danger);">2.25</div><div class="label">Writing → 5.0</div></div>
     </div>
     <p class="text-sm text-dim" style="margin-top:0.5rem;">📊 Re-diagnose in 4 weeks to update these scores</p>
+  </div>
+</div>
+
+<!-- ====== RESOURCES ====== -->
+<div id="panel-resources" class="panel">
+  <h2>📚 Free Resource Library</h2>
+  <p class="text-dim text-sm mb">Curated free TOEFL prep resources. This trainer is for habit + format; real test prep means combining it with these.</p>
+
+  <div class="card">
+    <h3>🥇 Tier 1 — Official ETS (use these first)</h3>
+    <ul style="list-style:none; padding:0; font-size:0.9rem;">
+      <li style="padding:0.3rem 0;"><a href="https://www.ets.org/toefl/test-takers/ibt/prepare/sample-test-jan-2026-1.html" target="_blank" style="color:var(--accent);">ETS Official Sample Test 1</a> — 2026 new format, all 4 sections</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.ets.org/toefl/test-takers/ibt/prepare/sample-test-jan-2026-2.html" target="_blank" style="color:var(--accent);">ETS Official Sample Test 2</a> — second free sample</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.ets.org/pdfs/toefl/toefl-ibt-free-practice-test.pdf" target="_blank" style="color:var(--accent);">ETS Free Practice Test PDF</a> — printable version with answer key</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.youtube.com/@TOEFLtv" target="_blank" style="color:var(--accent);">TOEFL TV (ETS YouTube)</a> — official sample speaking responses + tips</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.ets.org/toefl/test-takers/ibt/prepare.html" target="_blank" style="color:var(--accent);">ETS Prep Hub</a> — all official prep links</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📖 Reading</h3>
+    <ul style="list-style:none; padding:0; font-size:0.9rem;">
+      <li style="padding:0.3rem 0;"><a href="https://en.wikipedia.org/wiki/Wikipedia:Featured_articles" target="_blank" style="color:var(--accent);">Wikipedia Featured Articles</a> — vetted, academic-level prose on every topic</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.scientificamerican.com/" target="_blank" style="color:var(--accent);">Scientific American</a> — science writing at TOEFL difficulty</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.bbc.com/future" target="_blank" style="color:var(--accent);">BBC Future</a> — long-form science and culture articles</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.nationalgeographic.com/" target="_blank" style="color:var(--accent);">National Geographic</a> — academic-leaning features</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.khanacademy.org/test-prep/sat/sat-reading-writing-practice" target="_blank" style="color:var(--accent);">Khan Academy SAT Reading</a> — passages overlap heavily with TOEFL difficulty</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.aeon.co/" target="_blank" style="color:var(--accent);">Aeon Essays</a> — free, philosophy/science/culture</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>👂 Listening</h3>
+    <ul style="list-style:none; padding:0; font-size:0.9rem;">
+      <li style="padding:0.3rem 0;"><a href="https://ocw.mit.edu/" target="_blank" style="color:var(--accent);">MIT OpenCourseWare</a> — real MIT lectures, exactly the format of TOEFL listening</li>
+      <li style="padding:0.3rem 0;"><a href="https://oyc.yale.edu/" target="_blank" style="color:var(--accent);">Yale Open Courses</a> — free academic lectures with transcripts</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.coursera.org/" target="_blank" style="color:var(--accent);">Coursera</a> — audit free, watch real university lectures</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.ted.com/" target="_blank" style="color:var(--accent);">TED Talks</a> — varied accents, complex ideas, free transcripts</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.youtube.com/c/teded" target="_blank" style="color:var(--accent);">TED-Ed</a> — 5-min animated academic explainers</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.youtube.com/user/crashcourse" target="_blank" style="color:var(--accent);">Crash Course</a> — fast-paced academic topics, great for note-taking practice</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.npr.org/podcasts/510351/short-wave" target="_blank" style="color:var(--accent);">NPR Short Wave</a> — 10-min science podcast</li>
+      <li style="padding:0.3rem 0;"><a href="https://learningenglish.voanews.com/" target="_blank" style="color:var(--accent);">VOA Learning English</a> — slower speed for beginners</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.bbc.co.uk/learningenglish" target="_blank" style="color:var(--accent);">BBC Learning English</a> — 6-Minute English structured lessons</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>✍️ Writing</h3>
+    <ul style="list-style:none; padding:0; font-size:0.9rem;">
+      <li style="padding:0.3rem 0;"><a href="https://magoosh.com/toefl/toefl-writing-samples/" target="_blank" style="color:var(--accent);">Magoosh Writing Samples</a> — free scored sample essays</li>
+      <li style="padding:0.3rem 0;"><a href="https://tstprep.com/" target="_blank" style="color:var(--accent);">TST Prep</a> — free essay prompts and high-scoring samples</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.toeflresources.com/" target="_blank" style="color:var(--accent);">TOEFL Resources (Jay)</a> — independent expert with free writing tips</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.deepl.com/write" target="_blank" style="color:var(--accent);">DeepL Write</a> — free AI for paraphrasing/style suggestions</li>
+      <li style="padding:0.3rem 0;"><a href="https://languagetool.org/" target="_blank" style="color:var(--accent);">LanguageTool</a> — free grammar checker (Grammarly alternative)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>🗣 Speaking</h3>
+    <ul style="list-style:none; padding:0; font-size:0.9rem;">
+      <li style="padding:0.3rem 0;"><a href="https://www.myspeakingscore.com/" target="_blank" style="color:var(--accent);">My Speaking Score</a> — ETS-licensed scoring tech, free basic tier</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.youtube.com/c/NoteFull" target="_blank" style="color:var(--accent);">NoteFull TOEFL</a> — free speaking strategy videos + sample responses</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.italki.com/" target="_blank" style="color:var(--accent);">italki</a> — paid native-speaker tutors (~$10-25/hr, much cheaper than US tutors)</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.cambly.com/" target="_blank" style="color:var(--accent);">Cambly</a> — instant conversation with native speakers</li>
+      <li style="padding:0.3rem 0;"><a href="https://tandem.net/" target="_blank" style="color:var(--accent);">Tandem</a> — language exchange app (free, swap Chinese for English)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>📚 Vocabulary</h3>
+    <ul style="list-style:none; padding:0; font-size:0.9rem;">
+      <li style="padding:0.3rem 0;"><a href="https://www.victoria.ac.nz/lals/resources/academicwordlist" target="_blank" style="color:var(--accent);">AWL Official Site (Coxhead)</a> — Academic Word List source (570 words, public domain)</li>
+      <li style="padding:0.3rem 0;"><a href="https://quizlet.com/subject/toefl/" target="_blank" style="color:var(--accent);">Quizlet TOEFL decks</a> — community-made flashcard sets</li>
+      <li style="padding:0.3rem 0;"><a href="https://ankiweb.net/shared/decks/toefl" target="_blank" style="color:var(--accent);">Anki TOEFL decks</a> — best spaced repetition app, free</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.vocabulary.com/lists/52473" target="_blank" style="color:var(--accent);">Vocabulary.com TOEFL list</a> — interactive vocab quizzes</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.memrise.com/" target="_blank" style="color:var(--accent);">Memrise</a> — gamified vocab learning, free tier</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>🎯 Full Mock Tests</h3>
+    <ul style="list-style:none; padding:0; font-size:0.9rem;">
+      <li style="padding:0.3rem 0;"><a href="https://toefl.magoosh.com/practice_tests/free" target="_blank" style="color:var(--accent);">Magoosh Free Practice Test</a> — uses licensed ETS real questions</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.toeflmocktests.com/practice-tests/full-test/" target="_blank" style="color:var(--accent);">TOEFLMockTests.com</a> — 16 free full-length 2026-format mocks, AI scoring</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.testglider.com/toefl/en/mock-tests" target="_blank" style="color:var(--accent);">TestGlider</a> — free mocks with score + feedback</li>
+      <li style="padding:0.3rem 0;"><a href="https://testsucceed.com/en" target="_blank" style="color:var(--accent);">TestSucceed</a> — free scored mocks</li>
+      <li style="padding:0.3rem 0;"><a href="https://www.bestmytest.com/toefl/practice-test" target="_blank" style="color:var(--accent);">BestMyTest</a> — 1-hour free sample test</li>
+      <li style="padding:0.3rem 0;"><a href="https://toeflpractice.io/" target="_blank" style="color:var(--accent);">toeflpractice.io</a> — 50+ free mocks with AI feedback</li>
+      <li style="padding:0.3rem 0;"><a href="https://galvanizetestprep.com/toefl-practice-test/" target="_blank" style="color:var(--accent);">Galvanize TOEFL Mock</a> — AI-graded writing/speaking</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>💰 Worth Paying For (if budget allows)</h3>
+    <ul style="list-style:none; padding:0; font-size:0.9rem;">
+      <li style="padding:0.3rem 0;"><strong>ETS Official Guide to the TOEFL iBT (book)</strong> — ~$30, gold standard, 4 real tests + detailed explanations</li>
+      <li style="padding:0.3rem 0;"><strong>TOEFL iBT Official Tests Vol 1 & 2</strong> — ~$30 each, 10 retired real tests</li>
+      <li style="padding:0.3rem 0;"><strong>TPO (TOEFL Practice Online)</strong> — $45/set, real retired exams on ETS platform</li>
+      <li style="padding:0.3rem 0;"><strong>Magoosh TOEFL</strong> — ~$179, full course with video lessons</li>
+      <li style="padding:0.3rem 0;"><strong>italki sessions</strong> — $10-25/hr, 1-on-1 native speaker practice</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ====== ABOUT ====== -->
+<div id="panel-about" class="panel">
+  <h2>About this Trainer</h2>
+
+  <div class="card">
+    <h3>What this tool is</h3>
+    <p class="text-sm text-dim">A self-contained PWA for daily TOEFL iBT practice, designed for habit formation and format familiarity. It provides:</p>
+    <ul style="font-size:0.85rem; padding-left:1.2rem; color:var(--text-dim); margin-top:0.5rem;">
+      <li>500+ academic vocabulary flashcards with spaced repetition</li>
+      <li>Original TOEFL-format reading passages with questions</li>
+      <li>Writing prompts with 30-min timer and word count</li>
+      <li>Speaking prompts with 15s prep / 45s record + in-browser playback</li>
+      <li>Curated free listening/reading/speaking resource library</li>
+      <li>8-week phase plan that auto-advances</li>
+      <li>Daily checkbox + streak tracking</li>
+      <li>Browser notification reminders (opt-in)</li>
+      <li>Installable PWA, works offline</li>
+    </ul>
+  </div>
+
+  <div class="card" style="border-left: 4px solid var(--warn);">
+    <h3>⚠️ Content origins — full transparency</h3>
+    <p class="text-sm text-dim mb">Every TOEFL prep tool faces a tension: ETS owns its real questions. Here is exactly what this trainer uses:</p>
+    <table>
+      <tr><td><strong>NOT used ❌</strong></td><td>Real ETS exam questions (copyrighted)</td></tr>
+      <tr><td><strong>NOT used ❌</strong></td><td>Content from commercial prep books (Kaplan, Barron's, Princeton, ETS Official Guide)</td></tr>
+      <tr><td><strong>Used ✅</strong></td><td>TOEFL iBT format conventions (publicly documented by ETS)</td></tr>
+      <tr><td><strong>Used ✅</strong></td><td>Academic Word List (AWL, Coxhead 2000) — public domain word list, 570 word families</td></tr>
+      <tr><td><strong>Used ✅</strong></td><td>Public-domain question type patterns (agree/disagree, preference, explain)</td></tr>
+      <tr><td><strong>Original 🔧</strong></td><td>All reading passages, vocab example sentences, writing/speaking prompts written by AI (Claude) calibrated to TOEFL style</td></tr>
+    </table>
+    <p class="text-sm" style="margin-top:0.8rem;"><strong>What this means:</strong> use this trainer for daily practice habit, format familiarity, and vocab/concept exposure. For high-stakes prep, combine with <strong>official ETS materials</strong> (sample tests already linked in Resources, plus the Official Guide book if you can afford it).</p>
+  </div>
+
+  <div class="card">
+    <h3>Source code & license</h3>
+    <p class="text-sm text-dim">Public domain. Single HTML file + manifest + service worker. Embed in your own site by copying 3 files. See <a href="https://github.com/GeniusPudding" target="_blank" style="color:var(--accent);">GeniusPudding's repos</a>.</p>
+  </div>
+
+  <div class="card">
+    <h3>Storage & privacy</h3>
+    <p class="text-sm text-dim">Everything stays on your device (browser localStorage). No accounts, no backend, no tracking, no analytics. Progress doesn't sync across devices.</p>
   </div>
 </div>
 
@@ -570,7 +718,473 @@ const VOCAB = [
   {word:"attain",pos:"v.",def:"To succeed in achieving",ex:"Few athletes ever attain this level of skill."},
   {word:"attribute",pos:"v./n.",def:"To regard as caused by; a quality",ex:"He attributes his success to hard work."},
   {word:"compromise",pos:"v./n.",def:"To accept lower standards; a middle ground",ex:"Both sides must compromise to reach an agreement."},
-  {word:"deplete",pos:"v.",def:"To reduce significantly in number or amount",ex:"Overfishing has depleted local fish populations."}
+  {word:"deplete",pos:"v.",def:"To reduce significantly in number or amount",ex:"Overfishing has depleted local fish populations."},
+  {word:"acquire",pos:"v.",def:"To buy or obtain for oneself",ex:"The company acquired several smaller competitors last year."},
+  {word:"adequate",pos:"adj.",def:"Sufficient for a specific need or requirement",ex:"The room was small but adequate for our needs."},
+  {word:"adjacent",pos:"adj.",def:"Next to or adjoining something else",ex:"They live in an adjacent building."},
+  {word:"administer",pos:"v.",def:"To manage or be responsible for the running of",ex:"The test was administered by trained proctors."},
+  {word:"adolescent",pos:"n./adj.",def:"A young person in the process of developing from a child into an adult",ex:"Adolescent brains are still developing impulse control."},
+  {word:"aggregate",pos:"n./v.",def:"A whole formed by combining elements; to combine",ex:"The aggregate score determined the winner."},
+  {word:"aid",pos:"n./v.",def:"Help or support; to assist",ex:"Foreign aid helped rebuild the war-torn country."},
+  {word:"alter",pos:"v.",def:"To change in character or composition",ex:"The new evidence may alter the court's verdict."},
+  {word:"alternate",pos:"v./adj.",def:"To occur in turn repeatedly; every other",ex:"Day and night alternate in a 24-hour cycle."},
+  {word:"alternative",pos:"n./adj.",def:"One of two or more available possibilities",ex:"We need an alternative to fossil fuels."},
+  {word:"amend",pos:"v.",def:"To make minor changes to improve",ex:"The bill was amended several times before passing."},
+  {word:"analogy",pos:"n.",def:"A comparison between two things to explain or clarify",ex:"He drew an analogy between the brain and a computer."},
+  {word:"annual",pos:"adj.",def:"Occurring once every year",ex:"The annual conference attracts thousands of researchers."},
+  {word:"apparent",pos:"adj.",def:"Clearly visible or understood; obvious",ex:"It became apparent that the system was failing."},
+  {word:"append",pos:"v.",def:"To add as an attachment or supplement",ex:"Please append the documents to your application."},
+  {word:"appreciate",pos:"v.",def:"To recognize the value of; to be grateful for",ex:"I appreciate the time you took to explain this."},
+  {word:"approximate",pos:"adj./v.",def:"Close to the actual; to come close to",ex:"The approximate cost is $50."},
+  {word:"arbitrary",pos:"adj.",def:"Based on random choice or personal whim",ex:"The deadline seemed arbitrary."},
+  {word:"area",pos:"n.",def:"A region or part of a town, country, or world",ex:"This area is known for its agricultural productivity."},
+  {word:"aspect",pos:"n.",def:"A particular part or feature of something",ex:"Every aspect of the design was carefully considered."},
+  {word:"assemble",pos:"v.",def:"To bring together as a group",ex:"The team assembled for an emergency meeting."},
+  {word:"assess",pos:"v.",def:"To evaluate or estimate the nature or quality",ex:"We need to assess the damage before repairing."},
+  {word:"assign",pos:"v.",def:"To allocate a job or duty",ex:"Each team member was assigned a specific role."},
+  {word:"assist",pos:"v.",def:"To help (someone), typically by doing a share of the work",ex:"Volunteers assist with daily operations."},
+  {word:"assume",pos:"v.",def:"To suppose to be the case without proof",ex:"Don't assume he agrees just because he's silent."},
+  {word:"assure",pos:"v.",def:"To tell someone something positively",ex:"The doctor assured me everything was fine."},
+  {word:"attach",pos:"v.",def:"To fasten or join one thing to another",ex:"Please attach your resume to the application."},
+  {word:"author",pos:"n./v.",def:"A writer of a book or report; to write or create",ex:"She authored several influential papers."},
+  {word:"authority",pos:"n.",def:"The power or right to give orders or make decisions",ex:"He has the authority to approve the budget."},
+  {word:"available",pos:"adj.",def:"Able to be used or obtained",ex:"The data is publicly available online."},
+  {word:"aware",pos:"adj.",def:"Having knowledge or perception of a situation",ex:"Are you aware of the new policy?"},
+  {word:"behalf",pos:"n.",def:"In the interest of a particular person or group",ex:"I am writing on behalf of the entire team."},
+  {word:"bias",pos:"n./v.",def:"Prejudice in favor of or against something",ex:"The study controlled for selection bias."},
+  {word:"bond",pos:"n./v.",def:"A connection; to form a connection",ex:"Shared experiences create strong bonds."},
+  {word:"brief",pos:"adj./n.",def:"Of short duration; a short summary",ex:"He gave a brief overview of the project."},
+  {word:"capacity",pos:"n.",def:"The maximum amount that something can contain",ex:"The stadium has a capacity of 50,000."},
+  {word:"category",pos:"n.",def:"A class or division of people or things",ex:"Products are sorted into three categories."},
+  {word:"cease",pos:"v.",def:"To bring or come to an end",ex:"Production will cease at the end of the year."},
+  {word:"channel",pos:"n./v.",def:"A means of communication or expression",ex:"They opened a new channel for customer feedback."},
+  {word:"chapter",pos:"n.",def:"A main division of a book",ex:"The chapter discusses climate change in detail."},
+  {word:"chart",pos:"n./v.",def:"A graphic representation of data",ex:"The chart shows monthly sales growth."},
+  {word:"chemical",pos:"n./adj.",def:"A substance with distinct molecular composition",ex:"Industrial chemicals can pollute waterways."},
+  {word:"circumstance",pos:"n.",def:"A fact or condition connected with an event",ex:"Under these circumstances, we had no choice."},
+  {word:"cite",pos:"v.",def:"To quote as evidence or to credit a source",ex:"The paper cites dozens of recent studies."},
+  {word:"civil",pos:"adj.",def:"Relating to ordinary citizens; courteous",ex:"They had a civil discussion despite their disagreement."},
+  {word:"clarify",pos:"v.",def:"To make less confused or more clearly understood",ex:"Could you clarify what you meant by that?"},
+  {word:"classic",pos:"adj./n.",def:"Judged over time to be of the highest quality",ex:"This is a classic example of supply and demand."},
+  {word:"clause",pos:"n.",def:"A particular and separate article in a legal document",ex:"The contract includes a confidentiality clause."},
+  {word:"code",pos:"n./v.",def:"A system of signals or symbols; to write code",ex:"The dress code requires business attire."},
+  {word:"coincide",pos:"v.",def:"To occur at the same time",ex:"The two events happened to coincide."},
+  {word:"colleague",pos:"n.",def:"A person with whom one works",ex:"I discussed the issue with my colleagues."},
+  {word:"commence",pos:"v.",def:"To begin or start",ex:"Construction will commence in spring."},
+  {word:"comment",pos:"n./v.",def:"A verbal or written remark",ex:"He declined to comment on the rumors."},
+  {word:"commission",pos:"n./v.",def:"An instruction or authority to act; a fee",ex:"The artist was commissioned to create a sculpture."},
+  {word:"commit",pos:"v.",def:"To pledge or bind oneself to a course of action",ex:"She committed to the project for two years."},
+  {word:"commodity",pos:"n.",def:"A raw material or primary agricultural product",ex:"Oil is a globally traded commodity."},
+  {word:"communicate",pos:"v.",def:"To share or exchange information",ex:"Bees communicate through complex dances."},
+  {word:"community",pos:"n.",def:"A group of people living in the same place",ex:"The community came together to rebuild."},
+  {word:"compatible",pos:"adj.",def:"Able to exist or be used together without conflict",ex:"The software is compatible with both Mac and Windows."},
+  {word:"compensate",pos:"v.",def:"To give something to make up for loss or injury",ex:"The company compensated affected workers."},
+  {word:"compile",pos:"v.",def:"To produce by assembling from various sources",ex:"The researcher compiled data from 200 surveys."},
+  {word:"complement",pos:"v./n.",def:"To add to in a way that enhances",ex:"The wine perfectly complements the meal."},
+  {word:"complex",pos:"adj./n.",def:"Consisting of many different and connected parts",ex:"Climate is a complex system with many variables."},
+  {word:"component",pos:"n.",def:"A part of a larger whole",ex:"Each component must function correctly."},
+  {word:"compound",pos:"n./adj.",def:"A thing composed of two or more separate elements",ex:"Water is a compound of hydrogen and oxygen."},
+  {word:"comprise",pos:"v.",def:"To consist of; be made up of",ex:"The team comprises engineers from five countries."},
+  {word:"compute",pos:"v.",def:"To calculate or reckon",ex:"The algorithm computes the optimal path."},
+  {word:"conceive",pos:"v.",def:"To form an idea or plan in the mind",ex:"He conceived the project five years ago."},
+  {word:"concentrate",pos:"v.",def:"To focus all attention on something",ex:"Please concentrate on the task at hand."},
+  {word:"concept",pos:"n.",def:"An abstract idea or general notion",ex:"The concept of zero was revolutionary in mathematics."},
+  {word:"conclude",pos:"v.",def:"To bring or come to an end; to reach a judgment",ex:"The study concludes that exercise improves mood."},
+  {word:"conduct",pos:"v./n.",def:"To organize and carry out; behavior",ex:"The team conducted extensive experiments."},
+  {word:"confer",pos:"v.",def:"To have discussions; to grant or bestow",ex:"The committee will confer before making a decision."},
+  {word:"confine",pos:"v.",def:"To restrict within certain limits",ex:"Please confine your comments to the topic."},
+  {word:"confirm",pos:"v.",def:"To establish the truth or correctness of",ex:"Please confirm your attendance by Friday."},
+  {word:"conflict",pos:"n./v.",def:"A serious disagreement or argument",ex:"The two studies conflict in their findings."},
+  {word:"conform",pos:"v.",def:"To comply with rules or standards",ex:"All entries must conform to the contest rules."},
+  {word:"consent",pos:"n./v.",def:"Permission for something to happen",ex:"Patients must give consent before any procedure."},
+  {word:"consequence",pos:"n.",def:"A result or effect of an action or condition",ex:"Every decision has consequences."},
+  {word:"considerable",pos:"adj.",def:"Notably large in size, amount, or extent",ex:"The renovation required considerable investment."},
+  {word:"consist",pos:"v.",def:"To be composed or made up of",ex:"The committee consists of seven members."},
+  {word:"constant",pos:"adj./n.",def:"Occurring continuously over a period",ex:"Constant practice is essential for mastery."},
+  {word:"constitute",pos:"v.",def:"To be a part of a whole; to amount to",ex:"Water constitutes 60% of the human body."},
+  {word:"construct",pos:"v.",def:"To build by putting parts together",ex:"They constructed a bridge in record time."},
+  {word:"consult",pos:"v.",def:"To seek information or advice from",ex:"Always consult a doctor before changing medication."},
+  {word:"consume",pos:"v.",def:"To eat, drink, or use up",ex:"Americans consume vast amounts of energy."},
+  {word:"contact",pos:"n./v.",def:"The state of physical touching; to communicate",ex:"Please contact us with any questions."},
+  {word:"contemporary",pos:"adj./n.",def:"Belonging to or occurring in the present",ex:"Contemporary art often challenges traditional norms."},
+  {word:"context",pos:"n.",def:"The circumstances that form the setting for an event",ex:"Words can have different meanings depending on context."},
+  {word:"contract",pos:"n./v.",def:"A written agreement; to enter into agreement; to shrink",ex:"The contract was signed last week."},
+  {word:"contrary",pos:"adj./n.",def:"Opposite in nature or character",ex:"Contrary to popular belief, the data shows otherwise."},
+  {word:"contrast",pos:"n./v.",def:"The state of being strikingly different",ex:"In contrast to last year, sales have improved."},
+  {word:"contribute",pos:"v.",def:"To give to a common supply, fund, or effort",ex:"Many factors contribute to climate change."},
+  {word:"convene",pos:"v.",def:"To come together for a meeting",ex:"The board convenes monthly."},
+  {word:"convert",pos:"v.",def:"To change the form or character of",ex:"Solar panels convert sunlight into electricity."},
+  {word:"convince",pos:"v.",def:"To cause to believe firmly in the truth of",ex:"The evidence convinced the jury."},
+  {word:"cooperate",pos:"v.",def:"To work jointly toward the same end",ex:"The two agencies cooperated on the investigation."},
+  {word:"coordinate",pos:"v.",def:"To organize different elements to work together",ex:"She coordinates volunteer schedules."},
+  {word:"core",pos:"n./adj.",def:"The central or most important part",ex:"Math is at the core of the curriculum."},
+  {word:"corporate",pos:"adj.",def:"Relating to a large company or group",ex:"Corporate culture varies widely between firms."},
+  {word:"correspond",pos:"v.",def:"To match or agree almost exactly",ex:"The data corresponds to the model's predictions."},
+  {word:"create",pos:"v.",def:"To bring something into existence",ex:"Artists create new realities through their work."},
+  {word:"criterion",pos:"n.",def:"A principle by which something is judged",ex:"The main criterion for selection is academic merit."},
+  {word:"crucial",pos:"adj.",def:"Decisive or critical, especially in success or failure",ex:"Timing was crucial to the operation's success."},
+  {word:"cultivate",pos:"v.",def:"To prepare and use for crops; to nurture",ex:"Farmers cultivate corn in this region."},
+  {word:"cycle",pos:"n./v.",def:"A series of events that are regularly repeated",ex:"The water cycle is essential to life on Earth."},
+  {word:"data",pos:"n.",def:"Facts and statistics collected for reference",ex:"The data shows a clear upward trend."},
+  {word:"debate",pos:"n./v.",def:"A formal discussion of opposing arguments",ex:"There is intense debate over the new policy."},
+  {word:"decade",pos:"n.",def:"A period of ten years",ex:"The technology has improved dramatically over the past decade."},
+  {word:"decline",pos:"v./n.",def:"To become smaller; to politely refuse",ex:"Sales declined sharply last quarter."},
+  {word:"dedicate",pos:"v.",def:"To devote time or effort to a cause",ex:"She dedicated her life to medical research."},
+  {word:"deduce",pos:"v.",def:"To arrive at a conclusion by reasoning",ex:"From the clues, the detective deduced the killer's identity."},
+  {word:"define",pos:"v.",def:"To state or describe the meaning of",ex:"How would you define success?"},
+  {word:"definite",pos:"adj.",def:"Clearly stated or decided; not vague",ex:"We need a definite answer by tomorrow."},
+  {word:"demonstrate",pos:"v.",def:"To clearly show the existence or truth of",ex:"The study demonstrates a clear correlation."},
+  {word:"denote",pos:"v.",def:"To be a sign of; indicate",ex:"In chemistry, H denotes hydrogen."},
+  {word:"deny",pos:"v.",def:"To state that something is not true",ex:"He denied all the accusations."},
+  {word:"depress",pos:"v.",def:"To make sad or to lower the level of",ex:"The bad news depressed everyone."},
+  {word:"derive",pos:"v.",def:"To obtain something from a specified source",ex:"Many English words derive from Latin."},
+  {word:"design",pos:"v./n.",def:"To plan or fashion the form and structure",ex:"The architect designed a sustainable building."},
+  {word:"despite",pos:"prep.",def:"Without being affected by",ex:"Despite the rain, the event continued."},
+  {word:"detect",pos:"v.",def:"To discover or identify the presence of",ex:"The new sensor can detect tiny amounts of pollutants."},
+  {word:"device",pos:"n.",def:"A thing made for a particular purpose",ex:"Mobile devices have transformed how we communicate."},
+  {word:"devote",pos:"v.",def:"To give all or a large part of one's time to",ex:"He devoted his career to public service."},
+  {word:"differentiate",pos:"v.",def:"To recognize or ascertain what makes someone different",ex:"It's important to differentiate facts from opinions."},
+  {word:"dimension",pos:"n.",def:"A measurable extent; an aspect or feature",ex:"The problem has many dimensions."},
+  {word:"discriminate",pos:"v.",def:"To recognize a distinction; to treat unfairly",ex:"Babies can discriminate between different sounds."},
+  {word:"displace",pos:"v.",def:"To move from its usual place",ex:"The war displaced millions of people."},
+  {word:"display",pos:"v./n.",def:"To make a prominent exhibition of",ex:"The museum displays rare artifacts."},
+  {word:"dispose",pos:"v.",def:"To get rid of; to arrange",ex:"Please dispose of trash responsibly."},
+  {word:"distinct",pos:"adj.",def:"Recognizably different in nature",ex:"The two species are quite distinct."},
+  {word:"distribute",pos:"v.",def:"To give shares of something",ex:"The charity distributes food to those in need."},
+  {word:"diverse",pos:"adj.",def:"Showing a great deal of variety",ex:"The city has a diverse population."},
+  {word:"document",pos:"n./v.",def:"A written or printed record",ex:"Researchers documented over 200 species."},
+  {word:"domain",pos:"n.",def:"An area of knowledge or activity",ex:"AI is now her main research domain."},
+  {word:"domestic",pos:"adj.",def:"Relating to the home or country",ex:"Domestic sales rose 12%."},
+  {word:"dominate",pos:"v.",def:"To have a commanding influence over",ex:"One company dominates the entire industry."},
+  {word:"draft",pos:"n./v.",def:"A preliminary version of a piece of writing",ex:"I'll send you a first draft tomorrow."},
+  {word:"dramatic",pos:"adj.",def:"Sudden and striking",ex:"There has been a dramatic increase in remote work."},
+  {word:"duration",pos:"n.",def:"The length of time something continues",ex:"The course has a duration of six weeks."},
+  {word:"dynamic",pos:"adj.",def:"Characterized by constant change or activity",ex:"It's a dynamic and rapidly growing field."},
+  {word:"economy",pos:"n.",def:"The wealth and resources of a country",ex:"The global economy is becoming more interconnected."},
+  {word:"edit",pos:"v.",def:"To prepare written material for publication",ex:"She edits scientific journals."},
+  {word:"element",pos:"n.",def:"An essential or characteristic part",ex:"Iron is a chemical element."},
+  {word:"emerge",pos:"v.",def:"To move out of or away from something and become visible",ex:"New technologies emerge constantly."},
+  {word:"emphasis",pos:"n.",def:"Special importance or value placed on something",ex:"The school places emphasis on critical thinking."},
+  {word:"enable",pos:"v.",def:"To give the means or opportunity to do something",ex:"Technology enables us to work from anywhere."},
+  {word:"encounter",pos:"v./n.",def:"To unexpectedly meet or experience",ex:"They encountered several technical difficulties."},
+  {word:"energy",pos:"n.",def:"Power derived from physical or chemical resources",ex:"Renewable energy is becoming more affordable."},
+  {word:"enforce",pos:"v.",def:"To compel observance of or compliance with",ex:"Police enforce traffic laws."},
+  {word:"ensure",pos:"v.",def:"To make certain that something will happen",ex:"Please ensure the door is locked."},
+  {word:"entity",pos:"n.",def:"A thing with distinct and independent existence",ex:"The company is now a separate legal entity."},
+  {word:"environment",pos:"n.",def:"The surroundings in which something exists",ex:"Plants need a moist environment to thrive."},
+  {word:"equate",pos:"v.",def:"To consider one thing as equal to another",ex:"Don't equate price with quality."},
+  {word:"equip",pos:"v.",def:"To supply with the necessary items",ex:"The lab is equipped with the latest instruments."},
+  {word:"equivalent",pos:"adj./n.",def:"Equal in value, amount, or meaning",ex:"One mile is equivalent to about 1.6 kilometers."},
+  {word:"estate",pos:"n.",def:"An extensive area of land",ex:"The family estate has been in their possession for centuries."},
+  {word:"estimate",pos:"v./n.",def:"To roughly calculate or judge",ex:"Experts estimate the cost at $2 million."},
+  {word:"ethic",pos:"n.",def:"A set of moral principles",ex:"The medical profession follows a strict ethic."},
+  {word:"ethnic",pos:"adj.",def:"Relating to a population subgroup with common cultural tradition",ex:"The neighborhood has many ethnic restaurants."},
+  {word:"evaluate",pos:"v.",def:"To form an idea of the amount or value",ex:"Teachers evaluate students through tests and assignments."},
+  {word:"eventual",pos:"adj.",def:"Occurring at the end of or as a result of a process",ex:"His eventual goal is to start his own company."},
+  {word:"evident",pos:"adj.",def:"Plain or obvious",ex:"His talent was evident from a young age."},
+  {word:"evolve",pos:"v.",def:"To develop gradually",ex:"Species evolve over millions of years."},
+  {word:"exceed",pos:"v.",def:"To be greater in number or size than",ex:"Demand has exceeded supply."},
+  {word:"exclude",pos:"v.",def:"To deny entry or consideration",ex:"The study excluded participants under 18."},
+  {word:"exhibit",pos:"v./n.",def:"To publicly display; a display",ex:"The museum exhibits ancient artifacts."},
+  {word:"expand",pos:"v.",def:"To become or make larger",ex:"The company plans to expand into Asia."},
+  {word:"expert",pos:"n./adj.",def:"A person with comprehensive knowledge of something",ex:"She is an expert in renewable energy."},
+  {word:"expire",pos:"v.",def:"To come to the end of a period of validity",ex:"My passport expires next year."},
+  {word:"explicit",pos:"adj.",def:"Stated clearly and in detail",ex:"The instructions were explicit and easy to follow."},
+  {word:"exploit",pos:"v./n.",def:"To make full use of; to take unfair advantage",ex:"Some companies exploit cheap labor abroad."},
+  {word:"expose",pos:"v.",def:"To make visible by uncovering",ex:"The investigation exposed widespread fraud."},
+  {word:"external",pos:"adj.",def:"Belonging to or forming the outer surface",ex:"External factors influence the economy."},
+  {word:"extract",pos:"v./n.",def:"To remove or take out",ex:"Researchers extracted DNA from the bone fragments."},
+  {word:"feature",pos:"n./v.",def:"A distinctive attribute or aspect",ex:"The latest model has many new features."},
+  {word:"federal",pos:"adj.",def:"Relating to a system of government with central and regional authorities",ex:"This is a federal regulation."},
+  {word:"final",pos:"adj.",def:"Coming at the end; conclusive",ex:"The final decision rests with the board."},
+  {word:"finance",pos:"n./v.",def:"The management of large amounts of money",ex:"He works in corporate finance."},
+  {word:"finite",pos:"adj.",def:"Having limits or bounds",ex:"Earth's resources are finite."},
+  {word:"flexible",pos:"adj.",def:"Capable of bending easily; adaptable",ex:"We need flexible work arrangements."},
+  {word:"focus",pos:"v./n.",def:"To pay particular attention to",ex:"Please focus on the main issues."},
+  {word:"formula",pos:"n.",def:"A mathematical relationship or rule",ex:"The formula for water is H2O."},
+  {word:"found",pos:"v.",def:"To establish or originate",ex:"The university was founded in 1900."},
+  {word:"framework",pos:"n.",def:"A basic structure underlying a system",ex:"The book provides a framework for understanding global trade."},
+  {word:"function",pos:"n./v.",def:"An activity natural to a person or thing",ex:"The brain has many functions."},
+  {word:"fund",pos:"n./v.",def:"A sum of money saved for a purpose",ex:"The government funds basic research."},
+  {word:"furthermore",pos:"adv.",def:"In addition; besides",ex:"The plan is costly. Furthermore, it may not work."},
+  {word:"gender",pos:"n.",def:"Either of the two sexes; the state of being male or female",ex:"Gender equality remains a global challenge."},
+  {word:"generate",pos:"v.",def:"To cause to arise or come about",ex:"Solar panels generate electricity."},
+  {word:"generation",pos:"n.",def:"All people born and living at about the same time",ex:"My generation grew up with the internet."},
+  {word:"globe",pos:"n.",def:"The earth; the world",ex:"Plastic waste affects every region of the globe."},
+  {word:"goal",pos:"n.",def:"The object of a person's ambition or effort",ex:"Setting clear goals is essential for success."},
+  {word:"grade",pos:"n./v.",def:"A particular level of rank or quality",ex:"She received the highest grade in the class."},
+  {word:"grant",pos:"v./n.",def:"To agree to give; a sum of money awarded",ex:"The foundation granted $5 million to the project."},
+  {word:"guarantee",pos:"v./n.",def:"To promise; a formal pledge",ex:"There is no guarantee of success."},
+  {word:"guideline",pos:"n.",def:"A general rule, principle, or piece of advice",ex:"Follow these safety guidelines carefully."},
+  {word:"highlight",pos:"v./n.",def:"To emphasize or make prominent",ex:"The report highlights several urgent problems."},
+  {word:"hypothesis",pos:"n.",def:"A proposed explanation made on limited evidence",ex:"The experiment tested the researcher's hypothesis."},
+  {word:"identical",pos:"adj.",def:"Exactly the same",ex:"The twins look identical."},
+  {word:"identify",pos:"v.",def:"To establish or indicate who or what someone or something is",ex:"Scientists identified the new species in 2024."},
+  {word:"ideology",pos:"n.",def:"A system of ideas and ideals",ex:"Their political ideologies differ sharply."},
+  {word:"ignorance",pos:"n.",def:"Lack of knowledge or information",ex:"Ignorance of the law is no excuse."},
+  {word:"illustrate",pos:"v.",def:"To explain by using examples",ex:"This case illustrates the importance of planning."},
+  {word:"image",pos:"n.",def:"A representation of the external form of a person or thing",ex:"The campaign improved the brand's image."},
+  {word:"immigrate",pos:"v.",def:"To come to live permanently in a foreign country",ex:"Her family immigrated to Canada in the 1990s."},
+  {word:"impact",pos:"n./v.",def:"The action of one object coming forcibly into contact with another",ex:"Climate change has a global impact."},
+  {word:"implement",pos:"v.",def:"To put a decision or plan into effect",ex:"The school will implement the new policy next month."},
+  {word:"imply",pos:"v.",def:"To strongly suggest the truth without stating it",ex:"His silence seemed to imply agreement."},
+  {word:"impose",pos:"v.",def:"To force something on someone",ex:"The government imposed new restrictions."},
+  {word:"incentive",pos:"n.",def:"A thing that motivates someone to do something",ex:"Tax breaks serve as incentives for businesses."},
+  {word:"incidence",pos:"n.",def:"The occurrence or rate of occurrence of something",ex:"The incidence of disease has dropped."},
+  {word:"incline",pos:"v./n.",def:"To lean or slope; a slope",ex:"He inclines toward more cautious approaches."},
+  {word:"income",pos:"n.",def:"Money received on a regular basis",ex:"Their household income increased last year."},
+  {word:"incorporate",pos:"v.",def:"To take in or contain as part of a whole",ex:"The design incorporates traditional and modern elements."},
+  {word:"index",pos:"n.",def:"An alphabetical list of references; a measure",ex:"Check the index for relevant pages."},
+  {word:"indicate",pos:"v.",def:"To point out; show",ex:"The arrows indicate which way to go."},
+  {word:"individual",pos:"n./adj.",def:"A single human being; relating to one person",ex:"Each individual has unique strengths."},
+  {word:"induce",pos:"v.",def:"To succeed in persuading someone to do something",ex:"Nothing could induce him to change his mind."},
+  {word:"initial",pos:"adj./n.",def:"Existing or occurring at the beginning",ex:"My initial reaction was surprise."},
+  {word:"initiate",pos:"v.",def:"To cause a process or action to begin",ex:"The company initiated a new training program."},
+  {word:"injure",pos:"v.",def:"To do physical harm or damage to",ex:"Several players were injured during the game."},
+  {word:"input",pos:"n./v.",def:"What is put in, taken in, or operated on by any process",ex:"User input shapes the platform's features."},
+  {word:"insert",pos:"v.",def:"To place, fit, or thrust into",ex:"Insert the key and turn it gently."},
+  {word:"insight",pos:"n.",def:"The capacity to gain accurate understanding",ex:"The book offers valuable insights into human behavior."},
+  {word:"inspect",pos:"v.",def:"To look at closely and carefully",ex:"Officials inspect the building annually."},
+  {word:"institute",pos:"n./v.",def:"An organization for promoting a cause; to begin",ex:"The institute funds cutting-edge research."},
+  {word:"instruct",pos:"v.",def:"To direct or command; to teach",ex:"She instructs students in chemistry."},
+  {word:"integrate",pos:"v.",def:"To combine to form a whole",ex:"The new software integrates with existing systems."},
+  {word:"intelligence",pos:"n.",def:"The ability to acquire and apply knowledge",ex:"Artificial intelligence is advancing rapidly."},
+  {word:"intense",pos:"adj.",def:"Of extreme force, degree, or strength",ex:"The competition was intense."},
+  {word:"interact",pos:"v.",def:"To act in such a way as to have an effect on another",ex:"Children learn by interacting with their environment."},
+  {word:"intermediate",pos:"adj./n.",def:"Coming between two things in time, place, or character",ex:"This course is for intermediate learners."},
+  {word:"internal",pos:"adj.",def:"Existing or occurring within",ex:"There are internal conflicts within the organization."},
+  {word:"interpret",pos:"v.",def:"To explain the meaning of",ex:"Different scholars interpret the data differently."},
+  {word:"interval",pos:"n.",def:"An intervening time or space",ex:"Take a short break at regular intervals."},
+  {word:"intervene",pos:"v.",def:"To come between so as to prevent or alter a result",ex:"The teacher intervened to stop the argument."},
+  {word:"invest",pos:"v.",def:"To put money into financial schemes with the expectation of profit",ex:"She invested in renewable energy companies."},
+  {word:"investigate",pos:"v.",def:"To carry out a systematic inquiry",ex:"Detectives investigated the crime for months."},
+  {word:"invoke",pos:"v.",def:"To cite or appeal to as authority",ex:"He invoked the constitution to defend his position."},
+  {word:"involve",pos:"v.",def:"To include as a necessary part or result",ex:"The job involves long hours of travel."},
+  {word:"isolate",pos:"v.",def:"To cause to be alone or apart from others",ex:"Scientists isolated the virus for study."},
+  {word:"issue",pos:"n./v.",def:"An important topic or problem for debate",ex:"Climate change is the defining issue of our time."},
+  {word:"item",pos:"n.",def:"An individual article or unit",ex:"Each item on the list must be addressed."},
+  {word:"journal",pos:"n.",def:"A periodical publication containing articles",ex:"The findings were published in a leading journal."},
+  {word:"label",pos:"n./v.",def:"A small piece attached to indicate its nature; to assign",ex:"Don't label people based on first impressions."},
+  {word:"labor",pos:"n./v.",def:"Work, especially hard physical work",ex:"Labor costs vary widely by region."},
+  {word:"layer",pos:"n./v.",def:"A sheet, quantity, or thickness covering a surface",ex:"The cake has three layers."},
+  {word:"lecture",pos:"n./v.",def:"An educational talk to an audience",ex:"The professor's lectures are always engaging."},
+  {word:"legal",pos:"adj.",def:"Permitted by law",ex:"Legal documents must be signed in front of a witness."},
+  {word:"legislate",pos:"v.",def:"To make or enact laws",ex:"Congress legislated new environmental protections."},
+  {word:"liberal",pos:"adj.",def:"Open to new behavior or opinions",ex:"She has liberal views on social issues."},
+  {word:"license",pos:"n./v.",def:"A permit from authority to do something",ex:"You need a license to drive."},
+  {word:"likewise",pos:"adv.",def:"In the same way; also",ex:"He worked hard. Likewise, she put in long hours."},
+  {word:"link",pos:"n./v.",def:"A connection; to connect",ex:"There is a clear link between diet and health."},
+  {word:"locate",pos:"v.",def:"To discover the exact place or position",ex:"The treasure was located after weeks of searching."},
+  {word:"logic",pos:"n.",def:"Reasoning conducted according to strict principles",ex:"Your argument follows clear logic."},
+  {word:"maintain",pos:"v.",def:"To cause or enable to continue",ex:"Regular exercise helps maintain good health."},
+  {word:"major",pos:"adj./n.",def:"Important, serious, or significant",ex:"There has been a major shift in public opinion."},
+  {word:"manipulate",pos:"v.",def:"To handle or control in a skillful manner",ex:"Surgeons manipulate delicate instruments with precision."},
+  {word:"manual",pos:"adj./n.",def:"Done with the hands; a handbook",ex:"The manual explains how to operate the device."},
+  {word:"margin",pos:"n.",def:"The edge or border; a difference in amount",ex:"They won by a narrow margin."},
+  {word:"mature",pos:"adj./v.",def:"Fully developed; to become fully developed",ex:"The wine matures for ten years in oak barrels."},
+  {word:"maximize",pos:"v.",def:"To make as large or great as possible",ex:"We need to maximize efficiency."},
+  {word:"mechanism",pos:"n.",def:"A system of parts working together",ex:"Scientists studied the mechanism of cell division."},
+  {word:"media",pos:"n.",def:"The main means of mass communication",ex:"Social media has transformed politics."},
+  {word:"medical",pos:"adj.",def:"Relating to the science or practice of medicine",ex:"Seek immediate medical attention."},
+  {word:"medium",pos:"n./adj.",def:"A means; intermediate in quality",ex:"Paint is her favorite medium."},
+  {word:"mental",pos:"adj.",def:"Relating to the mind",ex:"Mental health is as important as physical health."},
+  {word:"method",pos:"n.",def:"A particular procedure for accomplishing something",ex:"The scientific method requires reproducible results."},
+  {word:"migrate",pos:"v.",def:"To move from one region to another",ex:"Many birds migrate south for winter."},
+  {word:"military",pos:"adj./n.",def:"Relating to soldiers or armed forces",ex:"Military spending has increased."},
+  {word:"minimize",pos:"v.",def:"To reduce to the smallest possible amount",ex:"We must minimize environmental damage."},
+  {word:"minimum",pos:"n./adj.",def:"The least or smallest amount",ex:"The minimum age for voting is 18."},
+  {word:"ministry",pos:"n.",def:"A government department headed by a minister",ex:"The Ministry of Education announced new policies."},
+  {word:"minor",pos:"adj./n.",def:"Lesser in importance, size, or degree",ex:"Don't worry about such minor details."},
+  {word:"mode",pos:"n.",def:"A way or manner in which something occurs",ex:"The car has multiple driving modes."},
+  {word:"modify",pos:"v.",def:"To make partial changes to",ex:"They modified the design based on feedback."},
+  {word:"monitor",pos:"v./n.",def:"To observe and check progress",ex:"Doctors monitor patients' vital signs."},
+  {word:"motive",pos:"n.",def:"A reason for doing something",ex:"Detectives are trying to determine the killer's motive."},
+  {word:"network",pos:"n./v.",def:"A group or system of interconnected people or things",ex:"She has a strong professional network."},
+  {word:"neutral",pos:"adj.",def:"Not supporting or helping either side",ex:"Switzerland remained neutral during the war."},
+  {word:"nevertheless",pos:"adv.",def:"In spite of that; notwithstanding",ex:"The road was wet; nevertheless, traffic moved smoothly."},
+  {word:"nonetheless",pos:"adv.",def:"In spite of that; nevertheless",ex:"It was raining; nonetheless, the game continued."},
+  {word:"norm",pos:"n.",def:"Something that is usual, typical, or standard",ex:"Remote work has become the norm in tech."},
+  {word:"normal",pos:"adj.",def:"Conforming to a standard; usual",ex:"His temperature is now normal."},
+  {word:"notion",pos:"n.",def:"A conception of or belief about something",ex:"He rejected the notion that money brings happiness."},
+  {word:"notwithstanding",pos:"prep./adv.",def:"In spite of",ex:"Notwithstanding the rain, we had a great time."},
+  {word:"nuclear",pos:"adj.",def:"Relating to the nucleus of an atom or nuclear weapons",ex:"Nuclear energy remains controversial."},
+  {word:"objective",pos:"n./adj.",def:"A goal; not influenced by personal feelings",ex:"Our main objective is to reduce costs."},
+  {word:"obtain",pos:"v.",def:"To get, acquire, or secure",ex:"You must obtain permission first."},
+  {word:"obvious",pos:"adj.",def:"Easily perceived or understood; clear",ex:"It's obvious that we need more data."},
+  {word:"occupy",pos:"v.",def:"To reside or have one's place of business in",ex:"This room is occupied."},
+  {word:"odd",pos:"adj.",def:"Different from what is usual or expected",ex:"That's an odd coincidence."},
+  {word:"option",pos:"n.",def:"A thing that may be chosen",ex:"You have several options to consider."},
+  {word:"orient",pos:"v.",def:"To align or position something relative to a reference",ex:"The map helps orient hikers."},
+  {word:"outcome",pos:"n.",def:"The way a thing turns out; a consequence",ex:"The outcome of the election surprised everyone."},
+  {word:"output",pos:"n./v.",def:"The amount of something produced",ex:"Factory output increased 15% this year."},
+  {word:"overall",pos:"adj./adv.",def:"Taking everything into account",ex:"Overall, the project was a success."},
+  {word:"overlap",pos:"v./n.",def:"To extend over so as to cover partly",ex:"The two job roles overlap considerably."},
+  {word:"oversee",pos:"v.",def:"To supervise; watch over",ex:"She oversees daily operations."},
+  {word:"panel",pos:"n.",def:"A small group of people with specialized knowledge",ex:"A panel of experts reviewed the proposals."},
+  {word:"parallel",pos:"adj./n.",def:"Side by side and never meeting; similar",ex:"There are interesting parallels between the two cases."},
+  {word:"parameter",pos:"n.",def:"A numerical factor that defines a system",ex:"Set the parameters before running the test."},
+  {word:"participate",pos:"v.",def:"To take part",ex:"All students must participate in class discussions."},
+  {word:"partner",pos:"n./v.",def:"A person who takes part with another",ex:"They partnered to launch the startup."},
+  {word:"passive",pos:"adj.",def:"Accepting what happens without active response",ex:"He played a passive role in the negotiations."},
+  {word:"percent",pos:"n.",def:"One part in every hundred",ex:"The temperature rose by 30 percent."},
+  {word:"period",pos:"n.",def:"A length or portion of time",ex:"The trial period lasts 30 days."},
+  {word:"perspective",pos:"n.",def:"A particular attitude toward or way of regarding something",ex:"Try to see things from her perspective."},
+  {word:"phase",pos:"n./v.",def:"A distinct stage of development",ex:"The project will be completed in three phases."},
+  {word:"philosophy",pos:"n.",def:"The study of fundamental questions about existence",ex:"He studied Eastern philosophy."},
+  {word:"physical",pos:"adj.",def:"Relating to the body; tangible",ex:"Regular physical activity improves health."},
+  {word:"plus",pos:"prep./n.",def:"In addition to; a positive aspect",ex:"The plus side is increased efficiency."},
+  {word:"policy",pos:"n.",def:"A course of action adopted by an organization",ex:"The new policy takes effect next month."},
+  {word:"portion",pos:"n.",def:"A part of a whole",ex:"A large portion of the budget goes to research."},
+  {word:"pose",pos:"v.",def:"To present or constitute a problem",ex:"The decision poses several challenges."},
+  {word:"positive",pos:"adj.",def:"Constructive, optimistic, or confident",ex:"Maintain a positive attitude."},
+  {word:"potential",pos:"adj./n.",def:"Having or showing the capacity to become",ex:"She has great potential as a leader."},
+  {word:"practitioner",pos:"n.",def:"A person actively engaged in an art or profession",ex:"Medical practitioners follow strict ethical guidelines."},
+  {word:"precise",pos:"adj.",def:"Marked by exactness and accuracy",ex:"Give me the precise measurements."},
+  {word:"predict",pos:"v.",def:"To say what will happen in the future",ex:"Meteorologists predict heavy rain tomorrow."},
+  {word:"predominant",pos:"adj.",def:"Present as the strongest or main element",ex:"English is the predominant language of business."},
+  {word:"preliminary",pos:"adj.",def:"Done before a more important action",ex:"Preliminary results look promising."},
+  {word:"presume",pos:"v.",def:"To suppose to be true without proof",ex:"I presume you've received my email."},
+  {word:"previous",pos:"adj.",def:"Existing or occurring before",ex:"Refer to the previous chapter for context."},
+  {word:"primary",pos:"adj.",def:"Of chief importance; principal",ex:"Education is the primary goal of the organization."},
+  {word:"principle",pos:"n.",def:"A fundamental truth or proposition",ex:"The principle of supply and demand."},
+  {word:"prior",pos:"adj.",def:"Existing or coming before in time",ex:"Prior experience is preferred but not required."},
+  {word:"priority",pos:"n.",def:"A thing regarded as more important than others",ex:"Safety is our top priority."},
+  {word:"procedure",pos:"n.",def:"An established or official way of doing something",ex:"Follow the safety procedures carefully."},
+  {word:"proceed",pos:"v.",def:"To begin a course of action",ex:"Please proceed to the next station."},
+  {word:"process",pos:"n./v.",def:"A series of actions or steps taken",ex:"The hiring process can take several weeks."},
+  {word:"professional",pos:"adj./n.",def:"Relating to a profession; skilled",ex:"She maintains a professional demeanor at work."},
+  {word:"prohibit",pos:"v.",def:"To formally forbid by law or rule",ex:"Smoking is prohibited in this building."},
+  {word:"project",pos:"n./v.",def:"An individual or collaborative enterprise",ex:"The construction project will take two years."},
+  {word:"promote",pos:"v.",def:"To further the progress of",ex:"The campaign promotes healthy eating."},
+  {word:"proportion",pos:"n.",def:"A part or share of a whole",ex:"A large proportion of students attend graduate school."},
+  {word:"prospect",pos:"n.",def:"The possibility of some future event",ex:"The prospects for economic growth are uncertain."},
+  {word:"protocol",pos:"n.",def:"The official procedure or system of rules",ex:"Follow standard medical protocol."},
+  {word:"psychology",pos:"n.",def:"The scientific study of the mind and behavior",ex:"She studies developmental psychology."},
+  {word:"publication",pos:"n.",def:"The preparation and issuing of a book or article",ex:"Her latest publication received international attention."},
+  {word:"publish",pos:"v.",def:"To prepare and issue for public distribution",ex:"The journal publishes peer-reviewed research."},
+  {word:"purchase",pos:"v./n.",def:"To acquire by paying money",ex:"She purchased the painting at auction."},
+  {word:"pursue",pos:"v.",def:"To follow or chase",ex:"He pursued a career in medicine."},
+  {word:"qualitative",pos:"adj.",def:"Relating to the nature or quality of something",ex:"Qualitative research uses interviews and observations."},
+  {word:"quote",pos:"v./n.",def:"To repeat or copy out a passage; a passage cited",ex:"Please quote your sources."},
+  {word:"radical",pos:"adj./n.",def:"Relating to or affecting the fundamental nature",ex:"The proposal calls for radical reform."},
+  {word:"random",pos:"adj.",def:"Made or done without method or conscious choice",ex:"Participants were selected at random."},
+  {word:"range",pos:"n./v.",def:"The area of variation between upper and lower limits",ex:"Prices range from $10 to $100."},
+  {word:"ratio",pos:"n.",def:"The quantitative relation between two amounts",ex:"The student-to-teacher ratio is 20:1."},
+  {word:"react",pos:"v.",def:"To respond or behave in a particular way",ex:"How did she react to the news?"},
+  {word:"recover",pos:"v.",def:"To return to a normal state of health, mind, or strength",ex:"It took weeks to recover from the illness."},
+  {word:"refine",pos:"v.",def:"To improve by making small changes",ex:"They continue to refine their methods."},
+  {word:"regime",pos:"n.",def:"A government, especially an authoritarian one",ex:"The regime collapsed after decades in power."},
+  {word:"region",pos:"n.",def:"An area or division",ex:"The Pacific region has experienced rapid growth."},
+  {word:"register",pos:"v./n.",def:"To enter on an official list",ex:"All students must register for classes."},
+  {word:"regulate",pos:"v.",def:"To control or maintain the rate or speed of",ex:"Governments regulate the financial industry."},
+  {word:"reject",pos:"v.",def:"To dismiss as inadequate",ex:"The proposal was rejected by the committee."},
+  {word:"relax",pos:"v.",def:"To make or become less tense",ex:"She likes to relax with a good book."},
+  {word:"release",pos:"v./n.",def:"To allow to escape from confinement",ex:"The new product will be released next week."},
+  {word:"relevant",pos:"adj.",def:"Closely connected or appropriate to the matter",ex:"Please provide only relevant information."},
+  {word:"rely",pos:"v.",def:"To depend on with full trust",ex:"You can rely on her to deliver results."},
+  {word:"remove",pos:"v.",def:"To take away from a place",ex:"Please remove your shoes at the door."},
+  {word:"require",pos:"v.",def:"To need for a particular purpose",ex:"The job requires a college degree."},
+  {word:"research",pos:"n./v.",def:"The systematic investigation into a subject",ex:"Years of research went into the discovery."},
+  {word:"reside",pos:"v.",def:"To have one's permanent home",ex:"They reside in a small coastal town."},
+  {word:"resolve",pos:"v.",def:"To settle or find a solution to",ex:"We need to resolve this issue quickly."},
+  {word:"resource",pos:"n.",def:"A stock or supply of materials or assets",ex:"Water is a precious resource."},
+  {word:"respond",pos:"v.",def:"To say something in reply",ex:"Please respond by email."},
+  {word:"restore",pos:"v.",def:"To bring back to its former condition",ex:"They restored the historic building."},
+  {word:"restrict",pos:"v.",def:"To put a limit on",ex:"Visiting hours are restricted to evenings."},
+  {word:"retain",pos:"v.",def:"To continue to have; keep",ex:"The company struggles to retain top talent."},
+  {word:"reveal",pos:"v.",def:"To make previously unknown information known",ex:"The investigation revealed surprising facts."},
+  {word:"revenue",pos:"n.",def:"Income, especially of a company or government",ex:"Tax revenue funds public services."},
+  {word:"reverse",pos:"v./adj.",def:"To move backward; opposite",ex:"The decision was reversed on appeal."},
+  {word:"revise",pos:"v.",def:"To re-examine and make alterations to",ex:"Please revise your draft based on feedback."},
+  {word:"revolution",pos:"n.",def:"A forcible overthrow of a government or social order",ex:"The industrial revolution transformed society."},
+  {word:"rigid",pos:"adj.",def:"Unable to bend or be forced out of shape",ex:"The rigid schedule left no room for flexibility."},
+  {word:"role",pos:"n.",def:"An actor's part; a function",ex:"What role do you play in the project?"},
+  {word:"route",pos:"n./v.",def:"A way or course taken in getting from a starting point",ex:"This is the fastest route to the airport."},
+  {word:"scenario",pos:"n.",def:"A postulated sequence of possible events",ex:"Consider the worst-case scenario."},
+  {word:"schedule",pos:"n./v.",def:"A plan listing intended events and times",ex:"My schedule is packed this week."},
+  {word:"scheme",pos:"n.",def:"A large-scale systematic plan",ex:"The pension scheme covers all employees."},
+  {word:"scope",pos:"n.",def:"The extent of the area or subject matter",ex:"The scope of the project expanded significantly."},
+  {word:"section",pos:"n.",def:"A distinct part or subdivision",ex:"This section covers basic principles."},
+  {word:"sector",pos:"n.",def:"An area or portion that is distinct from others",ex:"The technology sector is growing rapidly."},
+  {word:"secure",pos:"adj./v.",def:"Fixed or fastened; to make safe",ex:"Make sure the door is secure."},
+  {word:"select",pos:"v.",def:"To carefully choose as being the best",ex:"Select your preferred date."},
+  {word:"sequence",pos:"n.",def:"A particular order in which related things follow",ex:"Complete the steps in the correct sequence."},
+  {word:"series",pos:"n.",def:"A number of things of similar nature",ex:"The series explores ancient civilizations."},
+  {word:"shift",pos:"n./v.",def:"A slight change in position; to move",ex:"There has been a major shift in public opinion."},
+  {word:"significant",pos:"adj.",def:"Sufficiently great or important to be worthy of attention",ex:"The change had a significant impact."},
+  {word:"similar",pos:"adj.",def:"Resembling without being identical",ex:"The two products are very similar."},
+  {word:"simulate",pos:"v.",def:"To imitate the appearance or character of",ex:"The training simulates real combat conditions."},
+  {word:"site",pos:"n.",def:"An area of ground on which a building or activity is located",ex:"The construction site is closed to visitors."},
+  {word:"so-called",pos:"adj.",def:"Used to introduce a name that is not accurate",ex:"His so-called friends abandoned him."},
+  {word:"sole",pos:"adj.",def:"One and only",ex:"She is the sole heir to the fortune."},
+  {word:"somewhat",pos:"adv.",def:"To a moderate extent or degree",ex:"I'm somewhat hesitant about this plan."},
+  {word:"source",pos:"n./v.",def:"A place from which something comes",ex:"Always cite your sources."},
+  {word:"specific",pos:"adj.",def:"Clearly defined or identified",ex:"Please give a specific example."},
+  {word:"specify",pos:"v.",def:"To identify clearly and definitely",ex:"Please specify your preferences."},
+  {word:"sphere",pos:"n.",def:"An area of activity, interest, or influence",ex:"She is influential in academic spheres."},
+  {word:"stable",pos:"adj.",def:"Not likely to give way or change",ex:"The patient is in stable condition."},
+  {word:"statistic",pos:"n.",def:"A fact or piece of data from a study",ex:"The statistics tell a worrying story."},
+  {word:"status",pos:"n.",def:"The relative social, professional, or other standing",ex:"His status as an expert is well-established."},
+  {word:"straightforward",pos:"adj.",def:"Uncomplicated and easy to do or understand",ex:"The instructions are straightforward."},
+  {word:"strategy",pos:"n.",def:"A plan of action designed to achieve a long-term aim",ex:"The marketing strategy targets young adults."},
+  {word:"stress",pos:"n./v.",def:"Pressure or tension; to emphasize",ex:"He stressed the importance of teamwork."},
+  {word:"structure",pos:"n./v.",def:"The arrangement of and relations between parts",ex:"The essay needs better structure."},
+  {word:"style",pos:"n./v.",def:"A particular procedure by which something is done",ex:"Her writing style is clear and concise."},
+  {word:"submit",pos:"v.",def:"To present a proposal for consideration",ex:"Please submit your application by Friday."},
+  {word:"subordinate",pos:"adj./n.",def:"Lower in rank or position",ex:"He treats subordinates with respect."},
+  {word:"subsequent",pos:"adj.",def:"Coming after something in time",ex:"Subsequent events confirmed her suspicions."},
+  {word:"subsidy",pos:"n.",def:"A sum of money granted to support an industry",ex:"Government subsidies help farmers."},
+  {word:"successor",pos:"n.",def:"A person or thing that follows another",ex:"She named her successor before retiring."},
+  {word:"sufficient",pos:"adj.",def:"Enough; adequate",ex:"We have sufficient resources for the project."},
+  {word:"sum",pos:"n./v.",def:"A particular amount of money; total",ex:"The sum total of his savings was modest."},
+  {word:"summary",pos:"n.",def:"A brief statement of the main points",ex:"Please provide a one-page summary."},
+  {word:"survey",pos:"n./v.",def:"A general view, examination, or description",ex:"The survey gathered responses from 1,000 people."},
+  {word:"survive",pos:"v.",def:"To continue to live or exist",ex:"Some species barely survive in extreme cold."},
+  {word:"symbol",pos:"n.",def:"A thing that represents or stands for something else",ex:"The dove is a symbol of peace."},
+  {word:"target",pos:"n./v.",def:"A person, object, or place selected as the aim",ex:"The campaign targets young professionals."},
+  {word:"task",pos:"n./v.",def:"A piece of work to be done",ex:"She completed the task ahead of schedule."},
+  {word:"team",pos:"n./v.",def:"A group of players or workers",ex:"Our team won the championship."},
+  {word:"technical",pos:"adj.",def:"Relating to a particular subject, art, or craft",ex:"The book uses too much technical jargon."},
+  {word:"technique",pos:"n.",def:"A way of carrying out a particular task",ex:"He mastered several painting techniques."},
+  {word:"technology",pos:"n.",def:"The application of scientific knowledge for practical purposes",ex:"Mobile technology has changed daily life."},
+  {word:"temporary",pos:"adj.",def:"Lasting for only a limited period of time",ex:"This is a temporary solution."},
+  {word:"tense",pos:"adj./n.",def:"Stretched tight; mentally strained",ex:"The atmosphere in the room was tense."},
+  {word:"terminate",pos:"v.",def:"To bring to an end",ex:"The contract can be terminated at any time."},
+  {word:"text",pos:"n./v.",def:"A book or other written or printed work",ex:"Analyze the text carefully."},
+  {word:"theme",pos:"n.",def:"The subject of a talk, piece of writing, or work of art",ex:"The film's central theme is redemption."},
+  {word:"theory",pos:"n.",def:"A supposition intended to explain something",ex:"Einstein's theory of relativity changed physics."},
+  {word:"thereby",pos:"adv.",def:"By that means; as a result of that",ex:"Reducing waste, thereby saving money."},
+  {word:"thesis",pos:"n.",def:"A statement put forward as a premise to be maintained",ex:"His thesis was clearly stated."},
+  {word:"topic",pos:"n.",def:"A matter dealt with in a text, discourse, or conversation",ex:"What topic would you like to discuss?"},
+  {word:"trace",pos:"v./n.",def:"To find or describe the origin or development of",ex:"Researchers traced the disease's spread."},
+  {word:"tradition",pos:"n.",def:"The transmission of customs from generation to generation",ex:"Family traditions hold deep meaning."},
+  {word:"transfer",pos:"v./n.",def:"To move from one place to another",ex:"He transferred to a new department."},
+  {word:"transform",pos:"v.",def:"To make a thorough or dramatic change",ex:"The internet has transformed education."},
+  {word:"transit",pos:"n.",def:"The carrying of people or things from one place to another",ex:"Public transit reduces traffic."},
+  {word:"transmit",pos:"v.",def:"To cause to pass on from one place to another",ex:"Mosquitoes transmit several diseases."},
+  {word:"transport",pos:"n./v.",def:"A system of conveying people or goods",ex:"Public transport is efficient in this city."},
+  {word:"trend",pos:"n./v.",def:"A general direction in which something is developing",ex:"Climate trends are worrying."},
+  {word:"trigger",pos:"v./n.",def:"To cause an event or situation to happen",ex:"The announcement triggered widespread protests."},
+  {word:"ultimate",pos:"adj.",def:"Being or happening at the end of a process",ex:"The ultimate goal is world peace."},
+  {word:"undertake",pos:"v.",def:"To commit oneself to a task",ex:"They undertook a major renovation."},
+  {word:"uniform",pos:"adj./n.",def:"Remaining the same in all cases",ex:"Apply uniform pressure across the surface."},
+  {word:"unify",pos:"v.",def:"To make or become united",ex:"A common goal unified the team."},
+  {word:"unique",pos:"adj.",def:"Being the only one of its kind",ex:"Every snowflake is unique."},
+  {word:"utilize",pos:"v.",def:"To make practical and effective use of",ex:"We must utilize our resources wisely."},
+  {word:"vary",pos:"v.",def:"To differ in size, amount, or degree",ex:"Prices vary depending on location."},
+  {word:"vehicle",pos:"n.",def:"A means of transporting people or goods",ex:"Electric vehicles are gaining popularity."},
+  {word:"version",pos:"n.",def:"A particular form of something differing from others",ex:"This is the latest version of the software."},
+  {word:"via",pos:"prep.",def:"By way of; through",ex:"We flew to Tokyo via Hong Kong."},
+  {word:"violate",pos:"v.",def:"To break or fail to comply with a rule",ex:"He violated the terms of his contract."},
+  {word:"virtual",pos:"adj.",def:"Almost or nearly as described; computer-simulated",ex:"Virtual meetings have become common."},
+  {word:"visible",pos:"adj.",def:"Able to be seen",ex:"The mountain is visible from miles away."},
+  {word:"vision",pos:"n.",def:"The ability to think about the future with imagination",ex:"The CEO has a clear vision for the company."},
+  {word:"visual",pos:"adj.",def:"Relating to seeing or sight",ex:"Visual aids help with comprehension."},
+  {word:"volume",pos:"n.",def:"The amount of space that a substance occupies",ex:"Sales volume has tripled."},
+  {word:"voluntary",pos:"adj.",def:"Done, given, or acting of one's own free will",ex:"Participation is voluntary."},
+  {word:"welfare",pos:"n.",def:"The health, happiness, and fortunes of a person",ex:"We care about employee welfare."},
+  {word:"whereas",pos:"conj.",def:"In contrast to the fact that",ex:"He is calm, whereas his brother is hyperactive."},
+  {word:"widespread",pos:"adj.",def:"Found or distributed over a large area",ex:"There is widespread support for the proposal."}
 ];
 
 const READINGS = [
