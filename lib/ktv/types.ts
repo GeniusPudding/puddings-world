@@ -1,3 +1,7 @@
+// KV-internal storage shapes. Wire-contract types live in ./contract.gen.ts
+// (vendored from StreetPerformerMaster — see CLAUDE.md "Cross-project service
+// mounts"). Fields like ipHash / cancelToken exist only here on purpose.
+
 export type SongLanguage = "zh" | "en" | "jp" | "ko" | "other";
 
 export type Song = {

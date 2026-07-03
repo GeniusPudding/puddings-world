@@ -13,13 +13,21 @@ The performer app itself lives in a separate repo
 
 ## Single source of truth for the cross-end contract
 
-> **The HTTP contract, error-code catalog, and catalog-id alignment rules
-> across web + iOS + Android are defined in
-> `~/Desktop/StreetPerformerMaster/app/CLAUDE.md` §1.5.**
+> The contract is owned by `~/Desktop/StreetPerformerMaster/` in two layers:
 >
-> If anything in this README disagrees with that file, that file wins —
-> open a PR there to evolve the contract, then sync this side. The
-> sister handoff doc `~/Desktop/StreetPerformerMaster/docs/HANDOFF_TO_PUDDINGS_WORLD.md`
+> - **Field-level shapes (the *what*)**:
+>   `StreetPerformerMaster/contract/ktv-contract.json` — machine-readable,
+>   rendered by `tools/gen_contract.py` into Kotlin / TS / Python artifacts.
+>   This repo vendors the TS artifact at
+>   [`lib/ktv/contract.gen.ts`](../../../lib/ktv/contract.gen.ts) via
+>   `./scripts/sync-ktv-contract.{sh|ps1}`. Never edit either copy by hand.
+> - **Semantics and control flow (the *why*)**:
+>   `StreetPerformerMaster/app/CLAUDE.md §1.5` — capability table, term
+>   definitions, rev history, flow rules.
+>
+> If anything in this README disagrees with those files, those files win —
+> evolve the contract there (edit JSON → regenerate → re-sync here). The
+> sister handoff doc `StreetPerformerMaster/docs/HANDOFF_TO_PUDDINGS_WORLD.md`
 > covers the puddings-world-internal details (KV schema, wireframes)
 > and is intended to be retired into this README once stable.
 
