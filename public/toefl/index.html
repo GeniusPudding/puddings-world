@@ -147,6 +147,22 @@ textarea:focus { outline:none; border-color:var(--accent); }
   </div>
 </div>
 
+<div id="coach-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:2000;display:flex;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;max-width:640px;width:100%;max-height:85vh;display:flex;flex-direction:column;padding:1.2rem;">
+    <div class="flex-between mb">
+      <h3 style="margin:0;color:var(--accent);">🤖 Coach Prompt Ready</h3>
+      <button class="btn btn-secondary" onclick="closeCoachModal()" style="padding:0.3rem 0.7rem;">✕</button>
+    </div>
+    <p class="text-sm text-dim" style="margin-bottom:0.6rem;">1️⃣ Copy the prompt → 2️⃣ Open claude.ai (free) → 3️⃣ Paste & send → get expert coach feedback</p>
+    <textarea id="coach-prompt-text" readonly rows="10" style="flex:1;font-size:0.8rem;margin-bottom:0.8rem;"></textarea>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-success" onclick="copyCoachPrompt()" id="coach-copy-btn" style="flex:1;">📋 Copy Prompt</button>
+      <a href="https://claude.ai/new" target="_blank" class="btn" style="flex:1;text-align:center;text-decoration:none;display:inline-block;">Open claude.ai ↗</a>
+      <a href="https://chatgpt.com/" target="_blank" class="btn btn-secondary" style="flex:1;text-align:center;text-decoration:none;display:inline-block;">ChatGPT ↗</a>
+    </div>
+  </div>
+</div>
+
 <header>
   <h1>📝 TOEFL <span>Daily Trainer</span></h1>
   <p>Target score 5.0/6.0 (old: 100/120) — works offline, installable</p>
@@ -300,9 +316,11 @@ textarea:focus { outline:none; border-color:var(--accent); }
     </div>
     <div class="flex-between">
       <span class="text-sm text-dim" id="news-result-stats">—</span>
-      <button class="btn btn-success" onclick="submitNewsCheck()">Save session ✓</button>
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+        <button class="btn" onclick="coachNews()" style="background:var(--accent2);font-size:0.85rem;">🤖 Verify with AI Coach</button>
+        <button class="btn btn-success" onclick="submitNewsCheck()">Save session ✓</button>
+      </div>
     </div>
-    <p class="text-sm" style="margin-top:0.5rem;color:var(--accent);">💡 Tip: paste your summary into Claude with "Did I get this right?" + the original article for instant AI feedback.</p>
   </div>
 
   <!-- Free quality news sources -->
@@ -664,9 +682,10 @@ textarea:focus { outline:none; border-color:var(--accent); }
   <textarea id="writing-input" placeholder="Start writing your response here..." rows="12"></textarea>
   <div class="flex-between mt">
     <span class="text-dim text-sm">Word count: <strong id="word-count">0</strong></span>
-    <div style="display:flex; gap:0.5rem;">
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
       <button class="btn btn-secondary" onclick="toggleWritingTimer()">Start / Pause Timer</button>
       <button class="btn btn-success" onclick="submitWriting()">Submit & Self-Evaluate</button>
+      <button class="btn" onclick="coachWriting()" style="background:var(--accent2);">🤖 AI Coach Feedback</button>
     </div>
   </div>
   <div id="writing-eval" class="card hidden mt"></div>
@@ -693,6 +712,12 @@ textarea:focus { outline:none; border-color:var(--accent); }
     <h3>🎧 Your Recording</h3>
     <audio id="speaking-audio" controls style="width:100%; margin-top:0.5rem;"></audio>
     <p class="text-sm text-dim mt">Listen back. Did you address the question? Fluent? Clear pronunciation? <a id="speaking-download" download="toefl-speaking.webm" style="color:var(--accent);">Download recording ↓</a></p>
+  </div>
+  <div class="card mt">
+    <h3>🤖 AI Coach Feedback</h3>
+    <p class="text-sm text-dim mb">Listen to your recording, type what you said (transcript), and get coach feedback for free via claude.ai.</p>
+    <textarea id="speaking-transcript" rows="4" placeholder="Type your spoken answer here as accurately as you can — including hesitations like 'uh' if you remember them..." style="font-size:0.9rem;"></textarea>
+    <button class="btn mt" onclick="coachSpeaking()" style="background:var(--accent2);">🤖 Generate Coach Prompt</button>
   </div>
   <div class="card mt">
     <h3>Speaking Self-Evaluation Checklist</h3>
@@ -733,6 +758,14 @@ textarea:focus { outline:none; border-color:var(--accent); }
       <li style="padding:0.3rem 0;"><strong>Write a 3-sentence summary</strong> of what you heard</li>
       <li style="padding:0.3rem 0;"><strong>Note 3 new words/phrases</strong> you didn't know — add them to your vocab list</li>
     </ol>
+  </div>
+
+  <div class="card">
+    <h3>🤖 AI Coach Check</h3>
+    <p class="text-sm text-dim mb">After listening to any lecture/podcast, write what you understood below and get quizzed by the AI coach for free.</p>
+    <input type="text" id="listening-source" placeholder="What did you listen to? (e.g. 'TED-Ed: How do vaccines work')" style="width:100%;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:0.7rem;font-size:0.9rem;margin-bottom:0.5rem;">
+    <textarea id="listening-notes" rows="4" placeholder="Write your notes / summary of what you heard (in English)..." style="font-size:0.9rem;"></textarea>
+    <button class="btn mt" onclick="coachListening()" style="background:var(--accent2);">🤖 Generate Coach Prompt</button>
   </div>
 
   <div class="card">
@@ -1711,8 +1744,10 @@ function rateVocab(level) {
 }
 
 // ===== WRITING =====
+let currentWritingPrompt = '';
 function loadWriting() {
   const p = WRITING_PROMPTS[Math.floor(Math.random()*WRITING_PROMPTS.length)];
+  currentWritingPrompt = p.topic;
   document.getElementById('writing-prompt-area').innerHTML = `<span class="tag tag-w">${p.type}</span><p style="margin-top:0.5rem;font-size:1rem;">${p.topic}</p>`;
   document.getElementById('writing-input').value = '';
   document.getElementById('word-count').textContent = '0';
@@ -1779,8 +1814,10 @@ document.getElementById('writing-input').addEventListener('input', function() {
 });
 
 // ===== SPEAKING =====
+let currentSpeakingPrompt = '';
 function loadSpeaking() {
   const p = SPEAKING_PROMPTS[Math.floor(Math.random()*SPEAKING_PROMPTS.length)];
+  currentSpeakingPrompt = p.prompt;
   document.getElementById('speaking-prompt-area').innerHTML = `<span class="tag tag-s">${p.task}</span><p style="margin-top:0.5rem;font-size:1rem;">${p.prompt}</p>`;
   document.getElementById('speaking-timer').textContent = '—';
   document.getElementById('speaking-phase').textContent = '';
@@ -2230,6 +2267,92 @@ function renderNewsStats() {
   });
   html += '</tbody></table>';
   document.getElementById('news-history').innerHTML = html;
+}
+
+// ===== AI COACH PROMPT BRIDGE =====
+// Generates a full coaching prompt to paste into claude.ai / ChatGPT free tier.
+const LEARNER_PROFILE = `I am a Traditional-Chinese-speaking TOEFL iBT learner. My baseline: Reading B2, Listening B1-B2, Speaking A2, Writing A2-B1. Target: 5.0/6.0 (old scale 100/120) by March 2027. Give coaching commentary in Traditional Chinese, but keep all English examples/corrections in English. Be honest — do not inflate scores or give empty praise.`;
+
+const COACH_PERSONAS = {
+  writing: `You are a strict but encouraging TOEFL iBT Writing coach. ${LEARNER_PROFILE}
+
+Grade my essay against the TOEFL Independent Writing rubric. Respond in this exact order:
+1. What worked (1-2 sentences, honest)
+2. Top 2-3 highest-impact fixes: quote my exact phrase -> corrected version -> the rule in one sentence
+3. One structural suggestion (thesis placement, paragraph organization, transitions)
+4. Rewrite ONE key sentence of mine as a model (do not rewrite the whole essay)
+5. Estimated band score on the 1-6 scale with justification
+
+Then ask me one follow-up question to make me revise one paragraph.`,
+
+  speaking: `You are a TOEFL iBT Speaking coach. ${LEARNER_PROFILE}
+
+Below is the prompt I answered and a transcript of what I said (45-second Task 1 answer). Analyze the transcript:
+1. Structure: did I state a position, give 2 reasons with examples, and conclude?
+2. Fluency signals: self-corrections, restarts, hesitation fillers
+3. Vocabulary variety: flag repeated basic words (good/important/very) and suggest upgrades
+4. Grammar: top 2 errors only, quote -> correct -> rule
+5. Estimated band (1-6), honest
+6. Give me a model 45-second answer to the same prompt (about 100-120 words), then one drill instruction for my next attempt.`,
+
+  news: `You are a TOEFL Reading coach. ${LEARNER_PROFILE}
+
+I just read a news/academic article and wrote a summary from memory. Below are the article (or excerpt) and my answers.
+1. Verify my summary: what did I get right, miss, or misread?
+2. Check my claimed details against the article
+3. Quiz me with 3 TOEFL-style follow-up questions (1 inference, 1 detail, 1 vocabulary-in-context) — wait for my answers before revealing solutions
+4. Extract 5 high-value academic words/phrases from the article with definitions and one fresh example sentence each.`,
+
+  listening: `You are a TOEFL Listening coach. ${LEARNER_PROFILE}
+
+I just listened to the audio resource named below and wrote notes/summary from memory. You cannot hear the audio, so work from my notes:
+1. Ask me 5 comprehension questions based on what my notes claim (1 main idea, 2 detail, 1 attitude/purpose, 1 inference) — wait for my answers
+2. After I answer, judge consistency and probe gaps: what SHOULD a listener have caught on this topic that my notes don't mention?
+3. Diagnose my weakest listening sub-skill and give one targeted drill for tomorrow with a specific free resource (TED-Ed, NPR Short Wave, BBC 6-Minute English, or MIT OCW).`
+};
+
+function openCoachModal(promptText) {
+  document.getElementById('coach-prompt-text').value = promptText;
+  document.getElementById('coach-modal').classList.remove('hidden');
+  document.getElementById('coach-copy-btn').textContent = '📋 Copy Prompt';
+}
+function closeCoachModal() { document.getElementById('coach-modal').classList.add('hidden'); }
+function copyCoachPrompt() {
+  const ta = document.getElementById('coach-prompt-text');
+  ta.select();
+  const done = () => { document.getElementById('coach-copy-btn').textContent = '✅ Copied!'; };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(ta.value).then(done).catch(() => { document.execCommand('copy'); done(); });
+  } else { document.execCommand('copy'); done(); }
+}
+
+function coachWriting() {
+  const essay = document.getElementById('writing-input').value.trim();
+  if (essay.split(/\s+/).filter(w=>w).length < 50) { alert('Write at least 50 words first — the coach needs something to grade.'); return; }
+  openCoachModal(`${COACH_PERSONAS.writing}\n\n--- WRITING PROMPT ---\n${currentWritingPrompt}\n\n--- MY ESSAY ---\n${essay}`);
+}
+
+function coachSpeaking() {
+  const transcript = document.getElementById('speaking-transcript').value.trim();
+  if (transcript.length < 30) { alert('Type your spoken answer first (listen to your recording and transcribe it).'); return; }
+  openCoachModal(`${COACH_PERSONAS.speaking}\n\n--- SPEAKING PROMPT ---\n${currentSpeakingPrompt}\n\n--- MY TRANSCRIPT ---\n${transcript}`);
+}
+
+function coachNews() {
+  const article = document.getElementById('news-input').value.trim() || '(article text not retained — work from my summary only)';
+  const summary = document.getElementById('news-summary').value.trim();
+  const details = document.getElementById('news-details').value.trim();
+  const stance = document.getElementById('news-stance').value.trim();
+  if (summary.length < 20) { alert('Write your summary first.'); return; }
+  const excerpt = article.length > 4000 ? article.slice(0, 4000) + '\n[...truncated...]' : article;
+  openCoachModal(`${COACH_PERSONAS.news}\n\n--- ARTICLE ---\n${excerpt}\n\n--- MY SUMMARY ---\n${summary}\n\n--- DETAILS I REMEMBER ---\n${details}\n\n--- AUTHOR'S STANCE (my reading) ---\n${stance}`);
+}
+
+function coachListening() {
+  const source = document.getElementById('listening-source').value.trim();
+  const notes = document.getElementById('listening-notes').value.trim();
+  if (notes.length < 20) { alert('Write your notes/summary of what you heard first.'); return; }
+  openCoachModal(`${COACH_PERSONAS.listening}\n\n--- AUDIO RESOURCE ---\n${source || '(unspecified)'}\n\n--- MY NOTES / SUMMARY ---\n${notes}`);
 }
 
 // ===== INIT =====
