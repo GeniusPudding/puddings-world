@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-07-13T04:02:25.930Z",
+  "fetchedAt": "2026-07-20T04:06:51.627Z",
   "repos": {
     "puddingforhealth/FlowFusionBP": {
       "owner": "puddingforhealth",
@@ -119,7 +119,7 @@
       "stars": 4,
       "openIssues": 0,
       "defaultBranch": "main",
-      "weeklyCommits": 1,
+      "weeklyCommits": 0,
       "latestCommit": {
         "sha": "dc964bc",
         "message": "Fix setup robustness: correct venv timing and improve dependency diagnostics\n\n- install.sh: Use system Python to run patch_settings (venv doesn't exist yet)\n- start-voice.sh: Better error detection for dependency installation failures\n  * Detect macOS missing compiler (xcode-select --install)\n  * Log installation errors for debugging\n  * Graceful error messages for users\n\nThis ensures one-line setup works reliably across fresh installs.",
