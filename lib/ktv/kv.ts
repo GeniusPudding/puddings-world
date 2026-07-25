@@ -25,6 +25,7 @@ export const KV_KEYS = {
   queue: "ktv:queue",
   state: "ktv:state",
   catalog: "ktv:catalog",
+  messages: "ktv:messages",
 } as const;
 
 /** Returns true if KV is configured and ready. Use to gate API responses. */

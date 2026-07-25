@@ -39,9 +39,36 @@ export type QueueItem = {
 
 export type State = {
   acceptingRequests: boolean;
+  /**
+   * Gate for audience message POSTs (rev 4.1). Missing on states written
+   * before the message board existed — readers must default it to true.
+   */
+  acceptingMessages?: boolean;
   nowPlayingId: string | null;
   updatedAt: string;
 };
+
+export type ChatRole = "audience" | "performer";
+
+/** rev 4.1 live message board entry, KV `ktv:messages` (oldest → newest). */
+export type ChatMessage = {
+  id: string;
+  /** Stamped server-side from auth — client-supplied role is ignored. */
+  role: ChatRole;
+  /** Optional nickname (audience) or the fixed performer display name. */
+  name?: string;
+  text: string;
+  createdAt: string;
+  /** Internal: same anti-spam hash as QueueItem.ipHash. Stripped from responses. */
+  ipHash?: string;
+  /** Internal: audience self-delete credential, returned once at POST time. */
+  cancelToken?: string;
+};
+
+export type ChatMessagePublic = Pick<
+  ChatMessage,
+  "id" | "role" | "name" | "text" | "createdAt"
+>;
 
 export type QueueEntryPublic = {
   id: string;
@@ -53,9 +80,17 @@ export type QueueEntryPublic = {
 
 export type StatePublic = {
   acceptingRequests: boolean;
+  acceptingMessages: boolean;
   nowPlayingId: string | null;
   /** Joined catalog info for the now-playing song, when set. */
   nowPlaying: { songId: string; title: string; artist: string } | null;
   /** Full queue (oldest → newest). PII fields stripped. */
   queue: QueueEntryPublic[];
+  /**
+   * Message-board tail (last 30, oldest → newest) folded into the state
+   * poll so audience phones need zero extra requests (spec §1.5.12.6).
+   */
+  messages: ChatMessagePublic[];
+  /** createdAt of the newest message; cheap change-detection marker. */
+  lastMessageAt: string | null;
 };
