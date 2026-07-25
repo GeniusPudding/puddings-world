@@ -349,6 +349,62 @@ audience-facing read with public-cache + edge cache).
 
 Empties the queue. Call this between gigs to start clean.
 
+### `GET /api/ktv/messages` — public
+
+Live message board (contract v4.1.0, spec §1.5.12), incremental pull.
+`?since=<id>` returns only messages after that id (empty array in steady
+state — the performer app's cheap 1 s poll); without `since`, returns the
+last 30. Unknown `since` id falls back to the last 30 so clients resync.
+`Cache-Control: no-store` — audience phones don't call this; their tail
+is folded into `GET /api/ktv/state`.
+
+```json
+[ { "id": "msg1", "role": "audience", "name": "小明", "text": "唱得真好！",
+    "createdAt": "2026-07-25T08:00:00Z" } ]
+```
+
+### `POST /api/ktv/messages` — public (rate-limited) / bearer bypass
+
+Post one message. `role` is stamped server-side from auth — a bearer
+caller becomes `performer` (fixed display name, `KTV_PERFORMER_NAME` env
+var, default "GeniusPudding"); everyone else is `audience`. Text ≤ 200
+chars, optional nickname ≤ 16, both sanitized (trim + control / zero-width
+chars stripped).
+
+```http
+POST /api/ktv/messages
+Content-Type: application/json
+
+{ "text": "唱得真好！", "name": "小明" }
+```
+
+- 200 `{ id, cancelToken, createdAt }` — the audience client persists
+  `(id, cancelToken)` to delete its own message later
+- 400 `bad_request` — empty / over-long text or name
+- 403 `not_accepting` — performer turned messages off (bearer bypass)
+- 429 `rate_limit` `{ cooldownSec }` — 3 s per-IP cooldown (time-based,
+  unlike the queue's quota; chat runs faster than song requests)
+- 503 `kv_unavailable`
+
+### `DELETE /api/ktv/messages/:id` — performer or self-delete
+
+Same dual auth as queue rows: `Authorization: Bearer` (performer
+moderation) or `X-Cancel-Token` (audience deleting their own). 204 on
+success, 401 / 404 otherwise.
+
+### `DELETE /api/ktv/messages` — performer-only
+
+Clears the board. Call at end of gig alongside `DELETE /api/ktv/queue`.
+
+### Message board in `/state`
+
+`GET /api/ktv/state` now also returns `acceptingMessages` (missing
+pre-4.1 stored states read as `true`), `messages` (last 30, PII
+stripped), and `lastMessageAt` (change-detection marker) — still a
+single KV `mget`. `PATCH /api/ktv/state` accepts `acceptingMessages` to
+toggle the board without touching song requests. `ktv:messages` is
+capped server-side at the last 200 rows.
+
 ### `DELETE /api/ktv/queue/:id` — performer or self-cancel
 
 Removes one queue row. Two ways to authenticate:
