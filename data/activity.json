@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-07-27T04:04:51.001Z",
+  "fetchedAt": "2026-08-03T03:56:53.516Z",
   "repos": {
     "puddingforhealth/FlowFusionBP": {
       "owner": "puddingforhealth",
@@ -62,8 +62,14 @@
       "name": "SofaTearing",
       "stars": 0,
       "openIssues": 0,
-      "defaultBranch": "main",
-      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 52.159.244.65. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\"h"
+      "defaultBranch": "master",
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "ee86cbc",
+        "message": "Fix compile issure #1",
+        "date": "2023-01-19T08:22:01Z",
+        "url": "https://github.com/JaggerYu928/SofaTearing/commit/ee86cbc49b8c29ba60ada1e7ea82ff4664fedce5"
+      }
     },
     "jaggerturkey/CatAR_homepage": {
       "owner": "jaggerturkey",
@@ -71,15 +77,27 @@
       "stars": 0,
       "openIssues": 0,
       "defaultBranch": "main",
-      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 52.159.244.65. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\"h"
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "ee71fdb",
+        "message": "Temp : Upload & Analysis video API function works",
+        "date": "2026-01-22T09:47:27Z",
+        "url": "https://github.com/jaggerturkey/CatAR_homepage/commit/ee71fdb5606754ee59b766f815e9b8948b44e7fc"
+      }
     },
     "GeniusPudding/InvisibleGo": {
       "owner": "GeniusPudding",
       "name": "InvisibleGo",
-      "stars": 0,
+      "stars": 1,
       "openIssues": 0,
       "defaultBranch": "main",
-      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 52.159.244.65. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\"h"
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "3c359fe",
+        "message": "Make 3-illegal auto-skip a turn rotation, not a pass",
+        "date": "2026-05-08T16:53:28Z",
+        "url": "https://github.com/GeniusPudding/InvisibleGo/commit/3c359fe67e597dd813a68750236d0d0e1bae17e9"
+      }
     },
     "GeniusPudding/reprise-studio": {
       "owner": "GeniusPudding",
@@ -87,7 +105,7 @@
       "stars": 0,
       "openIssues": 0,
       "defaultBranch": "main",
-      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 52.159.244.65. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\"h"
+      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 172.184.211.90. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\""
     },
     "GeniusPudding/Kaikou-Claude": {
       "owner": "GeniusPudding",
@@ -95,7 +113,7 @@
       "stars": 0,
       "openIssues": 0,
       "defaultBranch": "main",
-      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 52.159.244.65. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\"h"
+      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 172.184.211.90. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\""
     },
     "GeniusPudding/SADroid": {
       "owner": "GeniusPudding",
@@ -103,7 +121,7 @@
       "stars": 0,
       "openIssues": 0,
       "defaultBranch": "main",
-      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 52.159.244.65. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\"h"
+      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 172.184.211.90. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\""
     },
     "GeniusPudding/ApkSmith": {
       "owner": "GeniusPudding",
@@ -111,7 +129,7 @@
       "stars": 0,
       "openIssues": 0,
       "defaultBranch": "main",
-      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 52.159.244.65. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\"h"
+      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 172.184.211.90. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\""
     }
   }
 }
