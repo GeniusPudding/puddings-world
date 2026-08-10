@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-08-03T03:56:53.516Z",
+  "fetchedAt": "2026-08-10T02:36:15.619Z",
   "repos": {
     "puddingforhealth/FlowFusionBP": {
       "owner": "puddingforhealth",
@@ -105,15 +105,27 @@
       "stars": 0,
       "openIssues": 0,
       "defaultBranch": "main",
-      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 172.184.211.90. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\""
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "2395d97",
+        "message": "Fix TimeScrubber swallowing shortcut keys when slider has focus\n\nRange / checkbox / button inputs never produce text, so the early-return\nthat protects text-typing inputs was wrong to include them. After clicking\nthe slider, =/-/+/_/r etc were going to the input and getting eaten.",
+        "date": "2026-05-02T01:59:23Z",
+        "url": "https://github.com/GeniusPudding/reprise-studio/commit/2395d97cb7ff7a7f0309008130f21f30f578a542"
+      }
     },
     "GeniusPudding/Kaikou-Claude": {
       "owner": "GeniusPudding",
       "name": "Kaikou-Claude",
-      "stars": 0,
+      "stars": 4,
       "openIssues": 0,
       "defaultBranch": "main",
-      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 172.184.211.90. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\""
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "dc964bc",
+        "message": "Fix setup robustness: correct venv timing and improve dependency diagnostics\n\n- install.sh: Use system Python to run patch_settings (venv doesn't exist yet)\n- start-voice.sh: Better error detection for dependency installation failures\n  * Detect macOS missing compiler (xcode-select --install)\n  * Log installation errors for debugging\n  * Graceful error messages for users\n\nThis ensures one-line setup works reliably across fresh installs.",
+        "date": "2026-05-10T11:11:06Z",
+        "url": "https://github.com/GeniusPudding/Kaikou-Claude/commit/dc964bc7145a96bfb80a9dc3a758536a5566cdc7"
+      }
     },
     "GeniusPudding/SADroid": {
       "owner": "GeniusPudding",
@@ -121,7 +133,13 @@
       "stars": 0,
       "openIssues": 0,
       "defaultBranch": "main",
-      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 172.184.211.90. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\""
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "dcd54e8",
+        "message": "Move ApkSmith submodule from droidbot/ to project root\n\nThe submodule was unnecessarily nested at droidbot/ApkSmith/ — it is\na project-level dependency, not specific to the droidbot subdirectory.\n\nMoved to SADroid/ApkSmith/ and replaced the sys.path hacks in both\ndriver files with clean imports:\n\n  # Before (fragile, path-dependent)\n  sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'ApkSmith', 'src'))\n  from apksmith import instrument_apk  # noqa: E402\n\n  # After (standard pip package)\n  from apksmith import instrument_apk\n\nSetup: run `pip install -e ApkSmith/` from the SADroid root to make\nthe apksmith package available as a normal import.\n\nCo-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>",
+        "date": "2026-05-01T16:10:26Z",
+        "url": "https://github.com/GeniusPudding/SADroid/commit/dcd54e8cff22665fbd5924a42fb472edcb61bb3c"
+      }
     },
     "GeniusPudding/ApkSmith": {
       "owner": "GeniusPudding",
@@ -129,7 +147,13 @@
       "stars": 0,
       "openIssues": 0,
       "defaultBranch": "main",
-      "error": "GitHub 403 rate limit exceeded: {\"message\":\"API rate limit exceeded for 172.184.211.90. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)\",\"documentation_url\":\""
+      "weeklyCommits": 0,
+      "latestCommit": {
+        "sha": "50a7c97",
+        "message": "Fix all ruff lint errors + stabilise E2E test\n\nLint fixes (38 issues across 11 files):\n- Import sorting (I001) via ruff --fix\n- Line too long (E501): break strings, reflow args\n- Lambda assignments (E731): convert to def functions\n- Unnecessary f-strings (F541): remove extraneous f prefix\n- Unused imports (F401): remove dead imports\n- Nested with statements (SIM117): combine into single with\n- Unnecessary mode arg (UP015): drop \"r\" from open()\n\nE2E test stability fixes:\n- Add force-stop before launching so onCreate always re-executes\n- Enlarge logcat buffer to 4M and add 1s settle time after clear\n- Replace logcat tag-based filtering (unreliable on some emulator\n  images) with full drain + Python-side grep\n- All 40 tests pass (39 unit + 1 E2E), CI lint clean\n\nCo-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>",
+        "date": "2026-04-22T14:48:52Z",
+        "url": "https://github.com/GeniusPudding/ApkSmith/commit/50a7c9770bcda8d042e2cd5ebef3043fcfa3ca3f"
+      }
     }
   }
 }
