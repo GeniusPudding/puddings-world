@@ -173,6 +173,7 @@ textarea:focus { outline:none; border-color:var(--accent); }
   <button onclick="showPanel('dashboard')" id="nav-dashboard">Dashboard</button>
   <button onclick="showPanel('reading')" id="nav-reading">Reading</button>
   <button onclick="showPanel('vocab')" id="nav-vocab">Vocabulary</button>
+  <button onclick="showPanel('context')" id="nav-context">🧩 Context</button>
   <button onclick="showPanel('writing')" id="nav-writing">Writing</button>
   <button onclick="showPanel('speaking')" id="nav-speaking">Speaking</button>
   <button onclick="showPanel('listening')" id="nav-listening">Listening</button>
@@ -667,6 +668,28 @@ textarea:focus { outline:none; border-color:var(--accent); }
     <button class="btn btn-danger" onclick="rateVocab('hard')">Hard — Again</button>
     <button class="btn btn-warn" onclick="rateVocab('medium')">Medium — Got It</button>
     <button class="btn btn-success" onclick="rateVocab('easy')">Easy — Knew It</button>
+  </div>
+</div>
+
+<!-- ====== CONTEXT VOCAB (theme weeks) ====== -->
+<div id="panel-context" class="panel">
+  <h2><span class="tag tag-r">Context</span> Theme Week — Words in Context</h2>
+  <p class="text-dim text-sm mb">No flashcards. Read the passage, and for every <b>bold word</b>: say your guess out loud FIRST, then reveal it below. The same 8 words come back in this week's reading, listening, speaking and writing — and in the 💼 business version.</p>
+  <div class="flex-between mb" style="flex-wrap:wrap; gap:0.5rem;">
+    <select id="ctx-theme-select" onchange="ctxSetTheme(this.value)" style="padding:0.5rem; border-radius:8px; background:var(--surface); color:var(--text); border:1px solid var(--border); max-width:100%;"></select>
+    <div style="display:flex; gap:0.4rem;">
+      <button class="btn btn-secondary" id="ctx-mode-academic" onclick="ctxSetMode('academic')">🎓 Academic</button>
+      <button class="btn btn-secondary" id="ctx-mode-business" onclick="ctxSetMode('business')">💼 Business</button>
+    </div>
+  </div>
+  <div class="card" id="ctx-passage" style="line-height:1.9; font-size:1.02rem;"></div>
+  <h3 class="mt">🔍 Word check — guess first, then reveal</h3>
+  <div id="ctx-words"></div>
+  <div class="card mt">
+    <h3 id="ctx-task-title">✍️ Production task</h3>
+    <p class="text-sm text-dim" id="ctx-task-desc"></p>
+    <textarea id="ctx-output" rows="6" style="width:100%; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:0.7rem;" placeholder="Type your guesses and sentences here..."></textarea>
+    <button class="btn" onclick="coachContext()" style="background:var(--accent2); margin-top:0.6rem;">🤖 AI Coach Feedback</button>
   </div>
 </div>
 
@@ -1976,27 +1999,166 @@ if (localStorage.getItem('notif-enabled') === '1' && typeof Notification !== 'un
   scheduleNextReminder();
 }
 
+// ===== CONTEXT VOCAB (theme weeks — no flashcards) =====
+// Target words appear only inside full passages; [[display|base]] marks an inflected form.
+const CTX_THEMES = [
+  { id:'tech-mind', name:'Week theme: Technology and the Mind (L1–2)',
+    words:[
+      {w:'ubiquitous',pos:'adj.',def:'present everywhere',col:'ubiquitous in modern life'},
+      {w:'significant',pos:'adj.',def:'important; large enough to matter',col:'a significant difference / driver'},
+      {w:'empirical',pos:'adj.',def:'based on observation, not theory',col:'empirical evidence / study'},
+      {w:'indicate',pos:'v.',def:'to show; to point out',col:'the data indicate that…'},
+      {w:'contribute',pos:'v.',def:'to help cause',col:'contribute to'},
+      {w:'factor',pos:'n.',def:'a circumstance that affects a result',col:'a key factor in'},
+      {w:'evidence',pos:'n.',def:'facts showing something is true',col:'growing evidence that…'},
+      {w:'mitigate',pos:'v.',def:'to make less severe',col:'mitigate the effects / risk of'}],
+    academic:`Digital devices have become [[ubiquitous]] in higher education, and their presence in the classroom is now a [[significant]] concern for researchers. Recent [[empirical]] studies [[indicate]] that students who keep smartphones within reach during lectures retain less information, even when the devices remain untouched. Attention, it appears, is a limited resource: the mere possibility of a notification [[contributes|contribute]] to what psychologists call "attentional drain." One key [[factor]] is that the brain must actively work to ignore a familiar stimulus, leaving fewer cognitive resources for learning. The [[evidence]] is not entirely one-sided, however — some researchers argue that well-designed educational software can [[mitigate]] these costs by turning the same devices into tools for active recall practice.`,
+    business:`TO: Product Team — FROM: Head of UX — RE: Notification redesign\n\nPush notifications are now [[ubiquitous]] across our app portfolio, and churn data [[indicates|indicate]] they have become a [[significant]] driver of uninstalls. Our latest [[empirical]] user study shows that interruptions during focused tasks [[contribute]] directly to frustration, and frequency is the single biggest [[factor]]. The [[evidence]] suggests we should act this quarter: batching alerts into two daily digests could [[mitigate]] the problem without hurting engagement. Please review the attached data before Thursday's planning meeting and come prepared to discuss trade-offs.`,
+    academicTask:'1) For each bold word, type your guessed meaning (中文或英文). 2) Then write 2–3 sentences using THREE of the words in a NEW context — your work or your grad-school plans. Tap AI Coach when done.',
+    businessTask:'Reply to this memo in 3–5 sentences as the engineering lead. Agree or push back — but use at least THREE bold words correctly. Tap AI Coach when done.'},
+  { id:'climate', name:'Week theme: Climate Systems and Resilience (L2)',
+    words:[
+      {w:'fluctuate',pos:'v.',def:'to rise and fall irregularly',col:'prices fluctuate'},
+      {w:'unprecedented',pos:'adj.',def:'never seen before',col:'unprecedented scale'},
+      {w:'comprehensive',pos:'adj.',def:'covering all aspects',col:'a comprehensive review of'},
+      {w:'deteriorate',pos:'v.',def:'to become progressively worse',col:'conditions deteriorate'},
+      {w:'phenomenon',pos:'n.',def:'an observed fact or event',col:'a widespread phenomenon'},
+      {w:'resilient',pos:'adj.',def:'able to recover quickly',col:'resilient to shocks'},
+      {w:'inherent',pos:'adj.',def:'existing as a natural part',col:'inherent risk / inherent in'},
+      {w:'allocate',pos:'v.',def:'to distribute for a purpose',col:'allocate funds / resources to'}],
+    academic:`Ocean temperatures naturally [[fluctuate]] from season to season, but the past decade has brought [[unprecedented]] extremes. A [[comprehensive]] survey of more than 300 reef sites shows that conditions have continued to [[deteriorate]]: repeated bleaching is a [[phenomenon]] now observed even in protected waters. Yet reefs are surprisingly [[resilient]] when stress is temporary, because recovery capacity is [[inherent]] in their biology. The policy question is therefore how governments should [[allocate]] limited conservation funds — protecting the most damaged sites, or the ones most likely to recover.`,
+    business:`TO: Executive Committee — RE: Supply-chain climate risk\n\nRaw-material prices have [[fluctuated|fluctuate]] sharply this year, and several supplier regions face [[unprecedented]] drought. Our audit shows that infrastructure at two key ports has begun to [[deteriorate]], a [[phenomenon]] our current contracts never anticipated. I recommend a [[comprehensive]] review before Q3: climate exposure is now an [[inherent]] part of our cost structure. We should [[allocate]] five percent of the logistics budget to backup routes; companies that invested early have proven far more [[resilient]] during recent disruptions.`,
+    academicTask:'1) Type your guessed meaning for each bold word. 2) Write 2–3 sentences using THREE of them about a risk in YOUR industry. Tap AI Coach when done.',
+    businessTask:'Write a 3–5 sentence reply to this memo as a department head: support or challenge the 5% proposal, using at least THREE bold words. Tap AI Coach when done.'},
+  { id:'innovation', name:'Week theme: Economics of Innovation (L2–3)',
+    words:[
+      {w:'proliferate',pos:'v.',def:'to increase rapidly in number',col:'tools have proliferated'},
+      {w:'paradigm',pos:'n.',def:'a typical model or framework',col:'paradigm shift'},
+      {w:'catalyst',pos:'n.',def:'something that triggers change',col:'a catalyst for change'},
+      {w:'disseminate',pos:'v.',def:'to spread widely',col:'disseminate information / findings'},
+      {w:'tangible',pos:'adj.',def:'real; clearly measurable',col:'tangible benefits / proof'},
+      {w:'plausible',pos:'adj.',def:'seeming reasonable or likely',col:'a plausible explanation'},
+      {w:'substantiate',pos:'v.',def:'to prove with evidence',col:'substantiate a claim'},
+      {w:'arbitrary',pos:'adj.',def:'based on random choice, not reason',col:'an arbitrary decision'}],
+    academic:`Why do some technologies spread while others stall? Innovations rarely succeed on merit alone; they [[proliferate]] when they fit an existing [[paradigm]] of use. The printing press is the classic example of a [[catalyst]]: it did not merely store knowledge, it changed who could [[disseminate]] it. Economists note that adoption depends on [[tangible]] benefits users can see immediately, which is why many [[plausible]] inventions fail in the market. Careful historical studies can [[substantiate]] these claims, showing that timing is rarely [[arbitrary]] — new tools take off when infrastructure, prices, and habits align.`,
+    business:`TO: Investment Committee — RE: Series A recommendation\n\nAI coding tools have [[proliferated|proliferate]] over the past two years, but this startup represents a genuine [[paradigm]] shift rather than another feature. Its enterprise pilot acted as a [[catalyst]] for expansion: three Fortune 500 clients now [[disseminate]] the tool across their engineering teams. Revenue provides [[tangible]] proof of demand, and the team's growth model is [[plausible]] given current pipeline data. Due diligence could [[substantiate]] the retention claims within two weeks. The valuation is aggressive but not [[arbitrary]] — comparable deals closed twenty percent higher last quarter.`,
+    academicTask:'1) Type your guessed meaning for each bold word. 2) Write 2–3 sentences using THREE of them about a technology you have watched succeed or fail. Tap AI Coach when done.',
+    businessTask:'You are on the investment committee. Write a 3–5 sentence response: approve, reject, or request more data — using at least THREE bold words. Tap AI Coach when done.'},
+  { id:'health-data', name:'Week theme: Public Health and Data (L3)',
+    words:[
+      {w:'scrutinize',pos:'v.',def:'to examine very closely',col:'scrutinize the data'},
+      {w:'discrepancy',pos:'n.',def:'a mismatch between facts',col:'a discrepancy between X and Y'},
+      {w:'concurrent',pos:'adj.',def:'happening at the same time',col:'concurrent studies / sessions'},
+      {w:'exacerbate',pos:'v.',def:'to make a problem worse',col:'exacerbate the problem'},
+      {w:'rudimentary',pos:'adj.',def:'basic; at an early stage',col:'a rudimentary understanding'},
+      {w:'elicit',pos:'v.',def:'to draw out (a response)',col:'elicit feedback / a response'},
+      {w:'synthesize',pos:'v.',def:'to combine into a whole',col:'synthesize findings'},
+      {w:'analogous',pos:'adj.',def:'comparable; similar in function',col:'analogous to'}],
+    academic:`When two hospital datasets report different infection rates, researchers must first [[scrutinize]] the methods behind each number. A [[discrepancy]] often reflects definitions rather than reality: [[concurrent]] studies may count the same cases differently. Poor data practices can [[exacerbate]] public confusion, especially when early figures are [[rudimentary]] estimates later revised. Careful surveys are designed to [[elicit]] accurate reporting, and meta-analyses then [[synthesize]] results across dozens of studies. The process is [[analogous]] to assembling a puzzle from mismatched boxes — slow, but far more reliable than any single piece.`,
+    business:`TO: Data Platform Team — RE: Q3 metrics incident\n\nFinance and Marketing presented [[concurrent]] dashboards with a twelve percent revenue [[discrepancy]] last week. Before we [[exacerbate]] stakeholder concern, we need to [[scrutinize]] the pipeline stage by stage. Initial checks suggest the root cause is a [[rudimentary]] deduplication rule written before the schema migration. I will [[elicit]] requirements from both teams this week and [[synthesize]] them into a single metric definition. The situation is [[analogous]] to last year's billing mismatch — annoying, but fixable within one sprint.`,
+    academicTask:'1) Type your guessed meaning for each bold word. 2) Write 2–3 sentences using THREE of them about debugging or data quality at work. Tap AI Coach when done.',
+    businessTask:'Write the 3–5 sentence status update you would send to stakeholders about this incident, using at least THREE bold words. Tap AI Coach when done.'}
+];
+
+const CTX_KEY = 'ctxVocabState';
+let ctxThemeIdx = 0, ctxMode = 'academic';
+function ctxLoadState(){ try { return JSON.parse(localStorage.getItem(CTX_KEY)) || {}; } catch(e){ return {}; } }
+function ctxSaveState(s){ try { localStorage.setItem(CTX_KEY, JSON.stringify(s)); } catch(e){} }
+function ctxSetTheme(i){ ctxThemeIdx = parseInt(i,10)||0; renderContext(); }
+function ctxSetMode(m){ ctxMode = m; renderContext(); }
+function ctxPlain(t){ return t.replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, '$1'); }
+
+function ctxMark(base, ok){
+  const s = ctxLoadState(); const t = CTX_THEMES[ctxThemeIdx];
+  s[t.id] = s[t.id] || {}; s[t.id][base] = ok ? 'ok' : 'review';
+  ctxSaveState(s); renderContext();
+}
+function ctxReveal(base){
+  const el = document.getElementById('ctx-def-'+base);
+  if (el) el.classList.toggle('hidden');
+}
+function renderContext(){
+  const sel = document.getElementById('ctx-theme-select');
+  if (!sel) return;
+  if (!sel.options.length) CTX_THEMES.forEach((t,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=t.name; sel.appendChild(o); });
+  sel.value = ctxThemeIdx;
+  const t = CTX_THEMES[ctxThemeIdx];
+  const marks = ctxLoadState()[t.id] || {};
+  document.getElementById('ctx-mode-academic').style.background = ctxMode==='academic' ? 'var(--accent)' : '';
+  document.getElementById('ctx-mode-business').style.background = ctxMode==='business' ? 'var(--accent)' : '';
+  const raw = ctxMode==='academic' ? t.academic : t.business;
+  document.getElementById('ctx-passage').innerHTML = raw
+    .replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (m,disp,base)=>`<b style="color:var(--accent);">${disp}</b>`)
+    .replace(/\n/g,'<br>');
+  document.getElementById('ctx-words').innerHTML = t.words.map(w=>{
+    const mark = marks[w.w];
+    const badge = mark==='ok' ? ' ✅' : mark==='review' ? ' 🔁' : '';
+    return `<div class="card" style="padding:0.8rem 1rem; margin:0.5rem 0;">
+      <div class="flex-between" style="flex-wrap:wrap; gap:0.4rem;">
+        <span><b>${w.w}</b> <span class="text-dim text-sm">${w.pos}</span>${badge}</span>
+        <span>
+          <button class="btn btn-secondary" style="padding:0.3rem 0.7rem; font-size:0.8rem;" onclick="ctxReveal('${w.w}')">👁 Reveal</button>
+          <button class="btn btn-success" style="padding:0.3rem 0.7rem; font-size:0.8rem;" onclick="ctxMark('${w.w}',true)">猜對</button>
+          <button class="btn btn-danger" style="padding:0.3rem 0.7rem; font-size:0.8rem;" onclick="ctxMark('${w.w}',false)">猜錯</button>
+        </span>
+      </div>
+      <div id="ctx-def-${w.w}" class="hidden text-sm" style="margin-top:0.5rem;">${w.def} — <i>${w.col}</i></div>
+    </div>`;
+  }).join('');
+  document.getElementById('ctx-task-title').textContent = ctxMode==='academic' ? '✍️ Production task (academic)' : '💼 Production task (business)';
+  document.getElementById('ctx-task-desc').textContent = ctxMode==='academic' ? t.academicTask : t.businessTask;
+}
+
+// Personas are built lazily inside coachContext() because LEARNER_PROFILE and
+// openCoachModal are declared further down in this script (load-order constraint).
+function ctxPersona(mode){
+  if (mode === 'academic') return `You are a TOEFL academic vocabulary coach. ${LEARNER_PROFILE}
+
+I just read a passage with 8 target words and did two things: guessed each word's meaning from context, and wrote sentences using three of them. My work is below.
+1. For each word: judge my guess (correct / partial / wrong), then give the precise meaning and 2 common academic collocations
+2. Correct my sentences: quote my phrase -> corrected version -> the rule in one sentence
+3. For every word I got wrong or skipped, give me ONE fresh cloze sentence (blank where the word goes) and wait for my answers.`;
+  return `You are a business English writing coach for a Taiwanese software engineer preparing to work in international teams. ${LEARNER_PROFILE}
+
+Below is a business scenario I read and my written reply. Grade my reply:
+1. Professional tone and register: is it appropriately direct and polite for an international workplace? Quote anything that sounds off
+2. Did I use the target words correctly and naturally? Flag misuse
+3. Top 2-3 highest-impact corrections: quote -> corrected -> rule
+4. Show a model version of my reply in 80-120 words
+5. One sentence of advice for my next business-writing attempt.`;
+}
+
+function coachContext(){
+  const t = CTX_THEMES[ctxThemeIdx];
+  const out = document.getElementById('ctx-output').value.trim();
+  if (out.length < 20) { alert('Type your guesses / sentences first — the coach needs your work to review.'); return; }
+  const persona = ctxPersona(ctxMode);
+  const raw = ctxMode==='academic' ? t.academic : t.business;
+  openCoachModal(`${persona}\n\n--- THEME ---\n${t.name}\n\n--- PASSAGE ---\n${ctxPlain(raw)}\n\n--- TARGET WORDS ---\n${t.words.map(w=>w.w).join(', ')}\n\n--- MY WORK ---\n${out}`);
+}
+renderContext();
+
 // ===== TODAY VIEW =====
 const PLAN_START_DATE = '2026-06-02';
 const TARGET_DEADLINE = '2027-03-01';
 
 const WEEKLY_TASKS = {
   foundation: [
-    {id:'vocab', icon:'📚', title:'Vocabulary — 10 flashcards', time:'5 min', detail:'Level 1–2 words. Use Vocabulary tab.', target:'vocab'},
+    {id:'vocab', icon:'🧩', title:'Vocab in context — theme passage', time:'10 min', detail:'L1–2 words inside an academic passage. Guess first, then reveal. Tue/Thu: use the 💼 Business mode.', target:'context'},
     {id:'reading', icon:'📖', title:'Reading — 1 short passage', time:'15 min', detail:'1 academic passage + 5 questions. Use Reading tab.', target:'reading'},
     {id:'listening', icon:'👂', title:'Listening — TED-Ed 5 min', time:'20 min', detail:'Watch WITHOUT subtitles → notes → watch WITH → 3-sentence summary', link:'https://www.youtube.com/c/teded'},
     {id:'speaking', icon:'🗣', title:'Speaking — Shadowing', time:'15 min', detail:'Pick 2-min TED segment, repeat each sentence after speaker (shadowing). NOT original output yet.', link:'https://www.ted.com/talks'},
     {id:'writing', icon:'✍️', title:'Writing — 5 varied sentences', time:'20 min', detail:'Write 5 English sentences about your day. Mix simple, compound, complex structures.', target:'writing'}
   ],
   templates: [
-    {id:'vocab', icon:'📚', title:'Vocabulary — 10 flashcards', time:'5 min', detail:'Level 2–3 words.', target:'vocab'},
+    {id:'vocab', icon:'🧩', title:'Vocab in context — theme passage', time:'10 min', detail:'L2–3 words in a theme passage. Tue/Thu: 💼 Business mode.', target:'context'},
     {id:'reading', icon:'📖', title:'Reading — Timed medium passage', time:'15 min', detail:'Time yourself. Aim for under 15 min for passage + Qs.', target:'reading'},
     {id:'listening', icon:'👂', title:'Listening — NPR Short Wave + dictation', time:'20 min', detail:'Listen to one episode (~10 min) once, then dictate one paragraph from memory.', link:'https://www.npr.org/podcasts/510351/short-wave'},
     {id:'speaking', icon:'🗣', title:'Speaking — Task 1 template', time:'15 min', detail:'Use template: Position (5s) → Reason 1 + ex (15s) → Reason 2 + ex (15s) → Conclusion (10s). Record yourself.', target:'speaking'},
     {id:'writing', icon:'✍️', title:'Writing — Independent essay', time:'20 min', detail:'5-paragraph structure: intro + 2 body + counterargument + conclusion. 1 prompt.', target:'writing'}
   ],
   integrated: [
-    {id:'vocab', icon:'📚', title:'Vocabulary — 10 flashcards', time:'5 min', detail:'Level 3 + connectors.', target:'vocab'},
+    {id:'vocab', icon:'🧩', title:'Vocab in context — theme passage', time:'10 min', detail:'L3 words in a theme passage. Tue/Thu: 💼 Business mode.', target:'context'},
     {id:'reading', icon:'📖', title:'Reading — Full TOEFL passage', time:'20 min', detail:'700-word passage + 10 questions, strictly timed.', target:'reading'},
     {id:'listening', icon:'👂', title:'Listening — TOEFL lecture', time:'20 min', detail:'5-min lecture + 6 questions, ONE listen only, take notes.', link:'https://www.ets.org/toefl/test-takers/ibt/prepare/sample-test-jan-2026-1.html'},
     {id:'speaking', icon:'🗣', title:'Speaking — Full TOEFL Task 1', time:'15 min', detail:'15s prep + 45s speaking. Record. Repeat 2x.', target:'speaking'},
