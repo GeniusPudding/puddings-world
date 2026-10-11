@@ -186,6 +186,32 @@ textarea:focus { outline:none; border-color:var(--accent); }
 <div class="container">
 
 <!-- ====== TODAY (NEW) ====== -->
+<style>
+/* ===== Skill Labs ===== */
+.chip{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0.45rem 0.7rem;margin:0.2rem;cursor:pointer;font-size:0.95rem;user-select:none;-webkit-user-select:none;}
+.chip:active{background:var(--accent);color:var(--bg);}
+.chip.used{opacity:0.25;pointer-events:none;}
+.diff-ok{color:var(--accent3);}
+.diff-miss{color:var(--danger);text-decoration:underline;}
+.lab-row{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-top:0.5rem;}
+.lab-select{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:0.5rem;font-size:0.9rem;max-width:100%;}
+.pair-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;margin-top:0.5rem;}
+#dict-sheet{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:2px solid var(--accent);border-radius:12px 12px 0 0;padding:1rem;z-index:60;max-height:55vh;overflow-y:auto;box-shadow:0 -4px 20px rgba(0,0,0,0.4);}
+.tap-hint{font-size:0.8rem;color:var(--accent2);margin-bottom:0.3rem;}
+</style>
+
+<div id="dict-sheet" class="hidden">
+  <div class="flex-between">
+    <h3 style="margin:0;"><span id="dict-word">—</span> <span class="text-dim text-sm" id="dict-phon"></span></h3>
+    <button class="btn btn-secondary" onclick="closeDictSheet()">✕</button>
+  </div>
+  <div id="dict-defs" class="text-sm" style="margin-top:0.5rem;">…</div>
+  <div class="lab-row">
+    <button class="btn btn-secondary" onclick="dictSpeakWord()">🔊 Pronounce</button>
+    <button class="btn" onclick="dictSaveWord()" id="dict-save-btn">＋ Save to my words</button>
+  </div>
+</div>
+
 <div id="panel-today" class="panel active">
   <div class="flex-between mb">
     <h2 style="margin:0;">📅 Today's Plan</h2>
@@ -697,6 +723,19 @@ textarea:focus { outline:none; border-color:var(--accent); }
 <div id="panel-writing" class="panel">
   <h2><span class="tag tag-w">Writing</span> Independent Writing Practice</h2>
   <p class="text-dim text-sm mb">You have 10 minutes to write a response. Aim for 150–300 words. Focus on clear thesis, supporting points, and conclusion.</p>
+
+  <div class="card" style="border:1px solid var(--accent2);">
+    <h3>🪜 Writing Ladder — 從 0 到段落</h3>
+    <p class="text-sm text-dim">還寫不出整段?從這裡循序漸進:1 排序 → 2 連接詞 → 3 中翻英 → 4 合併句。每階連續答對 5 題再升階,四階都熟了才去下面寫全文。</p>
+    <div class="lab-row">
+      <button class="btn btn-secondary" onclick="ladMode('scramble')">1️⃣ 排序</button>
+      <button class="btn btn-secondary" onclick="ladMode('connect')">2️⃣ 連接詞</button>
+      <button class="btn btn-secondary" onclick="ladMode('translate')">3️⃣ 中翻英</button>
+      <button class="btn btn-secondary" onclick="ladMode('combine')">4️⃣ 合併句</button>
+    </div>
+    <div id="lad-area" class="card card-sm" style="margin-top:0.5rem;"></div>
+    <p class="text-sm text-dim" id="lad-progress"></p>
+  </div>
   <div class="flex-between mb">
     <button class="btn" onclick="loadWriting()">New Prompt</button>
     <div class="timer" id="writing-timer">10:00</div>
@@ -718,6 +757,62 @@ textarea:focus { outline:none; border-color:var(--accent); }
 <div id="panel-speaking" class="panel">
   <h2><span class="tag tag-s">Speaking</span> Speaking Practice</h2>
   <p class="text-dim text-sm mb">15s prep, 45s answer. The browser records your voice — listen back and self-evaluate.</p>
+
+  <div class="card" style="border:1px solid var(--accent2);">
+    <h3>🎙 Accent Lab — American pronunciation</h3>
+    <p class="text-sm text-dim">跟讀(shadowing)→ 錄音 A/B 對比 → 語音辨識驗收。ASR 聽得懂 = 可理解度及格;口音像不像美式,靠 A/B 對比聽差異 + 教練回饋。</p>
+    <div class="card card-sm">
+      <p class="text-sm" style="color:var(--accent2);" id="shadow-focus"></p>
+      <p id="shadow-sentence" style="font-size:1.05rem;font-weight:600;margin:0.4rem 0;"></p>
+      <p class="text-sm text-dim" id="shadow-tip"></p>
+      <div class="lab-row">
+        <label class="text-sm text-dim">Model speed <span id="shadow-rate-label">0.9</span>× <input type="range" id="shadow-rate" min="0.6" max="1.1" step="0.05" value="0.9" oninput="document.getElementById('shadow-rate-label').textContent=this.value" style="vertical-align:middle;"></label>
+      </div>
+      <div class="lab-row">
+        <button class="btn btn-secondary" onclick="shadowPlay()">🔊 Model voice</button>
+        <button class="btn btn-success" id="shadow-rec-btn" onclick="shadowToggleRec()">⏺ Record me</button>
+        <button class="btn" style="background:var(--accent2);" onclick="shadowAsr()">🗣 Speak & Check</button>
+        <button class="btn btn-secondary" onclick="shadowNext()">Next ▸</button>
+      </div>
+      <span class="text-sm text-dim" id="shadow-asr-status"></span>
+      <div id="shadow-compare" class="hidden" style="margin-top:0.5rem;">
+        <p class="text-sm text-dim">A/B 對比:先按 Model voice,再播自己的。聽三件事:母音長度、連音、重音位置。</p>
+        <audio id="shadow-audio" controls style="width:100%;"></audio>
+      </div>
+      <div id="shadow-asr-result" class="text-sm" style="margin-top:0.4rem;"></div>
+      <div class="lab-row">
+        <button class="btn" style="background:var(--accent2);" onclick="coachAccent()">🤖 Accent Coach Prompt</button>
+      </div>
+    </div>
+    <details class="card card-sm">
+      <summary style="cursor:pointer;font-weight:600;">美式口音 7 個關鍵(台灣人最常漏的)</summary>
+      <ul class="text-sm text-dim" style="padding-left:1.2rem;margin-top:0.5rem;">
+        <li><strong>Flap T</strong> — water→「wader」、better→「bedder」:母音之間的 t 變成輕快的 d</li>
+        <li><strong>捲舌 R</strong> — car、her、work 的 r 一定要發出來(美式 vs 英式最大差異)</li>
+        <li><strong>θ/ð</strong> — think / this 舌尖輕觸上齒再抽回,不是 s/z 也不是 t/d</li>
+        <li><strong>長短母音</strong> — ship/sheep、full/fool 是不同的音色,不只是長短</li>
+        <li><strong>字尾子音</strong> — walked、works 字尾一定要收掉;中文沒有字尾子音,最容易整個掉</li>
+        <li><strong>連音</strong> — turn it off → 「tur-ni-doff」,字黏在一起才像母語者</li>
+        <li><strong>重音節奏</strong> — 英文是重音計時:功能詞 a / of / can 要弱讀成 schwa /ə/</li>
+      </ul>
+    </details>
+    <div class="card card-sm">
+      <h3 style="font-size:1rem;">Minimal Pairs — 辨音 + 發音驗收</h3>
+      <div class="lab-row">
+        <select class="lab-select" id="pair-set" onchange="pairRender()"></select>
+        <button class="btn btn-secondary" onclick="pairQuiz()">🎧 隨機考我(聽)</button>
+        <button class="btn" style="background:var(--accent2);" onclick="pairProd()">🗣 換我唸(說)</button>
+      </div>
+      <p class="text-sm text-dim" id="pair-tip" style="margin-top:0.4rem;"></p>
+      <div id="pair-list" class="pair-grid"></div>
+      <div id="pair-quiz-area" class="hidden" style="margin-top:0.5rem;">
+        <p class="text-sm">剛才唸的是哪個字?</p>
+        <div class="lab-row" id="pair-quiz-btns"></div>
+      </div>
+      <p class="text-sm" id="pair-quiz-fb" style="margin-top:0.3rem;"></p>
+      <p class="text-sm text-dim">Session score: <span id="pair-score">0/0</span></p>
+    </div>
+  </div>
   <div class="flex-between mb">
     <button class="btn" onclick="loadSpeaking()">New Prompt</button>
   </div>
@@ -759,6 +854,51 @@ textarea:focus { outline:none; border-color:var(--accent); }
 <div id="panel-listening" class="panel">
   <h2><span class="tag tag-l">Listening</span> Listening Practice Guide</h2>
   <p class="text-dim text-sm mb">TOEFL Listening requires sustained attention to academic lectures and conversations. Here's how to practice daily.</p>
+
+  <div class="card" style="border:1px solid var(--accent2);">
+    <h3>🌍 Accent & Speed Lab — 聽寫訓練</h3>
+    <p class="text-sm text-dim">用裝置內建的各國英文語音(美/英/澳/印度…依手機而定)從慢到快練聽寫:聽 → 打出聽到的 → 逐字對答案。目標:同一等級正確率 90% 以上才升速/升級。</p>
+    <div class="lab-row">
+      <select class="lab-select" id="dict-voice" style="max-width:60%;"></select>
+      <select class="lab-select" id="dict-level">
+        <option value="easy">Level 1 — 日常短句</option>
+        <option value="medium">Level 2 — 長句</option>
+        <option value="hard">Level 3 — 學術句</option>
+      </select>
+    </div>
+    <div class="lab-row">
+      <label class="text-sm text-dim">Speed <span id="dict-rate-label">0.8</span>× <input type="range" id="dict-rate" min="0.5" max="1.3" step="0.05" value="0.8" oninput="document.getElementById('dict-rate-label').textContent=this.value" style="vertical-align:middle;"></label>
+    </div>
+    <div class="lab-row">
+      <button class="btn" onclick="dictNew()">New sentence</button>
+      <button class="btn btn-secondary" onclick="dictPlay()">🔊 Play (<span id="dict-plays">0</span>)</button>
+    </div>
+    <textarea id="dict-input" rows="2" placeholder="Type exactly what you hear..." style="margin-top:0.5rem;font-size:0.95rem;"></textarea>
+    <div class="lab-row">
+      <button class="btn btn-success" onclick="dictCheck()">Check</button>
+      <span class="text-sm" id="dict-acc"></span>
+    </div>
+    <div id="dict-result" class="text-sm" style="margin-top:0.4rem;"></div>
+    <p class="text-sm text-dim" id="dict-history" style="margin-top:0.4rem;"></p>
+  </div>
+
+  <div class="card">
+    <h3>真人世界口音地圖(從慢到快)</h3>
+    <table style="width:100%;font-size:0.85rem;">
+      <thead><tr><th style="text-align:left;">口音</th><th style="text-align:left;">資源</th><th style="text-align:left;">速度</th></tr></thead>
+      <tbody>
+        <tr><td>🇺🇸 美式(慢)</td><td>VOA Learning English</td><td>🐢 刻意放慢,聽寫入門首選</td></tr>
+        <tr><td>🇬🇧 英式</td><td>BBC 6 Minute English → Global News Podcast</td><td>🐢→🐇</td></tr>
+        <tr><td>🇺🇸 美式(正常)</td><td>NPR Short Wave、TED</td><td>正常</td></tr>
+        <tr><td>🇦🇺 澳洲</td><td>ABC News Australia(YouTube)</td><td>正常</td></tr>
+        <tr><td>🇮🇳 印度</td><td>TED 印度講者、WION News</td><td>正常偏快</td></tr>
+        <tr><td>🇸🇬 新加坡</td><td>CNA(Channel NewsAsia)</td><td>正常</td></tr>
+        <tr><td>🌍 非母語混合</td><td>TED 任意非母語講者</td><td>不一,TOEFL 也考非母語口音</td></tr>
+        <tr><td>🇺🇸 快速母語</td><td>Crash Course、美劇無字幕</td><td>🐇 最終目標</td></tr>
+      </tbody>
+    </table>
+    <p class="text-sm text-dim" style="margin-top:0.5rem;">建議路線:VOA(慢)→ BBC 6-Min → TED → NPR → Crash Course。每換一個新口音,第一次開字幕、第二次關字幕。</p>
+  </div>
 
   <div class="card">
     <h3>Free Listening Resources</h3>
@@ -2517,6 +2657,578 @@ function coachListening() {
   openCoachModal(`${COACH_PERSONAS.listening}\n\n--- AUDIO RESOURCE ---\n${source || '(unspecified)'}\n\n--- MY NOTES / SUMMARY ---\n${notes}`);
 }
 
+// ===== SKILL LABS (Accent / Dictation / Tap-dictionary / Writing ladder) =====
+
+function safeRecord(type) {
+  if (typeof stats[type] !== 'number') stats[type] = 0;
+  recordActivity(type);
+}
+
+// --- TTS helpers ---
+function enVoices() {
+  if (!('speechSynthesis' in window)) return [];
+  return speechSynthesis.getVoices().filter(v => /^en[-_]/i.test(v.lang));
+}
+function usVoice() {
+  const vs = enVoices();
+  return vs.find(v => /en[-_]US/i.test(v.lang)) || vs[0] || null;
+}
+function labSpeak(text, rate, voice) {
+  if (!('speechSynthesis' in window)) { alert('此瀏覽器不支援語音合成,請改用 Chrome 或 Safari。'); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = rate || 0.9;
+  u.lang = 'en-US';
+  if (voice) { u.voice = voice; u.lang = voice.lang; }
+  speechSynthesis.speak(u);
+}
+function flagFor(lang) {
+  const m = {'en-US':'🇺🇸','en-GB':'🇬🇧','en-AU':'🇦🇺','en-IN':'🇮🇳','en-IE':'🇮🇪','en-ZA':'🇿🇦','en-NZ':'🇳🇿','en-CA':'🇨🇦','en-SG':'🇸🇬','en-PH':'🇵🇭','en-HK':'🇭🇰','en-KE':'🇰🇪','en-NG':'🇳🇬'};
+  return m[(lang||'').replace('_','-')] || '🌍';
+}
+function fillVoiceSelect() {
+  const sel = document.getElementById('dict-voice');
+  if (!sel) return;
+  const vs = enVoices();
+  if (!vs.length) { sel.innerHTML = '<option value="-1">預設英文語音</option>'; return; }
+  sel.innerHTML = vs.map((v, i) => `<option value="${i}">${flagFor(v.lang)} ${v.name} (${v.lang})</option>`).join('');
+  const us = vs.findIndex(v => /en[-_]US/i.test(v.lang));
+  if (us >= 0) sel.value = String(us);
+}
+
+// --- ASR (speech recognition) ---
+let asrActive = null;
+function asrListen(onText, onStatus) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { onStatus('此瀏覽器不支援語音辨識 — 請用 Chrome(桌面/Android)或 iOS Safari 14.5+'); return false; }
+  try { if (asrActive) asrActive.abort(); } catch (e) {}
+  const r = new SR();
+  asrActive = r;
+  r.lang = 'en-US'; r.interimResults = false; r.maxAlternatives = 1;
+  onStatus('🎙 聽取中…請開始說(自動在你停頓後結束)');
+  r.onresult = e => { onStatus(''); onText(e.results[0][0].transcript || ''); };
+  r.onerror = e => onStatus('辨識失敗:' + e.error + '(需要麥克風權限與網路)');
+  r.onend = () => { if (asrActive === r) asrActive = null; };
+  try { r.start(); } catch (e) { onStatus('無法啟動辨識:' + e.message); }
+  return true;
+}
+
+// --- word diff (LCS alignment) ---
+function labTok(s) { return s.toLowerCase().replace(/[^a-z0-9'\s]/g, ' ').split(/\s+/).filter(Boolean); }
+function lcsHits(a, b) {
+  const n = a.length, m = b.length;
+  const dp = Array.from({length: n + 1}, () => new Array(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
+    dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+  const hit = new Array(n).fill(false);
+  let i = 0, j = 0;
+  while (i < n && j < m) {
+    if (a[i] === b[j]) { hit[i] = true; i++; j++; }
+    else if (dp[i + 1][j] >= dp[i][j + 1]) i++; else j++;
+  }
+  return hit;
+}
+function diffRender(targetText, saidText) {
+  const t = labTok(targetText), s = labTok(saidText), hit = lcsHits(t, s);
+  const pct = t.length ? Math.round(100 * hit.filter(Boolean).length / t.length) : 0;
+  const html = t.map((w, i) => `<span class="${hit[i] ? 'diff-ok' : 'diff-miss'}">${w}</span>`).join(' ');
+  return {pct, html};
+}
+
+// --- Shadowing bank (American-accent focus points for Mandarin speakers) ---
+const SHADOW_BANK = [
+  {s:"I got a lot of water at the bottom of the little bottle.", f:"Flap T", tip:"母音之間的 t 全變輕 d:got a→「godda」、water→「wader」、bottle→「boddle」"},
+  {s:"Her brother works farther up the river near the border.", f:"捲舌 R", tip:"每個 r 都要捲:her、brother、works、farther、river、border — 一個都不能掉"},
+  {s:"I think both of these things are worth thinking through.", f:"θ/ð", tip:"舌尖輕觸上齒:think ≠ sink、both ≠ boat、these 的 th 有聲"},
+  {s:"Larry rarely reads really long novels in the library.", f:"L vs R", tip:"l 舌尖抵上齒齦,r 舌尖懸空後捲 — rarely 和 really 連續切換最難"},
+  {s:"Please sit in this seat and fill in the sheet.", f:"短 ɪ vs 長 iː", tip:"sit/seat、fill/sheet:短 ɪ 嘴放鬆,長 iː 嘴角往外拉 — 是音色不同,不只是長度"},
+  {s:"A banana and a bagel are a balanced breakfast.", f:"Schwa 弱讀", tip:"a / and / are 全部弱讀成 /ə/,banana 重音只在中間:bə-NA-nə"},
+  {s:"Turn it off and hand it over.", f:"連音", tip:"子音+母音黏起來:tur-ni-DOFF、han-di-DOH-ver — 分開唸就是外國腔"},
+  {s:"They will record a new record in record time.", f:"名/動詞重音", tip:"動詞 re-CORD 重音在後;名詞 RE-cord 重音在前 — 同字不同重音"},
+  {s:"We watched a very wide valley from the west window.", f:"V vs W", tip:"v 上齒咬下唇有震動;w 雙唇嘟圓不碰牙 — very ≠ wery"},
+  {s:"He walked and talked while she worked and watched.", f:"字尾子音", tip:"-ed 唸 /t/:walkt、talkt、workt、watcht — 字尾一定要收掉"},
+  {s:"I'll call the full table in a little while.", f:"Dark L", tip:"字尾的 l(call、full、table)舌後抬高,聽起來接近「歐」— 不是清楚的「了」"},
+  {s:"I can do it, but I can't do it today.", f:"can vs can't", tip:"can 弱讀 /kən/ 很短;can't 重讀 /kænt/ 母音飽滿 — 母語者靠母音分辨,不是靠 t"},
+  {s:"The singer is singing a long song this morning.", f:"n vs ŋ", tip:"ng /ŋ/ 舌後貼軟顎,鼻音從後面出來:sing ≠ sin"},
+  {s:"You're coming to the meeting tomorrow, right?", f:"語調", tip:"附加問句 right 上揚;前半句用美式自然降調,不要每個字同一個高度"},
+];
+let shadowIdx = 0;
+let lastAsr = null;
+function shadowShow() {
+  const it = SHADOW_BANK[shadowIdx];
+  document.getElementById('shadow-focus').textContent = `Focus ${shadowIdx + 1}/${SHADOW_BANK.length}: ${it.f}`;
+  document.getElementById('shadow-sentence').textContent = it.s;
+  document.getElementById('shadow-tip').textContent = it.tip;
+  document.getElementById('shadow-asr-result').innerHTML = '';
+  document.getElementById('shadow-asr-status').textContent = '';
+}
+function shadowNext() { shadowIdx = (shadowIdx + 1) % SHADOW_BANK.length; shadowShow(); }
+function shadowPlay() {
+  const rate = parseFloat(document.getElementById('shadow-rate').value);
+  labSpeak(SHADOW_BANK[shadowIdx].s, rate, usVoice());
+}
+let shadowRecorder = null, shadowChunks = [];
+async function shadowToggleRec() {
+  const btn = document.getElementById('shadow-rec-btn');
+  if (shadowRecorder && shadowRecorder.state === 'recording') { shadowRecorder.stop(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+    shadowChunks = [];
+    shadowRecorder = new MediaRecorder(stream);
+    shadowRecorder.ondataavailable = e => shadowChunks.push(e.data);
+    shadowRecorder.onstop = () => {
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(shadowChunks, {type: shadowRecorder.mimeType || 'audio/webm'});
+      document.getElementById('shadow-audio').src = URL.createObjectURL(blob);
+      document.getElementById('shadow-compare').classList.remove('hidden');
+      btn.textContent = '⏺ Record me';
+      safeRecord('speaking');
+    };
+    shadowRecorder.start();
+    btn.textContent = '⏹ Stop';
+  } catch (e) { alert('無法取得麥克風:' + e.message); }
+}
+function shadowAsr() {
+  const target = SHADOW_BANK[shadowIdx].s;
+  asrListen(text => {
+    lastAsr = {target, heard: text};
+    const d = diffRender(target, text);
+    document.getElementById('shadow-asr-result').innerHTML =
+      `辨識聽到:「<em>${text}</em>」<br>可理解度 <strong style="color:${d.pct >= 85 ? 'var(--accent3)' : d.pct >= 60 ? 'var(--warn)' : 'var(--danger)'};">${d.pct}%</strong> — ${d.html}<br><span class="text-dim">紅字 = ASR 沒聽成這個字,很可能就是發音問題點</span>`;
+  }, msg => { document.getElementById('shadow-asr-status').textContent = msg; });
+}
+function coachAccent() {
+  const it = SHADOW_BANK[shadowIdx];
+  const asrPart = lastAsr ? `\n--- WHAT SPEECH RECOGNITION HEARD ME SAY ---\nTarget: "${lastAsr.target}"\nASR heard: "${lastAsr.heard}"` : '\n(No ASR attempt yet — base your coaching on the focus point.)';
+  const persona = `You are an American English accent coach for a Mandarin (Taiwanese) speaker. ${LEARNER_PROFILE}
+
+I am doing shadowing drills to build a natural American accent.
+1. Diagnose which specific sounds likely failed, mapping each to typical Mandarin-speaker habits (no 字尾子音, θ→s, l/r confusion, no flap T, missing rhotic R, syllable-timing instead of stress-timing).
+2. For each problem sound, give mouth-position instructions in Traditional Chinese (tongue, lips, airflow) plus one memorable comparison.
+3. Give me 3 new practice sentences that concentrate exactly those sounds.
+4. Give a 5-minute daily drill plan for this week targeting my weakest sound.`;
+  openCoachModal(`${persona}\n\n--- DRILL SENTENCE (focus: ${it.f}) ---\n"${it.s}"${asrPart}`);
+}
+
+// --- Minimal pairs ---
+const PAIR_SETS = [
+  {name:"θ vs s(think/sink)", tip:"θ:舌尖輕觸上齒縫再抽回;s:舌尖不碰牙。摸喉嚨都不震動。", pairs:[["think","sink"],["thick","sick"],["mouth","mouse"],["path","pass"]]},
+  {name:"θ vs t(three/tree)", tip:"θ 有氣流摩擦聲;t 是爆破音一下就結束。", pairs:[["three","tree"],["thank","tank"],["both","boat"],["math","mat"]]},
+  {name:"L vs R(light/right)", tip:"l 舌尖抵上齒齦;r 舌尖懸空往後捲、嘴唇微嘟。", pairs:[["light","right"],["collect","correct"],["fly","fry"],["glass","grass"]]},
+  {name:"ɪ vs iː(ship/sheep)", tip:"短 ɪ 嘴放鬆微開;長 iː 嘴角用力往外拉(微笑嘴型)。", pairs:[["ship","sheep"],["sit","seat"],["fill","feel"],["live","leave"]]},
+  {name:"æ vs ɛ(bad/bed)", tip:"æ 嘴巴上下張大(接近「欸啊」之間);ɛ 開口較小。", pairs:[["bad","bed"],["man","men"],["sad","said"],["pan","pen"]]},
+  {name:"V vs W(vine/wine)", tip:"v 上齒咬下唇、有震動;w 雙唇嘟圓完全不碰牙。", pairs:[["vine","wine"],["vest","west"],["vent","went"],["veil","whale"]]},
+  {name:"n vs ŋ(sin/sing)", tip:"n 舌尖抵上齒齦;ŋ 舌後貼軟顎、嘴巴可保持開。", pairs:[["thin","thing"],["sin","sing"],["ban","bang"],["win","wing"]]},
+  {name:"字尾有聲/無聲(cart/card)", tip:"字尾 d/g/z 前面的母音會自然拉長;t/k/s 前面的母音短促。", pairs:[["cart","card"],["back","bag"],["rice","rise"],["leaf","leave"]]},
+];
+let pairSetIdx = 0, pairScore = [0, 0], pairQuizAnswer = null;
+function pairRender() {
+  pairSetIdx = parseInt(document.getElementById('pair-set').value || '0');
+  const set = PAIR_SETS[pairSetIdx];
+  document.getElementById('pair-tip').textContent = set.tip;
+  document.getElementById('pair-list').innerHTML = set.pairs.map(p =>
+    p.map(w => `<button class="quiz-option" style="text-align:center;" onclick="labSpeak('${w}',0.9,usVoice())">🔊 ${w}</button>`).join('')
+  ).join('');
+  document.getElementById('pair-quiz-area').classList.add('hidden');
+  document.getElementById('pair-quiz-fb').textContent = '';
+}
+function pairQuiz() {
+  const set = PAIR_SETS[pairSetIdx];
+  const pair = set.pairs[Math.floor(Math.random() * set.pairs.length)];
+  pairQuizAnswer = pair[Math.floor(Math.random() * 2)];
+  labSpeak(pairQuizAnswer, 0.9, usVoice());
+  const area = document.getElementById('pair-quiz-area');
+  area.classList.remove('hidden');
+  document.getElementById('pair-quiz-btns').innerHTML = pair.map(w =>
+    `<button class="btn btn-secondary" onclick="pairAnswer('${w}')">${w}</button>`
+  ).join('') + `<button class="btn btn-secondary" onclick="labSpeak('${pairQuizAnswer}',0.9,usVoice())">🔊 再聽一次</button>`;
+  document.getElementById('pair-quiz-fb').textContent = '';
+}
+function pairAnswer(w) {
+  pairScore[1]++;
+  const ok = w === pairQuizAnswer;
+  if (ok) pairScore[0]++;
+  const fb = document.getElementById('pair-quiz-fb');
+  fb.innerHTML = ok ? `<span style="color:var(--accent3);">✓ 正確,是 ${pairQuizAnswer}</span>`
+                    : `<span style="color:var(--danger);">✗ 是 ${pairQuizAnswer} — 再聽一次對比兩個字</span>`;
+  document.getElementById('pair-score').textContent = `${pairScore[0]}/${pairScore[1]}`;
+}
+function pairProd() {
+  const set = PAIR_SETS[pairSetIdx];
+  const pair = set.pairs[Math.floor(Math.random() * set.pairs.length)];
+  const target = pair[Math.floor(Math.random() * 2)];
+  const fb = document.getElementById('pair-quiz-fb');
+  fb.innerHTML = `請唸出:<strong style="font-size:1.1rem;">${target}</strong>(不是 ${pair.find(w => w !== target)})`;
+  asrListen(text => {
+    const heard = labTok(text);
+    const ok = heard.includes(target.toLowerCase());
+    const other = pair.find(w => w !== target).toLowerCase();
+    const gotOther = heard.includes(other);
+    fb.innerHTML += ok ? ` → <span style="color:var(--accent3);">✓ ASR 聽成「${text}」— 過關!</span>`
+      : gotOther ? ` → <span style="color:var(--danger);">✗ ASR 聽成「${text}」— 被聽成另一個字,正中這組對比的陷阱</span>`
+      : ` → <span style="color:var(--warn);">ASR 聽成「${text}」— 兩個都不像,再試一次</span>`;
+  }, msg => { if (msg) fb.innerHTML = msg; });
+}
+
+// --- Dictation (Accent & Speed Lab) ---
+const DICT_BANK = {
+  easy: [
+    "The meeting starts at nine tomorrow morning.",
+    "She asked me to send the report by Friday.",
+    "Most people check their phones many times a day.",
+    "The library is open until midnight during exam week.",
+    "He takes the bus to work when it rains.",
+    "Can you turn down the music a little bit?",
+  ],
+  medium: [
+    "Researchers found that students who sleep eight hours remember new words much better.",
+    "The company decided to delay the product launch because of unexpected software problems.",
+    "Regular exercise improves not only physical health but also memory and concentration.",
+    "Climate change is making extreme weather events more frequent and more severe.",
+    "The professor asked everyone to submit their assignments before the holiday weekend.",
+    "Learning a language takes daily practice rather than occasional long study sessions.",
+  ],
+  hard: [
+    "Although the experiment produced promising results, the researchers warned that the sample size was too small to draw firm conclusions.",
+    "The professor argued that technological innovation, while economically beneficial, often widens the gap between skilled and unskilled workers.",
+    "Public health officials emphasized that early intervention remains the most cost-effective strategy for preventing chronic disease.",
+    "The rapid adoption of artificial intelligence has forced universities to rethink how they assess student learning.",
+    "Urban planners increasingly favor mixed-use development because it reduces commuting time and strengthens local economies.",
+  ],
+};
+let dictCur = null, dictPlays = 0;
+function dictNew() {
+  const level = document.getElementById('dict-level').value;
+  const bank = DICT_BANK[level];
+  let next;
+  do { next = bank[Math.floor(Math.random() * bank.length)]; } while (next === dictCur && bank.length > 1);
+  dictCur = next;
+  dictPlays = 0;
+  document.getElementById('dict-plays').textContent = '0';
+  document.getElementById('dict-input').value = '';
+  document.getElementById('dict-result').innerHTML = '';
+  document.getElementById('dict-acc').textContent = '';
+}
+function dictPlay() {
+  if (!dictCur) dictNew();
+  dictPlays++;
+  document.getElementById('dict-plays').textContent = String(dictPlays);
+  const rate = parseFloat(document.getElementById('dict-rate').value);
+  const sel = document.getElementById('dict-voice');
+  const v = enVoices()[parseInt(sel.value)] || null;
+  labSpeak(dictCur, rate, v);
+}
+function dictCheck() {
+  if (!dictCur) { alert('先按 Play 聽一句。'); return; }
+  const typed = document.getElementById('dict-input').value.trim();
+  if (!typed) { alert('先把聽到的打出來。'); return; }
+  const d = diffRender(dictCur, typed);
+  document.getElementById('dict-acc').innerHTML = `正確率 <strong style="color:${d.pct >= 90 ? 'var(--accent3)' : d.pct >= 70 ? 'var(--warn)' : 'var(--danger)'};">${d.pct}%</strong>(聽了 ${dictPlays} 次)`;
+  document.getElementById('dict-result').innerHTML = `原文:${d.html}<br><span class="text-dim">紅字 = 你沒聽出來的字。${d.pct >= 90 ? '≥90% — 可以加速或升級了!' : '再播一次,專心聽紅字的位置。'}</span>`;
+  if (!stats.dictations) stats.dictations = [];
+  stats.dictations.push({date: new Date().toISOString().slice(0, 10), level: document.getElementById('dict-level').value, rate: document.getElementById('dict-rate').value, acc: d.pct, plays: dictPlays});
+  if (stats.dictations.length > 50) stats.dictations = stats.dictations.slice(-50);
+  safeRecord('listening');
+  const recent = stats.dictations.slice(-5).map(x => `${x.acc}%@${x.rate}×`).join(' · ');
+  document.getElementById('dict-history').textContent = '最近:' + recent;
+}
+
+// --- Tap-to-define dictionary ---
+let dictSheetWord = '';
+function getTappedWord(e) {
+  let node = null, off = 0;
+  if (document.caretRangeFromPoint) {
+    const r = document.caretRangeFromPoint(e.clientX, e.clientY);
+    if (r) { node = r.startContainer; off = r.startOffset; }
+  } else if (document.caretPositionFromPoint) {
+    const p = document.caretPositionFromPoint(e.clientX, e.clientY);
+    if (p) { node = p.offsetNode; off = p.offset; }
+  }
+  if (!node || node.nodeType !== 3) return null;
+  const txt = node.textContent;
+  const isW = c => /[A-Za-z'-]/.test(c || '');
+  if (!isW(txt[off]) && !isW(txt[off - 1])) return null;
+  let s = off, en = off;
+  while (s > 0 && isW(txt[s - 1])) s--;
+  while (en < txt.length && isW(txt[en])) en++;
+  const w = txt.slice(s, en).replace(/^['-]+|['-]+$/g, '');
+  return /^[A-Za-z][A-Za-z'-]*$/.test(w) && w.length > 1 ? w : null;
+}
+function closeDictSheet() { document.getElementById('dict-sheet').classList.add('hidden'); }
+async function openDictSheet(word) {
+  dictSheetWord = word.toLowerCase();
+  document.getElementById('dict-word').textContent = dictSheetWord;
+  document.getElementById('dict-phon').textContent = '';
+  document.getElementById('dict-save-btn').textContent = '＋ Save to my words';
+  const defs = document.getElementById('dict-defs');
+  defs.innerHTML = '查詢中…';
+  document.getElementById('dict-sheet').classList.remove('hidden');
+  const local = VOCAB.find(v => v.word.toLowerCase() === dictSheetWord);
+  try {
+    const res = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(dictSheetWord));
+    if (!res.ok) throw new Error('not found');
+    const data = await res.json();
+    const entry = data[0];
+    const phon = (entry.phonetics || []).map(p => p.text).find(Boolean) || '';
+    document.getElementById('dict-phon').textContent = phon;
+    let html = '';
+    (entry.meanings || []).slice(0, 3).forEach(m => {
+      const d = (m.definitions || [])[0];
+      if (!d) return;
+      html += `<p style="margin-bottom:0.4rem;"><em style="color:var(--accent2);">${m.partOfSpeech}</em> ${d.definition}${d.example ? `<br><span class="text-dim">"${d.example}"</span>` : ''}</p>`;
+    });
+    defs.innerHTML = html || '找不到定義。';
+  } catch (err) {
+    defs.innerHTML = local
+      ? `<p><em style="color:var(--accent2);">${local.pos}</em> ${local.def}<br><span class="text-dim">"${local.ex}"</span></p>`
+      : '線上字典查不到 — 試試還原原形(複數去 s、過去式還原),或網路暫時不通。';
+  }
+}
+function dictSpeakWord() { labSpeak(dictSheetWord, 0.85, usVoice()); }
+function dictSaveWord() {
+  if (!dictSheetWord) return;
+  stats.lookups = stats.lookups || [];
+  const ex = stats.lookups.find(x => x.w === dictSheetWord);
+  if (ex) { ex.n++; ex.d = new Date().toISOString().slice(0, 10); }
+  else stats.lookups.push({w: dictSheetWord, d: new Date().toISOString().slice(0, 10), n: 1});
+  saveStat();
+  document.getElementById('dict-save-btn').textContent = '✓ Saved';
+  renderMyWords();
+}
+function renderMyWords() {
+  const list = (stats.lookups || []).slice().reverse();
+  let card = document.getElementById('my-words-card');
+  if (!card) {
+    card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'my-words-card';
+    const host = document.getElementById('panel-news');
+    if (!host) return;
+    host.appendChild(card);
+  }
+  if (!list.length) {
+    card.innerHTML = '<h3>📖 My looked-up words</h3><p class="text-sm text-dim">閱讀時點任何字查字義,按「Save to my words」收集 — 收集到 8 個字就能讓 AI 教練用你自己的生字出一篇文章。</p>';
+    return;
+  }
+  card.innerHTML = `<h3>📖 My looked-up words (${list.length})</h3>
+    <div id="my-words-chips">${list.slice(0, 30).map(x => `<span class="chip" data-w="${x.w}">${x.w}${x.n > 1 ? ` ×${x.n}` : ''}</span>`).join('')}</div>
+    <div class="lab-row"><button class="btn" style="background:var(--accent2);" id="mw-coach-btn">🤖 用我的生字出一篇文章考我</button></div>`;
+  card.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', () => openDictSheet(ch.dataset.w)));
+  document.getElementById('mw-coach-btn').addEventListener('click', coachMyWords);
+}
+function coachMyWords() {
+  const list = (stats.lookups || []).slice().reverse().slice(0, 8).map(x => x.w);
+  if (list.length < 3) { alert('先收集至少 3 個生字(閱讀時點字 → Save)。'); return; }
+  openCoachModal(`You are my TOEFL vocabulary coach. ${LEARNER_PROFILE}
+
+Below are words I personally had to look up while reading — they are MY real vocabulary gaps. Never drill me with flashcards; I learn vocabulary only in full context.
+1. Write a ~180-word academic mini-passage (textbook/lecture style) that naturally embeds ALL these words, in **bold**.
+2. Have me guess each word's meaning from context; wait for my guesses before confirming.
+3. For each word give 1-2 high-frequency collocations.
+4. Then make me write 2-3 sentences using 3 of the words about my own field (software engineering / grad school).
+
+--- MY WORDS ---
+${list.join(', ')}`);
+}
+
+// --- Writing Ladder ---
+const LADDER = {
+  scramble: [
+    "She usually drinks coffee before work",
+    "He has lived in Taipei for ten years",
+    "The report was finished yesterday afternoon",
+    "I want to improve my English every day",
+    "They are planning to launch the product next month",
+    "Reading English news helps me learn new words",
+    "The engineer fixed the bug before the demo",
+    "We should test the feature before releasing it",
+  ],
+  connect: [
+    {s: "___ it was raining, we still went hiking.", opts: ["Although", "Because", "Therefore", "Moreover"], a: 0, why: "兩件事互相矛盾(下雨 vs 照去)→ 讓步 Although"},
+    {s: "He failed the first test; ___, he passed the retake.", opts: ["therefore", "however", "because", "for example"], a: 1, why: "前後轉折 → however(注意分號+逗號)"},
+    {s: "She stayed home ___ she felt sick.", opts: ["although", "so", "because", "despite"], a: 2, why: "後面是原因 → because"},
+    {s: "The app kept crashing; ___, we restarted the server.", opts: ["however", "although", "while", "therefore"], a: 3, why: "前因後果 → therefore"},
+    {s: "___ working full-time, he studies English every night.", opts: ["Despite", "Because", "Therefore", "However"], a: 0, why: "Despite + 名詞/動名詞 = 儘管(不接子句)"},
+    {s: "Exercise improves health; ___, it reduces stress.", opts: ["however", "moreover", "although", "because"], a: 1, why: "追加同方向論點 → moreover"},
+    {s: "Some people prefer big cities, ___ others prefer small towns.", opts: ["because", "therefore", "while", "moreover"], a: 2, why: "兩者對比 → while/whereas"},
+    {s: "Many snacks are unhealthy — ___, instant noodles and soda.", opts: ["therefore", "however", "moreover", "for example"], a: 3, why: "舉例 → for example"},
+  ],
+  translate: [
+    {zh: "我每天早上開會前會先看信。", en: "I check my email every morning before the meeting."},
+    {zh: "這個功能下週才會上線。", en: "This feature will not go live until next week."},
+    {zh: "如果測試失敗,請不要部署。", en: "If the tests fail, please do not deploy."},
+    {zh: "我們需要更多資料才能做決定。", en: "We need more data before we can make a decision."},
+    {zh: "他建議我們先修復最嚴重的錯誤。", en: "He suggested that we fix the most serious bug first."},
+    {zh: "這份報告的結論不夠清楚。", en: "The conclusion of this report is not clear enough."},
+    {zh: "使用者抱怨網頁載入太慢。", en: "Users complained that the page loads too slowly."},
+    {zh: "學英文最重要的是每天練習。", en: "The most important thing in learning English is daily practice."},
+  ],
+  combine: [
+    {a: "The server crashed.", b: "We lost some data.", model: "When the server crashed, we lost some data."},
+    {a: "She studied hard.", b: "She failed the exam.", model: "Although she studied hard, she failed the exam."},
+    {a: "I have a colleague.", b: "He speaks four languages.", model: "I have a colleague who speaks four languages."},
+    {a: "The feature is useful.", b: "Few users have discovered it.", model: "The feature is useful, but few users have discovered it."},
+    {a: "He finished the project.", b: "Then he took a vacation.", model: "After finishing the project, he took a vacation."},
+    {a: "AI tools save time.", b: "They sometimes make mistakes.", model: "AI tools save time, even though they sometimes make mistakes."},
+  ],
+};
+let ladState = {mode: 'scramble', idx: 0, picked: [], order: [], correct: 0};
+function ladMode(m) {
+  ladState = {mode: m, idx: Math.floor(Math.random() * LADDER[m].length), picked: [], order: [], correct: ladState.mode === m ? ladState.correct : 0};
+  ladRender();
+}
+function ladNext() {
+  const bank = LADDER[ladState.mode];
+  ladState.idx = (ladState.idx + 1) % bank.length;
+  ladState.picked = [];
+  ladState.order = [];
+  ladRender();
+}
+function ladShuffleWords(sentence) {
+  const words = sentence.split(' ');
+  let order = words.map((_, i) => i);
+  do { order.sort(() => Math.random() - 0.5); } while (order.every((v, i) => v === i) && words.length > 2);
+  return order;
+}
+function ladRender() {
+  const area = document.getElementById('lad-area');
+  const m = ladState.mode;
+  if (m === 'scramble') {
+    const sentence = LADDER.scramble[ladState.idx];
+    const words = sentence.split(' ');
+    if (!ladState.order.length) ladState.order = ladShuffleWords(sentence);
+    const built = ladState.picked.map(i => words[i]).join(' ');
+    area.innerHTML = `<p class="text-sm text-dim">點字排出正確句子:</p>
+      <div>${ladState.order.map(i => `<span class="chip ${ladState.picked.includes(i) ? 'used' : ''}" onclick="ladPick(${i})">${words[i]}</span>`).join('')}</div>
+      <p style="min-height:1.6rem;font-weight:600;margin-top:0.5rem;">${built}${built ? '.' : ''}</p>
+      <div class="lab-row">
+        <button class="btn btn-secondary" onclick="ladUndo()">↩ Undo</button>
+        <button class="btn btn-success" onclick="ladCheckScramble()">Check</button>
+        <button class="btn btn-secondary" onclick="ladNext()">Next ▸</button>
+      </div><p class="text-sm" id="lad-fb"></p>`;
+  } else if (m === 'connect') {
+    const it = LADDER.connect[ladState.idx];
+    area.innerHTML = `<p style="font-weight:600;">${it.s.replace('___', '＿＿＿')}</p>
+      <div class="lab-row">${it.opts.map((o, i) => `<button class="btn btn-secondary" onclick="ladCheckConnect(${i})">${o}</button>`).join('')}</div>
+      <p class="text-sm" id="lad-fb"></p>
+      <div class="lab-row"><button class="btn btn-secondary" onclick="ladNext()">Next ▸</button></div>`;
+  } else if (m === 'translate') {
+    const it = LADDER.translate[ladState.idx];
+    area.innerHTML = `<p class="text-sm text-dim">把這句翻成英文(不求跟參考答案一樣,求正確):</p>
+      <p style="font-weight:600;font-size:1.05rem;">${it.zh}</p>
+      <textarea id="lad-input" rows="2" placeholder="Write your English sentence..." style="margin-top:0.5rem;font-size:0.95rem;"></textarea>
+      <div class="lab-row">
+        <button class="btn btn-secondary" onclick="ladReveal()">Show model</button>
+        <button class="btn" style="background:var(--accent2);" onclick="coachLadder()">🤖 Coach 批改</button>
+        <button class="btn btn-secondary" onclick="ladNext()">Next ▸</button>
+      </div><p class="text-sm" id="lad-fb"></p>`;
+  } else {
+    const it = LADDER.combine[ladState.idx];
+    area.innerHTML = `<p class="text-sm text-dim">把兩句合併成一句自然的英文:</p>
+      <p style="font-weight:600;">${it.a}<br>${it.b}</p>
+      <textarea id="lad-input" rows="2" placeholder="Combine them into one sentence..." style="margin-top:0.5rem;font-size:0.95rem;"></textarea>
+      <div class="lab-row">
+        <button class="btn btn-secondary" onclick="ladReveal()">Show model</button>
+        <button class="btn" style="background:var(--accent2);" onclick="coachLadder()">🤖 Coach 批改</button>
+        <button class="btn btn-secondary" onclick="ladNext()">Next ▸</button>
+      </div><p class="text-sm" id="lad-fb"></p>`;
+  }
+  const done = (stats.ladder || {})[m] || 0;
+  document.getElementById('lad-progress').textContent = `此階累計完成 ${done} 題` + (done >= 20 && m !== 'combine' ? ' — 已經很熟了,升下一階吧!' : '');
+}
+function ladPick(i) {
+  if (ladState.picked.includes(i)) return;
+  ladState.picked.push(i);
+  ladRender();
+}
+function ladUndo() { ladState.picked.pop(); ladRender(); }
+function ladScore() {
+  stats.ladder = stats.ladder || {};
+  stats.ladder[ladState.mode] = (stats.ladder[ladState.mode] || 0) + 1;
+  saveStat();
+  ladState.correct++;
+  if (ladState.correct === 5) safeRecord('writing');
+}
+function ladCheckScramble() {
+  const sentence = LADDER.scramble[ladState.idx];
+  const words = sentence.split(' ');
+  const built = ladState.picked.map(i => words[i]).join(' ');
+  const fb = document.getElementById('lad-fb');
+  if (built === sentence) {
+    fb.innerHTML = `<span style="color:var(--accent3);">✓ 正確:${sentence}.</span>`;
+    ladScore();
+    ladRender();
+    document.getElementById('lad-fb').innerHTML = `<span style="color:var(--accent3);">✓ 正確!按 Next 下一題</span>`;
+  } else {
+    fb.innerHTML = `<span style="color:var(--danger);">還不對 — 提示:英文基本語序是 主詞 → 動詞 → 受詞 → 地點 → 時間</span>`;
+  }
+}
+function ladCheckConnect(i) {
+  const it = LADDER.connect[ladState.idx];
+  const fb = document.getElementById('lad-fb');
+  if (i === it.a) {
+    fb.innerHTML = `<span style="color:var(--accent3);">✓ ${it.opts[it.a]} — ${it.why}</span>`;
+    ladScore();
+  } else {
+    fb.innerHTML = `<span style="color:var(--danger);">✗ 正解:${it.opts[it.a]} — ${it.why}</span>`;
+  }
+}
+function ladReveal() {
+  const m = ladState.mode;
+  const model = m === 'translate' ? LADDER.translate[ladState.idx].en : LADDER.combine[ladState.idx].model;
+  document.getElementById('lad-fb').innerHTML = `參考答案:<strong>${model}</strong><span class="text-dim">(你的版本不一樣沒關係,文法對就好 — 不確定就按 Coach 批改)</span>`;
+  ladScore();
+}
+function coachLadder() {
+  const input = (document.getElementById('lad-input') || {}).value || '';
+  if (input.trim().length < 3) { alert('先寫出你的句子。'); return; }
+  const m = ladState.mode;
+  const task = m === 'translate'
+    ? `Translate this Traditional Chinese sentence into English.\nChinese: ${LADDER.translate[ladState.idx].zh}\nReference answer: ${LADDER.translate[ladState.idx].en}`
+    : `Combine these two sentences into one natural sentence.\nSentences: "${LADDER.combine[ladState.idx].a}" + "${LADDER.combine[ladState.idx].b}"\nReference answer: ${LADDER.combine[ladState.idx].model}`;
+  openCoachModal(`You are a bilingual (Traditional Chinese / English) writing coach for an A2-B1 learner who is building writing skill from the sentence level up. ${LEARNER_PROFILE}
+
+1. Judge my sentence: fully correct / understandable but unnatural / incorrect.
+2. If not perfect: quote my exact words -> corrected version -> the grammar rule in one short Traditional Chinese sentence.
+3. My version may differ from the reference — judge MY version on its own merits.
+4. Give me ONE more similar exercise to try right now, and wait for my answer.
+
+--- EXERCISE ---
+${task}
+
+--- MY ANSWER ---
+${input.trim()}`);
+}
+
+// --- init labs ---
+function initLabs() {
+  fillVoiceSelect();
+  if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = fillVoiceSelect;
+  const ps = document.getElementById('pair-set');
+  ps.innerHTML = PAIR_SETS.map((s, i) => `<option value="${i}">${s.name}</option>`).join('');
+  shadowShow();
+  pairRender();
+  dictNew();
+  ladMode('scramble');
+  renderMyWords();
+  // tap-to-define on reading surfaces
+  document.addEventListener('click', e => {
+    if (e.target.closest('button, a, textarea, input, select, .chip')) return;
+    if (!e.target.closest('#news-display, #reading-area, #ctx-passage')) return;
+    const w = getTappedWord(e);
+    if (w) openDictSheet(w);
+  });
+  [['news-display', '💡 閱讀時點任何英文字 → 查字義 → 存入我的生字'], ['reading-area', '💡 點 passage 裡任何字即可查字義']].forEach(([id, txt]) => {
+    const el = document.getElementById(id);
+    if (el && el.parentNode) {
+      const p = document.createElement('p');
+      p.className = 'tap-hint';
+      p.textContent = txt;
+      el.parentNode.insertBefore(p, el);
+    }
+  });
+}
+
 // ===== INIT =====
 updateDashboard();
 loadTodayTasks();
@@ -2526,6 +3238,7 @@ loadWriting();
 loadSpeaking();
 renderNewsStats();
 updateNewsWordCount();
+initLabs();
 </script>
 </body>
 </html>
