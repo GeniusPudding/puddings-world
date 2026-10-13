@@ -1,40 +1,37 @@
 import { Header } from "@/components/Header";
 import { TrackSection } from "@/components/TrackSection";
-import { tracks } from "@/content/projects";
-import { loadActivity } from "@/lib/activity";
+import { groupByTrack, loadProjects } from "@/lib/projects";
 
 export const metadata = {
   title: "Projects · puddingsworld",
-  description: "A live dashboard of R&D projects and research threads.",
+  description: "A live dashboard of research code, tools, and side projects.",
 };
 
 export default async function ProjectsPage() {
-  const activity = await loadActivity();
-
-  const allProjects = tracks.flatMap((t) => t.projects);
-  const liveCount = allProjects.filter((p) => p.status === "active").length;
-  const shippedCount = allProjects.filter((p) => p.status === "shipped").length;
+  const { fetchedAt, projects } = await loadProjects();
+  const tracks = groupByTrack(projects);
+  const liveCount = projects.filter((p) => p.status === "active").length;
+  const shippedCount = projects.filter((p) => p.status === "shipped").length;
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-6 py-12">
+    <main className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
       <Header
-        totalProjects={allProjects.length}
+        totalProjects={projects.length}
         live={liveCount}
         shipped={shippedCount}
-        lastFetched={activity.fetchedAt}
+        lastFetched={fetchedAt}
       />
 
       <div className="mt-16 space-y-16">
         {tracks.map((track) => (
-          <TrackSection key={track.slug} track={track} activity={activity} />
+          <TrackSection key={track.slug} track={track} />
         ))}
       </div>
 
       <footer className="mt-24 border-t border-bg-border pt-6 text-xs text-ink-muted">
-        Last activity refresh:{" "}
-        <span className="font-mono">{activity.fetchedAt ?? "never"}</span>
+        Last refresh: <span className="font-mono">{fetchedAt ?? "never"}</span>
         {" · "}
-        Refreshed weekly via GitHub Actions.
+        Weekly via GitHub Actions.
       </footer>
     </main>
   );

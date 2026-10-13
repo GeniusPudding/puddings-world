@@ -36,7 +36,7 @@ const ITEMS: Item[] = [
     title: "InvisibleGo",
     blurb:
       "A partially-observable Go variant — you only see part of the board. Play against a trained RL agent.",
-    href: "/projects/invisible-go",
+    href: "/projects/invisiblego",
   },
 ];
 

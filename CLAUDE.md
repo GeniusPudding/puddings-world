@@ -32,6 +32,15 @@ Pattern for any service whose home is another repo:
   `lib/ktv/types.ts` keeps KV-internal storage shapes (`ipHash`,
   `cancelToken`) that are deliberately NOT part of the wire contract.
 
+## Projects data flow
+
+`/projects` renders `data/projects.json`, generated weekly by
+`scripts/fetch-projects.ts` from GitHub: repos tagged `puddings-world` +
+a `research` / `tool` / `side-project` topic, optional `.puddings.json`
+manifest per repo, optional `CITATION.cff`. Never hand-edit
+`data/projects.json`; never reintroduce a hand-written project list. Repos
+this account cannot tag live in `content/external-projects.ts`.
+
 ## Conventions
 
 - Node ≥ 20. Package manager: **pnpm** (fallback: npm).

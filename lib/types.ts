@@ -1,39 +1,49 @@
-export type ProjectStatus = "active" | "paused" | "shipped" | "tbd";
+export type TrackSlug = "research" | "tool" | "side";
 
-export type Project = {
-  slug: string;
+export type ProjectStatus = "active" | "paused" | "shipped" | "archived";
+
+export type Paper = {
   title: string;
-  tagline: string;
-  /** Long-form description shown on the project detail page. Markdown not parsed; render as paragraphs. */
+  authors?: string[];
+  venue?: string;
+  year?: number;
+  doi?: string;
+  url?: string;
+};
+
+export type ProjectLink = { label: string; href: string };
+
+/**
+ * Optional `.puddings.json` at a repo root. Every field overrides what the
+ * fetcher derives from GitHub metadata. Treat the contents as public copy,
+ * even on private repos: the site publishes them.
+ */
+export type Manifest = {
+  slug?: string;
+  title?: string;
+  tagline?: string;
+  /** Long-form description. Paragraphs separated by blank lines. */
   description?: string;
-  /** Path under /public for the project's hero / visualization image, e.g. "/projects/foo.png". */
+  track?: TrackSlug;
+  status?: ProjectStatus;
+  /** Repo-relative path or absolute URL for the hero image. */
   image?: string;
-  /** One-line caption shown under the image. Helpful when the image is a diagram or screenshot. */
   imageCaption?: string;
-  repo?: {
-    owner: string;
-    name: string;
-    /** Hide the owner handle in the UI (e.g. anonymous submission accounts). */
-    anonymous?: boolean;
-  };
-  links?: { label: string; href: string }[];
-  tags?: string[];
-  status: ProjectStatus;
+  links?: ProjectLink[];
+  paper?: Paper;
+  featured?: boolean;
+  /** Keep the repo out of the site without removing the topic. */
+  hidden?: boolean;
+  /** Lower sorts first inside its track. Defaults to recency. */
+  order?: number;
 };
 
-export type Track = {
-  slug: string;
-  title: string;
-  description?: string;
-  projects: Project[];
-};
-
-export type RepoActivity = {
-  owner: string;
-  name: string;
+export type Activity = {
   stars: number;
   openIssues: number;
   defaultBranch: string;
+  pushedAt: string;
+  weeklyCommits: number;
   latestCommit?: {
     sha: string;
     message: string;
@@ -46,11 +56,36 @@ export type RepoActivity = {
     date: string;
     url: string;
   };
-  weeklyCommits?: number;
+};
+
+export type Project = {
+  slug: string;
+  title: string;
+  tagline: string;
+  description?: string;
+  track: TrackSlug;
+  status: ProjectStatus;
+  repo: { owner: string; name: string; private: boolean };
+  topics: string[];
+  homepage?: string;
+  image?: string;
+  imageCaption?: string;
+  links: ProjectLink[];
+  paper?: Paper;
+  featured: boolean;
+  order?: number;
+  activity?: Activity;
   error?: string;
 };
 
-export type ActivitySnapshot = {
+export type ProjectsSnapshot = {
   fetchedAt: string | null;
-  repos: Record<string, RepoActivity>;
+  projects: Project[];
+};
+
+export type Track = {
+  slug: TrackSlug;
+  title: string;
+  description: string;
+  projects: Project[];
 };

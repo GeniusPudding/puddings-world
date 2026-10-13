@@ -26,6 +26,47 @@ DOCKER=1 ./scripts/deploy.sh       # Docker → Cloud Run / Fly.io
 
 - `app/` — pages + API routes (App Router)
 - `app/api/<name>/route.ts` — backend endpoints
+- `content/` — hand-authored content (musings, interests, external projects)
+- `data/projects.json` — generated project snapshot (do not edit; see below)
+- `lib/projects.ts` — loads the snapshot, groups by track, picks featured cards
+- `scripts/fetch-projects.ts` — the generator
 - `Dockerfile` — multi-stage build for self-host
+
+## Projects: discovered from GitHub
+
+`/projects` is not hand-maintained. A weekly GitHub Action
+(`.github/workflows/fetch-projects.yml`) runs `pnpm fetch-projects`, which:
+
+1. Lists every repo this account owns or belongs to and keeps the ones tagged
+   with the **`puddings-world`** topic.
+2. Picks the track from a plain topic: `research` → Research, `tool` → Tools,
+   anything else → Side Projects.
+3. Derives status: GitHub `archived` → archived; pushed within 90 days →
+   active; otherwise paused.
+4. Reads an optional `.puddings.json` at the repo root (schema: `Manifest` in
+   `lib/types.ts`) that overrides any derived field — title, tagline, long
+   description, track, status, hero image, links, `featured`, `hidden`,
+   `order`.
+5. Reads `CITATION.cff` if present and renders it as the project's paper.
+6. Attaches stars, open issues, weekly commits, latest commit and release.
+7. Appends `content/external-projects.ts` — repos this account cannot tag.
+
+Remaining GitHub topics become the card's tags. Private repos are shown
+without a link. Manifest text is published verbatim, so write it as public
+copy even on private repos.
+
+To put a repo on the site: add the `puddings-world` topic plus one of
+`research` / `tool` / `side-project` on GitHub. To take it down: remove the
+topic, or set `"hidden": true` in its manifest.
+
+Run locally with a token to include private repos:
+
+```bash
+GH_PAT=$(gh auth token) pnpm fetch-projects
+```
+
+The Action needs a `GH_PAT` repository secret (fine-grained token, read-only
+on contents + metadata for the repos to show) for private repos and a higher
+rate limit; without it only public repos are discovered.
 
 Created 2026-04-28.

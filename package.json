@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "fetch-activity": "tsx scripts/fetch-activity.ts"
+    "fetch-projects": "tsx scripts/fetch-projects.ts"
   },
   "dependencies": {
     "@upstash/redis": "^1.38.0",

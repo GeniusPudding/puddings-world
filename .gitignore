@@ -29,3 +29,4 @@ desktop.ini
 .vercel/
 .claude/cache/
 .claude/debug/
+tsconfig.tsbuildinfo

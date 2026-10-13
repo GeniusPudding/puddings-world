@@ -2,14 +2,21 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProjectVisual } from "@/components/ProjectVisual";
 import { StatusBadge } from "@/components/StatusBadge";
-import { tracks } from "@/content/projects";
-import { loadActivity, repoKey } from "@/lib/activity";
-import type { Project } from "@/lib/types";
+import {
+  TRACKS,
+  formatRelative,
+  groupByTrack,
+  loadProjects,
+  repoUrl,
+} from "@/lib/projects";
 
-const flatProjects: Project[] = tracks.flatMap((t) => t.projects);
+async function orderedProjects() {
+  const { projects } = await loadProjects();
+  return groupByTrack(projects).flatMap((t) => t.projects);
+}
 
-export function generateStaticParams() {
-  return flatProjects.map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  return (await orderedProjects()).map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({
@@ -18,25 +25,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const project = flatProjects.find((p) => p.slug === slug);
+  const project = (await orderedProjects()).find((p) => p.slug === slug);
   if (!project) return { title: "Project not found" };
   return {
     title: `${project.title} · puddingsworld`,
     description: project.tagline,
   };
-}
-
-const DAY = 1000 * 60 * 60 * 24;
-function formatRelative(iso: string): string {
-  const then = new Date(iso).getTime();
-  if (Number.isNaN(then)) return iso;
-  const days = Math.round((Date.now() - then) / DAY);
-  if (days <= 0) return "today";
-  if (days === 1) return "yesterday";
-  if (days < 30) return `${days}d ago`;
-  const months = Math.round(days / 30);
-  if (months < 12) return `${months}mo ago`;
-  return `${(days / 365).toFixed(1)}y ago`;
 }
 
 export default async function ProjectDetailPage({
@@ -45,25 +39,18 @@ export default async function ProjectDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const idx = flatProjects.findIndex((p) => p.slug === slug);
+  const all = await orderedProjects();
+  const idx = all.findIndex((p) => p.slug === slug);
   if (idx === -1) notFound();
 
-  const project = flatProjects[idx];
-  const prev = idx > 0 ? flatProjects[idx - 1] : null;
-  const next = idx < flatProjects.length - 1 ? flatProjects[idx + 1] : null;
-
-  const activity = await loadActivity();
-  const repoActivity = project.repo
-    ? activity.repos[repoKey(project.repo.owner, project.repo.name)]
-    : undefined;
-
-  const repoHref =
-    project.repo && !project.repo.anonymous
-      ? `https://github.com/${project.repo.owner}/${project.repo.name}`
-      : undefined;
+  const project = all[idx];
+  const prev = idx > 0 ? all[idx - 1] : null;
+  const next = idx < all.length - 1 ? all[idx + 1] : null;
+  const activity = project.activity;
+  const href = repoUrl(project);
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-6 py-12">
+    <main className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6">
       <Link
         href="/projects"
         className="font-mono text-xs text-ink-muted transition-colors hover:text-accent"
@@ -72,8 +59,11 @@ export default async function ProjectDetailPage({
       </Link>
 
       <header className="mt-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-accent">
+          {TRACKS[project.track].title}
+        </p>
+        <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
+          <h1 className="min-w-0 break-words text-3xl font-semibold tracking-tight sm:text-4xl">
             {project.title}
           </h1>
           <StatusBadge status={project.status} />
@@ -81,9 +71,9 @@ export default async function ProjectDetailPage({
         <p className="mt-3 max-w-2xl text-base leading-relaxed text-ink-secondary">
           {project.tagline}
         </p>
-        {project.tags && project.tags.length > 0 && (
+        {project.topics.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-1.5">
-            {project.tags.map((tag) => (
+            {project.topics.map((tag) => (
               <span
                 key={tag}
                 className="rounded-md border border-bg-border bg-bg-raised px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-ink-muted"
@@ -95,75 +85,102 @@ export default async function ProjectDetailPage({
         )}
       </header>
 
-      <div className="mt-10">
-        <ProjectVisual
-          src={project.image}
-          caption={project.imageCaption}
-          title={project.title}
-          slug={project.slug}
-        />
-      </div>
+      {project.image && (
+        <div className="mt-10">
+          <ProjectVisual
+            src={project.image}
+            caption={project.imageCaption}
+            title={project.title}
+          />
+        </div>
+      )}
 
       <div className="mt-12 grid gap-10 lg:grid-cols-[1fr_280px]">
         <article className="space-y-4 text-base leading-relaxed text-ink-secondary">
           {project.description ? (
-            project.description.split(/\n\n+/).map((para, i) => (
-              <p key={i}>{para}</p>
-            ))
+            project.description
+              .split(/\n\n+/)
+              .map((para, i) => <p key={i}>{para}</p>)
           ) : (
             <p className="text-ink-muted">
-              No long description yet. Add one in{" "}
-              <code className="rounded bg-bg-raised px-1 font-mono">
-                content/projects.ts
-              </code>
-              .
+              No long description yet — the repo&apos;s own README has the details.
             </p>
           )}
         </article>
 
         <aside className="space-y-6">
-          {project.repo && (
-            <div className="rounded-xl border border-bg-border bg-bg-panel p-5">
+          {project.paper && (
+            <div className="rounded-xl border border-accent/30 bg-accent/5 p-5">
               <h2 className="font-mono text-xs uppercase tracking-wider text-ink-muted">
-                Repository
+                Paper
               </h2>
-              {repoHref ? (
+              <p className="mt-2 text-sm font-medium leading-snug text-ink-primary">
+                {project.paper.title}
+              </p>
+              {project.paper.authors && (
+                <p className="mt-1 text-xs text-ink-secondary">
+                  {project.paper.authors.join(", ")}
+                </p>
+              )}
+              {(project.paper.venue || project.paper.year) && (
+                <p className="mt-1 font-mono text-xs text-ink-muted">
+                  {[project.paper.venue, project.paper.year].filter(Boolean).join(" · ")}
+                </p>
+              )}
+              {(project.paper.doi || project.paper.url) && (
                 <a
-                  href={repoHref}
+                  href={
+                    project.paper.doi
+                      ? `https://doi.org/${project.paper.doi}`
+                      : project.paper.url
+                  }
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-2 block break-all font-mono text-sm text-accent hover:underline"
+                  className="mt-3 block break-all font-mono text-xs text-accent hover:underline"
                 >
-                  {project.repo.owner}/{project.repo.name} ↗
+                  {project.paper.doi ? `doi:${project.paper.doi}` : "Read ↗"}
                 </a>
-              ) : (
-                <p className="mt-2 font-mono text-sm text-ink-muted">
-                  withheld
-                </p>
               )}
             </div>
           )}
 
-          {repoActivity && !repoActivity.error && (
+          <div className="rounded-xl border border-bg-border bg-bg-panel p-5">
+            <h2 className="font-mono text-xs uppercase tracking-wider text-ink-muted">
+              Repository
+            </h2>
+            {href ? (
+              <a
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 block break-all font-mono text-sm text-accent hover:underline"
+              >
+                {project.repo.owner}/{project.repo.name} ↗
+              </a>
+            ) : (
+              <p className="mt-2 font-mono text-sm text-ink-muted">
+                {project.repo.name} · private
+              </p>
+            )}
+          </div>
+
+          {activity && (
             <div className="rounded-xl border border-bg-border bg-bg-panel p-5">
               <h2 className="font-mono text-xs uppercase tracking-wider text-ink-muted">
                 Activity
               </h2>
               <dl className="mt-3 space-y-2 text-sm">
-                <Row label="Stars" value={repoActivity.stars} />
-                <Row label="Open issues" value={repoActivity.openIssues} />
-                <Row label="Commits / wk" value={repoActivity.weeklyCommits ?? 0} />
-                {repoActivity.latestCommit && (
-                  <Row
-                    label="Last commit"
-                    value={formatRelative(repoActivity.latestCommit.date)}
-                  />
+                <Row label="Stars" value={activity.stars} />
+                <Row label="Open issues" value={activity.openIssues} />
+                <Row label="Commits / wk" value={activity.weeklyCommits} />
+                {activity.latestCommit && (
+                  <Row label="Last commit" value={formatRelative(activity.latestCommit.date)} />
                 )}
-                {repoActivity.latestRelease && (
+                {activity.latestRelease && (
                   <Row
                     label="Latest release"
-                    value={`${repoActivity.latestRelease.tag} · ${formatRelative(
-                      repoActivity.latestRelease.date,
+                    value={`${activity.latestRelease.tag} · ${formatRelative(
+                      activity.latestRelease.date,
                     )}`}
                   />
                 )}
@@ -171,7 +188,7 @@ export default async function ProjectDetailPage({
             </div>
           )}
 
-          {project.links && project.links.length > 0 && (
+          {project.links.length > 0 && (
             <div className="rounded-xl border border-bg-border bg-bg-panel p-5">
               <h2 className="font-mono text-xs uppercase tracking-wider text-ink-muted">
                 Links
@@ -181,7 +198,7 @@ export default async function ProjectDetailPage({
                   <li key={l.href}>
                     <a
                       href={l.href}
-                      className="text-accent hover:underline"
+                      className="break-all text-accent hover:underline"
                       target={l.href.startsWith("http") ? "_blank" : undefined}
                       rel={l.href.startsWith("http") ? "noreferrer" : undefined}
                     >
@@ -195,11 +212,11 @@ export default async function ProjectDetailPage({
         </aside>
       </div>
 
-      <nav className="mt-16 flex items-center justify-between border-t border-bg-border pt-6 text-sm">
+      <nav className="mt-16 flex items-center justify-between gap-4 border-t border-bg-border pt-6 text-sm">
         {prev ? (
           <Link
             href={`/projects/${prev.slug}`}
-            className="text-ink-muted transition-colors hover:text-accent"
+            className="min-w-0 truncate text-ink-muted transition-colors hover:text-accent"
           >
             ← {prev.title}
           </Link>
@@ -209,7 +226,7 @@ export default async function ProjectDetailPage({
         {next ? (
           <Link
             href={`/projects/${next.slug}`}
-            className="text-right text-ink-muted transition-colors hover:text-accent"
+            className="min-w-0 truncate text-right text-ink-muted transition-colors hover:text-accent"
           >
             {next.title} →
           </Link>

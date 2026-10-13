@@ -1,4 +1,4 @@
-name: Fetch GitHub activity
+name: Fetch GitHub projects
 
 on:
   schedule:
@@ -29,24 +29,24 @@ jobs:
             npm install
           fi
 
-      - name: Fetch activity
+      - name: Fetch projects
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           if [ -f pnpm-lock.yaml ]; then
-            pnpm fetch-activity
+            pnpm fetch-projects
           else
-            npm run fetch-activity
+            npm run fetch-projects
           fi
 
-      - name: Commit updated data/activity.json
+      - name: Commit updated data/projects.json
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/activity.json
+          git add data/projects.json
           if git diff --cached --quiet; then
-            echo "No activity changes."
+            echo "No project changes."
           else
-            git commit -m "chore(activity): weekly refresh"
+            git commit -m "chore(projects): weekly refresh"
             git push
           fi

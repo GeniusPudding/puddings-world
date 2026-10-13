@@ -13,8 +13,8 @@ const STYLES: Record<ProjectStatus, { label: string; className: string }> = {
     label: "shipped",
     className: "border-accent/40 bg-accent/10 text-accent",
   },
-  tbd: {
-    label: "tbd",
+  archived: {
+    label: "archived",
     className: "border-bg-border bg-bg-raised text-ink-muted",
   },
 };

@@ -25,7 +25,7 @@ const IDENTITIES: Identity[] = [
         href: "https://github.com/GeniusPudding",
         external: true,
       },
-      { label: "Suggested first stop: InvisibleGo", href: "/projects" },
+      { label: "Suggested first stop: InvisibleGo", href: "/projects/invisiblego" },
     ],
   },
   {
@@ -44,9 +44,9 @@ const IDENTITIES: Identity[] = [
     label: "researcher",
     emoji: "📚",
     greeting:
-      "Welcome. Research-flavored work lives in projects (look for tags like biosignal, physics-ml, simulation). Papers and talks are in flux — email is fastest if you want to dig in or collaborate.",
+      "Welcome. The Research track on /projects collects the code behind papers in progress; cards with a 📄 line already have a citation. Email is fastest if you want to dig in or collaborate.",
     routes: [
-      { label: "Projects with research output", href: "/projects" },
+      { label: "Research track", href: "/projects#track-research" },
       { label: "Email me", href: "/contact" },
     ],
   },

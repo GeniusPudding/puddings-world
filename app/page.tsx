@@ -1,21 +1,15 @@
 import Link from "next/link";
 import { ProjectCard } from "@/components/ProjectCard";
 import { WhoAmIPrompt } from "@/components/WhoAmIPrompt";
-import { tracks } from "@/content/projects";
-import { loadActivity } from "@/lib/activity";
-
-const FEATURED_SLUGS = ["flowfusion-bp", "surgery-ocr", "invisible-go"];
+import { loadProjects, pickFeatured } from "@/lib/projects";
 
 export default async function HomePage() {
-  const activity = await loadActivity();
-  const allProjects = tracks.flatMap((t) => t.projects);
-  const featured = FEATURED_SLUGS
-    .map((slug) => allProjects.find((p) => p.slug === slug))
-    .filter((p): p is NonNullable<typeof p> => !!p);
-  const activeCount = allProjects.filter((p) => p.status === "active").length;
+  const { projects } = await loadProjects();
+  const featured = pickFeatured(projects);
+  const activeCount = projects.filter((p) => p.status === "active").length;
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-6">
+    <main className="mx-auto w-full max-w-6xl px-4 sm:px-6">
       <section className="pt-16 pb-12 sm:pt-24 sm:pb-16">
         <div className="mb-10 inline-flex items-center gap-2 rounded-md border border-accent-amber/40 bg-accent-amber/10 px-3 py-1.5 font-mono text-xs text-accent-amber">
           <span aria-hidden>🛠</span>
@@ -55,7 +49,7 @@ export default async function HomePage() {
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           {featured.map((project) => (
-            <ProjectCard key={project.slug} project={project} activity={activity} />
+            <ProjectCard key={project.slug} project={project} />
           ))}
         </div>
       </section>

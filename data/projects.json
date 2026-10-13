@@ -1,0 +1,376 @@
+{
+  "fetchedAt": "2026-10-13T10:45:19.995Z",
+  "projects": [
+    {
+      "slug": "kaikou-claude",
+      "title": "Kaikou-Claude",
+      "tagline": "Use Chinese voice input to use claude-code (開口即克)",
+      "track": "tool",
+      "status": "paused",
+      "repo": {
+        "owner": "GeniusPudding",
+        "name": "Kaikou-Claude",
+        "private": false
+      },
+      "topics": [],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 4,
+        "openIssues": 0,
+        "defaultBranch": "main",
+        "pushedAt": "2026-07-06T10:17:22Z",
+        "weeklyCommits": 0,
+        "latestCommit": {
+          "sha": "dc964bc",
+          "message": "Fix setup robustness: correct venv timing and improve dependency diagnostics",
+          "date": "2026-05-10T11:11:06Z",
+          "url": "https://github.com/GeniusPudding/Kaikou-Claude/commit/dc964bc7145a96bfb80a9dc3a758536a5566cdc7"
+        }
+      }
+    },
+    {
+      "slug": "reverse-turing-test",
+      "title": "reverse-turing-test",
+      "tagline": "Reverse Turing Test live-talk party game for 20-30 players (Cloudflare Workers + Durable Objects)",
+      "track": "side",
+      "status": "paused",
+      "repo": {
+        "owner": "GeniusPudding",
+        "name": "reverse-turing-test",
+        "private": true
+      },
+      "topics": [],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 0,
+        "openIssues": 0,
+        "defaultBranch": "master",
+        "pushedAt": "2026-06-05T18:03:08Z",
+        "weeklyCommits": 0,
+        "latestCommit": {
+          "sha": "4d9d9da",
+          "message": "Bump cache-buster to 20260606a for the 3-question final UI rewrite",
+          "date": "2026-06-05T18:03:01Z",
+          "url": "https://github.com/GeniusPudding/reverse-turing-test/commit/4d9d9da2ac4ef91e35172c0a26550a8e4672a182"
+        }
+      }
+    },
+    {
+      "slug": "invisiblego",
+      "title": "InvisibleGo",
+      "tagline": "A fog-of-war 9×9 Go variant: you only see your own stones, and every illegal move looks identical — so you can't scan the opponent.",
+      "track": "side",
+      "status": "paused",
+      "repo": {
+        "owner": "GeniusPudding",
+        "name": "InvisibleGo",
+        "private": false
+      },
+      "topics": [],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 1,
+        "openIssues": 0,
+        "defaultBranch": "main",
+        "pushedAt": "2026-05-08T16:53:33Z",
+        "weeklyCommits": 0,
+        "latestCommit": {
+          "sha": "3c359fe",
+          "message": "Make 3-illegal auto-skip a turn rotation, not a pass",
+          "date": "2026-05-08T16:53:28Z",
+          "url": "https://github.com/GeniusPudding/InvisibleGo/commit/3c359fe67e597dd813a68750236d0d0e1bae17e9"
+        }
+      }
+    },
+    {
+      "slug": "reprise-studio",
+      "title": "reprise-studio",
+      "tagline": "Where covers become light — an abstract lyric MV production kit.",
+      "track": "tool",
+      "status": "paused",
+      "repo": {
+        "owner": "GeniusPudding",
+        "name": "reprise-studio",
+        "private": false
+      },
+      "topics": [],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 0,
+        "openIssues": 0,
+        "defaultBranch": "main",
+        "pushedAt": "2026-05-02T01:59:19Z",
+        "weeklyCommits": 0,
+        "latestCommit": {
+          "sha": "2395d97",
+          "message": "Fix TimeScrubber swallowing shortcut keys when slider has focus",
+          "date": "2026-05-02T01:59:23Z",
+          "url": "https://github.com/GeniusPudding/reprise-studio/commit/2395d97cb7ff7a7f0309008130f21f30f578a542"
+        }
+      }
+    },
+    {
+      "slug": "sadroid",
+      "title": "SADroid",
+      "tagline": "Static-aided dynamic analysis tool based on droidbot ",
+      "track": "tool",
+      "status": "paused",
+      "repo": {
+        "owner": "GeniusPudding",
+        "name": "SADroid",
+        "private": false
+      },
+      "topics": [],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 0,
+        "openIssues": 0,
+        "defaultBranch": "main",
+        "pushedAt": "2026-05-01T16:14:53Z",
+        "weeklyCommits": 0,
+        "latestCommit": {
+          "sha": "dcd54e8",
+          "message": "Move ApkSmith submodule from droidbot/ to project root",
+          "date": "2026-05-01T16:10:26Z",
+          "url": "https://github.com/GeniusPudding/SADroid/commit/dcd54e8cff22665fbd5924a42fb472edcb61bb3c"
+        }
+      }
+    },
+    {
+      "slug": "apksmith",
+      "title": "ApkSmith",
+      "tagline": "Smali-level Android APK rewriting toolchain — decompile, inject arbitrary behaviour,   repack, resign, install.",
+      "track": "tool",
+      "status": "paused",
+      "repo": {
+        "owner": "GeniusPudding",
+        "name": "ApkSmith",
+        "private": false
+      },
+      "topics": [],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 0,
+        "openIssues": 0,
+        "defaultBranch": "main",
+        "pushedAt": "2026-04-22T14:48:58Z",
+        "weeklyCommits": 0,
+        "latestCommit": {
+          "sha": "50a7c97",
+          "message": "Fix all ruff lint errors + stabilise E2E test",
+          "date": "2026-04-22T14:48:52Z",
+          "url": "https://github.com/GeniusPudding/ApkSmith/commit/50a7c9770bcda8d042e2cd5ebef3043fcfa3ca3f"
+        }
+      }
+    },
+    {
+      "slug": "flowfusionbp",
+      "title": "FlowFusionBP",
+      "tagline": "Real-time blood-pressure prediction from wearable sensor fusion.",
+      "description": "Predicts blood pressure in real time by fusing features across multiple wearable signal channels and inferring from just a few seconds of input — aimed at always-on, cuffless monitoring scenarios where neither cuff inflation nor minute-long calibration is acceptable.",
+      "track": "research",
+      "status": "paused",
+      "repo": {
+        "owner": "puddingforhealth",
+        "name": "FlowFusionBP",
+        "private": false
+      },
+      "topics": [
+        "aami",
+        "bloodpressure",
+        "contrastive-learning",
+        "cuffless",
+        "deep-learning",
+        "ecg",
+        "ieee",
+        "ppg",
+        "regression",
+        "representation-learning",
+        "sensor-fusion",
+        "tonometry"
+      ],
+      "links": [],
+      "featured": true,
+      "activity": {
+        "stars": 5,
+        "openIssues": 0,
+        "defaultBranch": "main",
+        "pushedAt": "2025-03-25T12:53:08Z",
+        "weeklyCommits": 0,
+        "latestCommit": {
+          "sha": "f8fdf8c",
+          "message": "Update README.md",
+          "date": "2025-03-25T12:53:08Z",
+          "url": "https://github.com/puddingforhealth/FlowFusionBP/commit/f8fdf8c684ace37c65555cc9f58ce7a250fc82c5"
+        }
+      }
+    },
+    {
+      "slug": "epg-latentflow",
+      "title": "EPG-LatentFlow",
+      "tagline": "Representation learning over EPG pulse-wave signals.",
+      "description": "Learned latent embeddings of pulse-wave signals captured with FlowEHealth's proprietary EPG sensing technology. Replaces hand-engineered features with representations that downstream tasks (BP estimation, rhythm classification, anomaly detection) can build on.",
+      "track": "research",
+      "status": "paused",
+      "repo": {
+        "owner": "puddingforhealth",
+        "name": "EPG-LatentFlow",
+        "private": false
+      },
+      "topics": [
+        "anomaly-detection",
+        "disentangled-representations",
+        "manifold-learning",
+        "pulse-sensor",
+        "representation-learning",
+        "signal-processing",
+        "waveform-analysis"
+      ],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 2,
+        "openIssues": 0,
+        "defaultBranch": "main",
+        "pushedAt": "2025-03-25T10:20:42Z",
+        "weeklyCommits": 0,
+        "latestCommit": {
+          "sha": "966e706",
+          "message": "Merge branch 'main' of https://github.com/jamesforhealth/EPG_data_analyzer",
+          "date": "2025-03-25T10:19:56Z",
+          "url": "https://github.com/puddingforhealth/EPG-LatentFlow/commit/966e7068ce9a60e95ae0acaf06a27efda71f5f5f"
+        }
+      }
+    },
+    {
+      "slug": "ppg-pulseflowbp",
+      "title": "PPG-PulseFlowBP",
+      "tagline": "Cuffless BP prediction from PPG, with serious data hygiene.",
+      "description": "Cuffless blood-pressure prediction from PPG signals, with a heavy emphasis on cleaning the PulseDB dataset before any modelling — many cuffless-BP papers skip this and over-claim accuracy on noisy ground truth. The repo establishes the data-cleaning baseline first, then layers experimental models on top.",
+      "track": "research",
+      "status": "paused",
+      "repo": {
+        "owner": "puddingforhealth",
+        "name": "PPG-PulseFlowBP",
+        "private": false
+      },
+      "topics": [
+        "bloodpressure",
+        "cuffless",
+        "deep-learning",
+        "machine-learning",
+        "ppg",
+        "pulse-transit",
+        "signal-processing"
+      ],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 1,
+        "openIssues": 1,
+        "defaultBranch": "main",
+        "pushedAt": "2025-03-25T12:36:38Z",
+        "weeklyCommits": 0,
+        "latestCommit": {
+          "sha": "d844325",
+          "message": "Remove .png and .pth files from repository tracking",
+          "date": "2025-03-25T12:36:26Z",
+          "url": "https://github.com/puddingforhealth/PPG-PulseFlowBP/commit/d844325bbabbbca03832ef788644e7d750b171cc"
+        }
+      }
+    },
+    {
+      "slug": "surgeryocr",
+      "title": "SurgeryOCR",
+      "tagline": "OCR for ophthalmological surgical video overlays.",
+      "description": "Reads numerical readouts (device parameters, timings, settings) directly off ophthalmological surgical video — useful when raw device telemetry isn't recorded but the screen is. Combines region detection with a small recognizer trained on the fonts surgical equipment actually uses.",
+      "track": "research",
+      "status": "paused",
+      "repo": {
+        "owner": "puddingforhealth",
+        "name": "SurgeryOCR",
+        "private": false
+      },
+      "topics": [],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 1,
+        "openIssues": 0,
+        "defaultBranch": "main",
+        "pushedAt": "2026-01-01T11:49:33Z",
+        "weeklyCommits": 0,
+        "latestCommit": {
+          "sha": "a05e1f0",
+          "message": "Modularize the analysis functions",
+          "date": "2026-01-01T11:49:13Z",
+          "url": "https://github.com/puddingforhealth/SurgeryOCR/commit/a05e1f0df5012e554b0395c4dc0fa35d590acbe5"
+        }
+      }
+    },
+    {
+      "slug": "sofatearing",
+      "title": "SofaTearing",
+      "tagline": "Tearing/fracture extensions for the SOFA FEM framework.",
+      "description": "Extensions to the SOFA finite-element framework that introduce dynamic tearing and fracture along material boundaries during simulation. Aimed at soft-tissue surgical training scenarios where realistic mesh separation matters.",
+      "track": "research",
+      "status": "paused",
+      "repo": {
+        "owner": "JaggerYu928",
+        "name": "SofaTearing",
+        "private": false
+      },
+      "topics": [],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 0,
+        "openIssues": 0,
+        "defaultBranch": "master",
+        "pushedAt": "2024-03-09T09:12:07Z",
+        "weeklyCommits": 0,
+        "latestCommit": {
+          "sha": "ee86cbc",
+          "message": "Fix compile issure #1",
+          "date": "2023-01-19T08:22:01Z",
+          "url": "https://github.com/JaggerYu928/SofaTearing/commit/ee86cbc49b8c29ba60ada1e7ea82ff4664fedce5"
+        }
+      }
+    },
+    {
+      "slug": "catar_homepage",
+      "title": "CatAR Homepage",
+      "tagline": "Landing site for the CatAR project.",
+      "description": "Marketing / informational landing page for CatAR, an augmented-reality experience. Static site, lightweight stack.",
+      "track": "side",
+      "status": "shipped",
+      "repo": {
+        "owner": "jaggerturkey",
+        "name": "CatAR_homepage",
+        "private": false
+      },
+      "topics": [],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 0,
+        "openIssues": 0,
+        "defaultBranch": "main",
+        "pushedAt": "2026-01-22T09:47:32Z",
+        "weeklyCommits": 0,
+        "latestCommit": {
+          "sha": "ee71fdb",
+          "message": "Temp : Upload & Analysis video API function works",
+          "date": "2026-01-22T09:47:27Z",
+          "url": "https://github.com/jaggerturkey/CatAR_homepage/commit/ee71fdb5606754ee59b766f815e9b8948b44e7fc"
+        }
+      }
+    }
+  ]
+}
