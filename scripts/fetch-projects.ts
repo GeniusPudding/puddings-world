@@ -97,15 +97,15 @@ async function paginate(path: string): Promise<RepoResponse[]> {
   return out;
 }
 
+// ORGS are always listed via their public endpoint: the token belongs to an
+// account that is not a member there, so /user/repos would miss them.
 async function discoverRepos(): Promise<RepoResponse[]> {
-  const repos = TOKEN
-    ? await paginate("/user/repos?affiliation=owner,organization_member&sort=pushed")
-    : (
-        await Promise.all([
-          paginate(`/users/${USER}/repos?sort=pushed`),
-          ...ORGS.map((org) => paginate(`/orgs/${org}/repos?sort=pushed`)),
-        ])
-      ).flat();
+  const own = TOKEN
+    ? paginate("/user/repos?affiliation=owner,collaborator,organization_member&sort=pushed")
+    : paginate(`/users/${USER}/repos?sort=pushed`);
+  const repos = (
+    await Promise.all([own, ...ORGS.map((org) => paginate(`/orgs/${org}/repos?sort=pushed`))])
+  ).flat();
   const seen = new Set<string>();
   return repos.filter((r) => {
     const key = `${r.owner.login}/${r.name}`;
