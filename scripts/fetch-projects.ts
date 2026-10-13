@@ -19,7 +19,8 @@ import type {
 const MARKER_TOPIC = "puddings-world";
 const MANIFEST_PATH = ".puddings.json";
 const USER = "GeniusPudding";
-const ORGS = ["puddingforhealth"];
+// Other accounts whose public repos are scanned for the marker topic.
+const EXTRA_ACCOUNTS = ["puddingforhealth"];
 const ACTIVE_WINDOW_DAYS = 90;
 
 const TOKEN = process.env.GH_PAT ?? process.env.GITHUB_TOKEN ?? "";
@@ -97,14 +98,15 @@ async function paginate(path: string): Promise<RepoResponse[]> {
   return out;
 }
 
-// ORGS are always listed via their public endpoint: the token belongs to an
-// account that is not a member there, so /user/repos would miss them.
 async function discoverRepos(): Promise<RepoResponse[]> {
   const own = TOKEN
     ? paginate("/user/repos?affiliation=owner,collaborator,organization_member&sort=pushed")
     : paginate(`/users/${USER}/repos?sort=pushed`);
   const repos = (
-    await Promise.all([own, ...ORGS.map((org) => paginate(`/orgs/${org}/repos?sort=pushed`))])
+    await Promise.all([
+      own,
+      ...EXTRA_ACCOUNTS.map((login) => paginate(`/users/${login}/repos?sort=pushed`)),
+    ])
   ).flat();
   const seen = new Set<string>();
   return repos.filter((r) => {
