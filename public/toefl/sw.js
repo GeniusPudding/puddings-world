@@ -1,4 +1,4 @@
-const CACHE = 'toefl-trainer-v9';
+﻿const CACHE = 'toefl-trainer-v10';
 const ASSETS = ['./', 'index.html', 'manifest.json'];
 
 self.addEventListener('install', e => {
