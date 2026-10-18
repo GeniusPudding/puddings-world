@@ -30,14 +30,20 @@ export const now = {
       image: "/now/mapetite.jpg",
     },
     {
-      title: "Kaikou-Claude",
-      note: "I'm making **Chinese voice input for Claude Code and Codex**. This week I cut idle CPU use, added automatic mic picking, Simplified-to-Traditional conversion and model warm-up, and built a **bench to compare Whisper, Breeze, Qwen3 and FireRed** on my own recordings.",
+      title: "Agent CLI companions",
+      note: "I'm building **three small companions for terminal coding agents, Claude Code, Codex and Gemini CLI alike**: Kaikou for Chinese voice input, Clip for pasting screenshots where the CLI has no image paste, Listen for spoken replies in my own voice. This week Kaikou cut idle CPU use, picked up automatic mic selection, Simplified-to-Traditional conversion and model warm-up, and gained a **bench comparing Whisper, Breeze, Qwen3 and FireRed** on my own recordings; Clip finished an audit pass (clipboard never left open, no console flashes, cheaper idle polling); Listen's speech server stopped popping windows, with readback paused until it stays quiet.",
       href: "/projects/kaikou-claude",
     },
     {
       title: "Assistant Hub",
       note: "I'm building a **personal command centre**: a task ledger, routines, widgets, a phone view and a desktop sidebar. This week it gained **automatic triage of phone captures**, a listening player for lecture series, and a weekly watcher for campus talks.",
       image: "/now/assistant-hub.jpg",
+    },
+    {
+      title: "Street KTV & Mandopop pipeline",
+      note: "I'm running a **music line from dataset to stage**: MandpopDataPipeline turns Mandarin pop into separated stems and time-aligned lyrics, Reprise Studio renders those into abstract lyric videos, and Street KTV is the gig-side app, a **performer app on Android with a live audience songbook on this site** where listeners scan a QR code and queue songs.",
+      href: "/playground/street-ktv-menu",
+      image: "/now/street-ktv.png",
     },
     {
       title: "Virtual Embryo Challenge",
@@ -50,14 +56,6 @@ export const now = {
     {
       title: "Xensur Medical",
       note: "I'm **co-building a medical startup**. We've placed well in a few startup competitions this autumn and are preparing for a **pitch final at the end of October**.",
-    },
-    {
-      title: "Listen-Claude",
-      note: "I'm giving **Claude's replies a spoken voice**, trained on my own with GPT-SoVITS. This week's fix stops the speech server from popping console windows; readback is paused until I've confirmed it stays quiet.",
-    },
-    {
-      title: "Clip-Claude",
-      note: "I'm maintaining a **cross-device clipboard and SSH bridge**. A full audit pass just finished: the clipboard is never left open, file copies no longer flash a console, and idle polling is cheaper. No new features queued.",
     },
     {
       title: "TOEFL sprint",
