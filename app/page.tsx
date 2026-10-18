@@ -1,15 +1,16 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ProjectCard } from "@/components/ProjectCard";
 import { WhoAmIPrompt } from "@/components/WhoAmIPrompt";
 import { loadProjects, pickFeatured } from "@/lib/projects";
 import { now, type NowItem } from "@/content/now";
+import { hueFor, initials, splitBold } from "@/lib/markup";
 
 const NOW_VISIBLE = 4;
 
 export default async function HomePage() {
   const { projects } = await loadProjects();
   const featured = pickFeatured(projects);
-  const activeCount = projects.filter((p) => p.status === "active").length;
   const visibleNow = now.items.slice(0, NOW_VISIBLE);
   const hiddenNow = now.items.slice(NOW_VISIBLE);
 
@@ -32,9 +33,8 @@ export default async function HomePage() {
           become papers, some stay weird.
         </p>
         <p className="mt-3 max-w-2xl text-base leading-relaxed text-ink-secondary">
-          Currently {activeCount} active build{activeCount === 1 ? "" : "s"} in
-          flight. Some are open source, some are commissioned, some are
-          scratching personal itches.
+          {now.items.length} things in flight this week. Some are open source,
+          some are commissioned, some are scratching personal itches.
         </p>
       </section>
 
@@ -123,17 +123,52 @@ export default async function HomePage() {
 
 function NowCard({ item }: { item: NowItem }) {
   return (
-    <li className="flex min-w-0 flex-col rounded-xl border border-bg-border bg-bg-panel p-5">
-      <h3 className="text-base font-semibold tracking-tight">
-        {item.href ? (
-          <Link href={item.href} className="transition-colors hover:text-accent">
-            {item.title}
-          </Link>
-        ) : (
-          item.title
-        )}
-      </h3>
-      <p className="mt-2 text-sm leading-relaxed text-ink-secondary">{item.note}</p>
+    <li className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-panel">
+      {item.image ? (
+        <div className="relative aspect-video border-b border-bg-border bg-bg-raised">
+          <Image
+            src={item.image}
+            alt={item.title}
+            fill
+            unoptimized
+            className="object-cover object-top"
+            sizes="(min-width: 768px) 50vw, 100vw"
+          />
+        </div>
+      ) : (
+        <div
+          aria-hidden
+          className="flex h-14 items-center border-b border-bg-border px-5 font-mono text-lg font-semibold tracking-wider"
+          style={{
+            background: `linear-gradient(135deg, hsl(${hueFor(item.title)} 45% 18%), hsl(${(hueFor(item.title) + 40) % 360} 45% 12%))`,
+            color: `hsl(${hueFor(item.title)} 70% 70%)`,
+          }}
+        >
+          {initials(item.title)}
+        </div>
+      )}
+      <div className="flex flex-col p-5">
+        <h3 className="text-base font-semibold tracking-tight">
+          {item.href ? (
+            <Link href={item.href} className="transition-colors hover:text-accent">
+              {item.title}
+            </Link>
+          ) : (
+            item.title
+          )}
+        </h3>
+        <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
+          {splitBold(item.note).map((seg, i) =>
+            seg.bold ? (
+              <strong key={i} className="font-semibold text-ink-primary">
+                {seg.text}
+              </strong>
+            ) : (
+              <span key={i}>{seg.text}</span>
+            ),
+          )}
+        </p>
+      </div>
     </li>
   );
 }
