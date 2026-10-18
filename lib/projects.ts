@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { Project, ProjectsSnapshot, Track, TrackSlug } from "./types";
@@ -23,10 +24,33 @@ export const TRACKS: Record<TrackSlug, { title: string; description: string }> =
 
 export const TRACK_ORDER: TrackSlug[] = ["research", "tool", "side"];
 
+const LOCAL_IMAGE_EXTS = ["jpg", "png", "webp"];
+
+/**
+ * A screenshot dropped at public/projects/<slug>.<ext> becomes the project's
+ * image, unless the repo manifest already set one. Lets private repos (whose
+ * files the site cannot hotlink) still get a thumbnail.
+ */
+export function withLocalImages(
+  projects: Project[],
+  exists: (publicPath: string) => boolean,
+): Project[] {
+  return projects.map((p) => {
+    if (p.image) return p;
+    const hit = LOCAL_IMAGE_EXTS.map((ext) => `/projects/${p.slug}.${ext}`).find(exists);
+    return hit ? { ...p, image: hit } : p;
+  });
+}
+
 export async function loadProjects(): Promise<ProjectsSnapshot> {
   try {
     const raw = await readFile(join(process.cwd(), "data", "projects.json"), "utf8");
-    return JSON.parse(raw) as ProjectsSnapshot;
+    const snap = JSON.parse(raw) as ProjectsSnapshot;
+    const publicDir = join(process.cwd(), "public");
+    return {
+      ...snap,
+      projects: withLocalImages(snap.projects, (p) => existsSync(join(publicDir, p))),
+    };
   } catch {
     return EMPTY;
   }

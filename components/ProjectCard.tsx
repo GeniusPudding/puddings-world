@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Project } from "@/lib/types";
 import { formatRelative, repoUrl } from "@/lib/projects";
@@ -8,7 +9,20 @@ export function ProjectCard({ project }: { project: Project }) {
   const activity = project.activity;
 
   return (
-    <article className="group relative flex min-w-0 flex-col rounded-xl border border-bg-border bg-bg-panel p-5 transition-colors hover:border-ink-muted has-[a.card-link:focus-visible]:border-accent">
+    <article className="group relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-panel transition-colors hover:border-ink-muted has-[a.card-link:focus-visible]:border-accent">
+      {project.image && (
+        <div className="relative aspect-video border-b border-bg-border bg-bg-raised">
+          <Image
+            src={project.image}
+            alt=""
+            fill
+            unoptimized
+            className="object-cover object-top"
+            sizes="(min-width: 768px) 50vw, 100vw"
+          />
+        </div>
+      )}
+      <div className="flex flex-1 flex-col p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="truncate text-base font-semibold tracking-tight">
@@ -92,6 +106,7 @@ export function ProjectCard({ project }: { project: Project }) {
       {project.error && (
         <div className="mt-3 text-xs text-accent-red">activity fetch failed: {project.error}</div>
       )}
+      </div>
     </article>
   );
 }

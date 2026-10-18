@@ -68,7 +68,10 @@ native `<details>` toggle.
 6. Attaches stars, open issues, weekly commits, latest commit and release.
 7. Appends `content/external-projects.ts` — repos this account cannot tag.
 
-Remaining GitHub topics become the card's tags. Private repos are shown
+A screenshot at `public/projects/<slug>.{jpg,png,webp}` (16:9, 1280×720,
+under ~150 KB) becomes the card's thumbnail unless the manifest sets
+`image`; this is how private repos get one. Remaining GitHub topics become
+the card's tags. Private repos are shown
 without a link. Manifest text is published verbatim, so write it as public
 copy even on private repos.
 

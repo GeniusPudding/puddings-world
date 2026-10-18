@@ -15,7 +15,8 @@ export function ProjectVisual({ src, caption, title }: Props) {
             src={src}
             alt={title}
             fill
-            className="object-cover"
+            unoptimized
+            className="object-cover object-top"
             sizes="(min-width: 1024px) 768px, 100vw"
           />
         </div>
