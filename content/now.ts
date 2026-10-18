@@ -20,12 +20,14 @@ export const now = {
   updated: "2026-10-18",
   items: [
     {
-      title: "paper-daily",
-      note: "I'm building a **nightly reading queue for ICLR, ICML and NeurIPS papers** with its own desktop reader. This week it learned proper math and diagram typesetting, a keyboard-first list view, exportable reading-list bundles, a macOS build, and a round that **drafts a presentation-ready slide deck from a close reading**.",
+      title: "Paperfact",
+      note: "I'm building **Paperfact, a desktop reader that turns any paper into a guided reading session**: AI commentary paragraph by paragraph, a citation map of what a paper builds on and what built on it, and a reading queue across venues. This week it learned proper math and diagram typesetting, a keyboard-first list view, exportable reading-list bundles, a macOS build, and a round that **drafts a presentation-ready slide deck from a close reading**.",
+      image: "/now/paperfact.jpg",
     },
     {
       title: "Mapetite",
       note: "I'm building a **browser extension that curates food places on top of Google Maps**. Saved places now **sync both ways with Google lists** in near real time, candidates are filtered down to actual food, and the first review and visit-tracking cards just landed.",
+      image: "/now/mapetite.jpg",
     },
     {
       title: "Kaikou-Claude",
@@ -35,6 +37,7 @@ export const now = {
     {
       title: "Assistant Hub",
       note: "I'm building a **personal command centre**: a task ledger, routines, widgets, a phone view and a desktop sidebar. This week it gained **automatic triage of phone captures**, a listening player for lecture series, and a weekly watcher for campus talks.",
+      image: "/now/assistant-hub.jpg",
     },
     {
       title: "Virtual Embryo Challenge",
