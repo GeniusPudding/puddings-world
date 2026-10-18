@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ProjectCard } from "@/components/ProjectCard";
 import { WhoAmIPrompt } from "@/components/WhoAmIPrompt";
 import { loadProjects, pickFeatured } from "@/lib/projects";
+import { now } from "@/content/now";
 
 export default async function HomePage() {
   const { projects } = await loadProjects();
@@ -31,6 +32,39 @@ export default async function HomePage() {
           flight. Some are open source, some are commissioned, some are
           scratching personal itches.
         </p>
+      </section>
+
+      <section className="border-t border-bg-border pt-12 pb-16">
+        <div className="mb-6 flex items-baseline justify-between">
+          <h2 className="text-xl font-semibold tracking-tight">Now building</h2>
+          <span className="font-mono text-xs text-ink-muted">
+            updated {now.updated}
+          </span>
+        </div>
+        <ul className="grid gap-4 md:grid-cols-2">
+          {now.items.map((item) => (
+            <li
+              key={item.title}
+              className="flex min-w-0 flex-col rounded-xl border border-bg-border bg-bg-panel p-5"
+            >
+              <h3 className="text-base font-semibold tracking-tight">
+                {item.href ? (
+                  <Link
+                    href={item.href}
+                    className="transition-colors hover:text-accent"
+                  >
+                    {item.title}
+                  </Link>
+                ) : (
+                  item.title
+                )}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
+                {item.note}
+              </p>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="mx-auto max-w-2xl pb-16">
