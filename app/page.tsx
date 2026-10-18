@@ -2,12 +2,16 @@ import Link from "next/link";
 import { ProjectCard } from "@/components/ProjectCard";
 import { WhoAmIPrompt } from "@/components/WhoAmIPrompt";
 import { loadProjects, pickFeatured } from "@/lib/projects";
-import { now } from "@/content/now";
+import { now, type NowItem } from "@/content/now";
+
+const NOW_VISIBLE = 4;
 
 export default async function HomePage() {
   const { projects } = await loadProjects();
   const featured = pickFeatured(projects);
   const activeCount = projects.filter((p) => p.status === "active").length;
+  const visibleNow = now.items.slice(0, NOW_VISIBLE);
+  const hiddenNow = now.items.slice(NOW_VISIBLE);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 sm:px-6">
@@ -42,29 +46,25 @@ export default async function HomePage() {
           </span>
         </div>
         <ul className="grid gap-4 md:grid-cols-2">
-          {now.items.map((item) => (
-            <li
-              key={item.title}
-              className="flex min-w-0 flex-col rounded-xl border border-bg-border bg-bg-panel p-5"
-            >
-              <h3 className="text-base font-semibold tracking-tight">
-                {item.href ? (
-                  <Link
-                    href={item.href}
-                    className="transition-colors hover:text-accent"
-                  >
-                    {item.title}
-                  </Link>
-                ) : (
-                  item.title
-                )}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
-                {item.note}
-              </p>
-            </li>
+          {visibleNow.map((item) => (
+            <NowCard key={item.title} item={item} />
           ))}
         </ul>
+        {hiddenNow.length > 0 && (
+          <details className="group mt-4">
+            <summary className="cursor-pointer list-none rounded-md border border-bg-border bg-bg-panel px-4 py-2 text-center font-mono text-xs text-ink-secondary transition-colors hover:text-ink-primary">
+              <span className="group-open:hidden">
+                show {hiddenNow.length} more ↓
+              </span>
+              <span className="hidden group-open:inline">show less ↑</span>
+            </summary>
+            <ul className="mt-4 grid gap-4 md:grid-cols-2">
+              {hiddenNow.map((item) => (
+                <NowCard key={item.title} item={item} />
+              ))}
+            </ul>
+          </details>
+        )}
       </section>
 
       <section className="mx-auto max-w-2xl pb-16">
@@ -118,5 +118,22 @@ export default async function HomePage() {
         </div>
       </section>
     </main>
+  );
+}
+
+function NowCard({ item }: { item: NowItem }) {
+  return (
+    <li className="flex min-w-0 flex-col rounded-xl border border-bg-border bg-bg-panel p-5">
+      <h3 className="text-base font-semibold tracking-tight">
+        {item.href ? (
+          <Link href={item.href} className="transition-colors hover:text-accent">
+            {item.title}
+          </Link>
+        ) : (
+          item.title
+        )}
+      </h3>
+      <p className="mt-2 text-sm leading-relaxed text-ink-secondary">{item.note}</p>
+    </li>
   );
 }
