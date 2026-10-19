@@ -5,11 +5,12 @@ export const metadata = {
   description: "Fun links, mini games, and small experiments.",
 };
 
-type Tag = "game" | "demo" | "link" | "experiment";
+type Tag = "game" | "demo" | "tool" | "link" | "experiment";
 
 const TAG_STYLE: Record<Tag, string> = {
   game: "border-accent-amber/40 bg-accent-amber/10 text-accent-amber",
   demo: "border-accent/40 bg-accent/10 text-accent",
+  tool: "border-ink-muted/40 bg-bg-raised text-ink-secondary",
   link: "border-accent-green/40 bg-accent-green/10 text-accent-green",
   experiment: "border-accent-red/40 bg-accent-red/10 text-accent-red",
 };
@@ -37,6 +38,20 @@ const ITEMS: Item[] = [
     blurb:
       "A partially-observable Go variant — you only see part of the board. Play against a trained RL agent.",
     href: "/projects/invisiblego",
+  },
+  {
+    tag: "demo",
+    title: "Street KTV songbook",
+    blurb:
+      "The audience side of my street gigs: scan the QR code at the show, browse the songbook and queue a song. The performer app on stage picks it up within a second.",
+    href: "/playground/street-ktv-menu",
+  },
+  {
+    tag: "tool",
+    title: "TOEFL Daily Trainer",
+    blurb:
+      "The installable, offline-capable trainer I use for my own TOEFL prep: a daily 90-minute plan with reminders. Built for me, open to anyone.",
+    href: "/services/toefl-trainer",
   },
 ];
 
@@ -91,6 +106,18 @@ export default function PlaygroundPage() {
         })}
       </ul>
 
+      <section className="mt-8 rounded-xl border border-dashed border-bg-border p-5 sm:p-6">
+        <p className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+          coming up
+        </p>
+        <h2 className="mt-2 text-base font-semibold tracking-tight">
+          More toys on the way.
+        </h2>
+        <p className="mt-1.5 text-sm leading-relaxed text-ink-secondary">
+          Mini games, music experiments and odd little demos land here when
+          they&apos;re fun enough to share. Check back now and then.
+        </p>
+      </section>
     </main>
   );
 }

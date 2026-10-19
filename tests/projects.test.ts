@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { withLocalImages } from "../lib/projects";
+import { sortProjects, withLocalImages } from "../lib/projects";
 import type { Project } from "../lib/types";
 
 const base = (slug: string, image?: string): Project => ({
@@ -37,4 +37,18 @@ test("no local file leaves the project untouched", () => {
   const [p] = withLocalImages([input], () => false);
   assert.equal(p.image, undefined);
   assert.equal(p, input);
+});
+
+test("featured projects sort ahead of more recent ones, after explicit order", () => {
+  const at = (slug: string, pushedAt: string, extra: Partial<Project> = {}): Project => ({
+    ...base(slug),
+    ...extra,
+    activity: { stars: 0, openIssues: 0, defaultBranch: "main", pushedAt, weeklyCommits: 0 },
+  });
+  const sorted = sortProjects([
+    at("recent", "2026-10-01"),
+    at("flagged", "2025-01-01", { featured: true }),
+    at("pinned", "2024-01-01", { order: 1 }),
+  ]);
+  assert.deepEqual(sorted.map((p) => p.slug), ["pinned", "flagged", "recent"]);
 });

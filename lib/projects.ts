@@ -65,6 +65,7 @@ export function sortProjects(projects: Project[]): Project[] {
     const ao = a.order ?? Number.POSITIVE_INFINITY;
     const bo = b.order ?? Number.POSITIVE_INFINITY;
     if (ao !== bo) return ao - bo;
+    if (a.featured !== b.featured) return a.featured ? -1 : 1;
     return pushedAt(b) - pushedAt(a);
   });
 }
@@ -75,16 +76,6 @@ export function groupByTrack(projects: Project[]): Track[] {
     ...TRACKS[slug],
     projects: sortProjects(projects.filter((p) => p.track === slug)),
   })).filter((t) => t.projects.length > 0);
-}
-
-/** One card per track: the manifest-flagged project, else the most recently pushed. */
-export function pickFeatured(projects: Project[]): Project[] {
-  return TRACK_ORDER.flatMap((slug) => {
-    const inTrack = sortProjects(projects.filter((p) => p.track === slug));
-    const flagged = inTrack.find((p) => p.featured);
-    const pick = flagged ?? inTrack[0];
-    return pick ? [pick] : [];
-  });
 }
 
 export function repoUrl(p: Project): string | undefined {

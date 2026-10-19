@@ -35,7 +35,7 @@ DOCKER=1 ./scripts/deploy.sh       # Docker → Cloud Run / Fly.io
 - `app/api/<name>/route.ts` — backend endpoints
 - `content/` — hand-authored content (musings, interests, external projects)
 - `data/projects.json` — generated project snapshot (do not edit; see below)
-- `lib/projects.ts` — loads the snapshot, groups by track, picks featured cards
+- `lib/projects.ts` — loads the snapshot, groups and sorts by track
 - `scripts/fetch-projects.ts` — the generator
 - `Dockerfile` — multi-stage build for self-host
 
@@ -46,7 +46,8 @@ assistant hub, merged via PR). Each item has a `title`, a `note` in which
 `**double asterisks**` mark the one or two phrases to bold, an optional
 `href` (public repo or on-site page) and an optional `image` under
 `public/now/` (16:9, 1280×720, served unoptimized). Items without an image
-get a monogram tile. The first four render open; the rest sit behind a
+get a monogram tile. Cards with an image are listed first (`lib/now.ts`),
+otherwise in file order. The first four render open; the rest sit behind a
 native `<details>` toggle.
 
 ## Projects: discovered from GitHub
@@ -70,7 +71,8 @@ native `<details>` toggle.
 
 A screenshot at `public/projects/<slug>.{jpg,png,webp}` (16:9, 1280×720,
 under ~150 KB) becomes the card's thumbnail unless the manifest sets
-`image`; this is how private repos get one. Remaining GitHub topics become
+`image`; this is how private repos get one. Inside a track, projects sort by manifest `order`, then
+`featured`, then most recent push. Remaining GitHub topics become
 the card's tags. Private repos are shown
 without a link. Manifest text is published verbatim, so write it as public
 copy even on private repos.

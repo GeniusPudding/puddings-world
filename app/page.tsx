@@ -1,18 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ProjectCard } from "@/components/ProjectCard";
 import { WhoAmIPrompt } from "@/components/WhoAmIPrompt";
-import { loadProjects, pickFeatured } from "@/lib/projects";
 import { now, type NowItem } from "@/content/now";
 import { hueFor, initials, splitBold } from "@/lib/markup";
+import { imagesFirst } from "@/lib/now";
 
 const NOW_VISIBLE = 4;
 
-export default async function HomePage() {
-  const { projects } = await loadProjects();
-  const featured = pickFeatured(projects);
-  const visibleNow = now.items.slice(0, NOW_VISIBLE);
-  const hiddenNow = now.items.slice(NOW_VISIBLE);
+export default function HomePage() {
+  const items = imagesFirst(now.items);
+  const visibleNow = items.slice(0, NOW_VISIBLE);
+  const hiddenNow = items.slice(NOW_VISIBLE);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 sm:px-6">
@@ -42,7 +40,10 @@ export default async function HomePage() {
         <div className="mb-6 flex items-baseline justify-between">
           <h2 className="text-xl font-semibold tracking-tight">Now building</h2>
           <span className="font-mono text-xs text-ink-muted">
-            updated {now.updated}
+            updated {now.updated} ·{" "}
+            <Link href="/projects" className="hover:text-accent">
+              all projects →
+            </Link>
           </span>
         </div>
         <ul className="grid gap-4 md:grid-cols-2">
@@ -71,22 +72,6 @@ export default async function HomePage() {
         <WhoAmIPrompt />
       </section>
 
-      <section className="border-t border-bg-border pt-12 pb-16">
-        <div className="mb-6 flex items-baseline justify-between">
-          <h2 className="text-xl font-semibold tracking-tight">Featured</h2>
-          <Link
-            href="/projects"
-            className="font-mono text-xs text-ink-muted hover:text-accent"
-          >
-            view all →
-          </Link>
-        </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          {featured.map((project) => (
-            <ProjectCard key={project.slug} project={project} />
-          ))}
-        </div>
-      </section>
 
       <section className="border-t border-bg-border pt-12 pb-20">
         <div className="mx-auto max-w-2xl text-center sm:text-left">

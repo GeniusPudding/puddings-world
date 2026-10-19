@@ -6,6 +6,8 @@ export const metadata = {
 };
 
 export default function InterestsPage() {
+  const filled = interests.filter((s) => s.items.length > 0);
+  const pending = interests.filter((s) => s.items.length === 0);
   return (
     <main className="mx-auto w-full max-w-3xl px-6 py-16">
       <header>
@@ -25,11 +27,31 @@ export default function InterestsPage() {
         </p>
       </header>
 
-      <div className="mt-12 space-y-8">
-        {interests.map((section) => (
-          <Section key={section.slug} section={section} />
-        ))}
-      </div>
+      {filled.length > 0 && (
+        <div className="mt-12 space-y-8">
+          {filled.map((section) => (
+            <Section key={section.slug} section={section} />
+          ))}
+        </div>
+      )}
+
+      {pending.length > 0 && (
+        <section className="mt-12 rounded-xl border border-dashed border-bg-border p-5 sm:p-6">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+            still being written
+          </p>
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+            {pending.map((section) => (
+              <li key={section.slug} className="min-w-0">
+                <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink-primary">
+                  {section.label}
+                </p>
+                <p className="mt-1 text-sm text-ink-secondary">{section.eyebrow}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
     </main>
   );
@@ -48,48 +70,40 @@ function Section({ section }: { section: InterestSection }) {
       </header>
       <p className="mt-2 text-sm text-ink-secondary">{section.eyebrow}</p>
 
-      {section.items.length > 0 ? (
-        <>
-          <ul className="mt-5 divide-y divide-bg-border/60 font-mono text-sm">
-            {section.items.map((item, i) => (
-              <li
-                key={i}
-                className="flex items-baseline justify-between gap-4 py-2.5"
+      <ul className="mt-5 divide-y divide-bg-border/60 font-mono text-sm">
+        {section.items.map((item, i) => (
+          <li
+            key={i}
+            className="flex items-baseline justify-between gap-4 py-2.5"
+          >
+            {item.href ? (
+              <a
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                className="min-w-0 truncate text-ink-primary transition-colors hover:text-accent"
               >
-                {item.href ? (
-                  <a
-                    href={item.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="min-w-0 truncate text-ink-primary transition-colors hover:text-accent"
-                  >
-                    {item.primary}
-                  </a>
-                ) : (
-                  <span className="min-w-0 truncate text-ink-primary">
-                    {item.primary}
-                  </span>
-                )}
-                {item.secondary && (
-                  <span className="shrink-0 text-right text-xs text-ink-muted">
-                    {item.secondary}
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-          {section.whyThese && (
-            <p className="mt-5 border-t border-bg-border pt-4 text-sm italic leading-relaxed text-ink-secondary">
-              <span className="not-italic font-mono text-[10px] uppercase tracking-wider text-ink-muted">
-                Why these —{" "}
+                {item.primary}
+              </a>
+            ) : (
+              <span className="min-w-0 truncate text-ink-primary">
+                {item.primary}
               </span>
-              {section.whyThese}
-            </p>
-          )}
-        </>
-      ) : (
-        <p className="mt-5 font-mono text-xs italic text-ink-muted">
-          Coming soon.
+            )}
+            {item.secondary && (
+              <span className="shrink-0 text-right text-xs text-ink-muted">
+                {item.secondary}
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+      {section.whyThese && (
+        <p className="mt-5 border-t border-bg-border pt-4 text-sm italic leading-relaxed text-ink-secondary">
+          <span className="not-italic font-mono text-[10px] uppercase tracking-wider text-ink-muted">
+            Why these —{" "}
+          </span>
+          {section.whyThese}
         </p>
       )}
     </section>
