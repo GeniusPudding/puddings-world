@@ -1,3 +1,5 @@
+import { ContactForm } from "@/components/ContactForm";
+
 export const metadata = {
   title: "Contact · puddingsworld",
 };
@@ -19,12 +21,16 @@ export default function ContactPage() {
           Get in touch.
         </h1>
         <p className="mt-5 text-base leading-relaxed text-ink-secondary">
-          The fastest way to reach me is email. I read everything; replies
-          take a few days.
+          Leave a message below and it lands in my inbox, or email me
+          directly. I read everything; replies take a few days.
         </p>
       </header>
 
-      <section className="mt-10 space-y-4">
+      <section className="mt-10">
+        <ContactForm />
+      </section>
+
+      <section className="mt-8 space-y-4">
         <ContactRow label="Email" value={CONTACT.email} href={`mailto:${CONTACT.email}`} />
         <ContactRow
           label="GitHub"

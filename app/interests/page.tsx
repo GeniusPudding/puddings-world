@@ -1,13 +1,14 @@
+import Link from "next/link";
 import { interests, type InterestSection } from "@/content/interests";
 
 export const metadata = {
   title: "Interests · puddingsworld",
-  description: "Things I consume — reading, listening, playing, watching, eating.",
+  description: "What I read, sing, eat and play: papers, Mandopop, Taipei food, Go, basketball, science, literature, history.",
 };
 
 export default function InterestsPage() {
   const filled = interests.filter((s) => s.items.length > 0);
-  const pending = interests.filter((s) => s.items.length === 0);
+  const compact = interests.filter((s) => s.items.length === 0);
   return (
     <main className="mx-auto w-full max-w-3xl px-6 py-16">
       <header>
@@ -18,7 +19,8 @@ export default function InterestsPage() {
           Things I keep returning to.
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-ink-secondary">
-          What I consume — books, music, games, films, food. The inputs side.{" "}
+          Papers I&apos;m reading, songs I sing, places I eat, and the
+          things I think about when I&apos;m not building.{" "}
           <span className="text-ink-muted">
             (What I create lives in <a href="/musings" className="hover:text-accent">/musings</a>,{" "}
             <a href="/projects" className="hover:text-accent">/projects</a>, and{" "}
@@ -35,18 +37,31 @@ export default function InterestsPage() {
         </div>
       )}
 
-      {pending.length > 0 && (
-        <section className="mt-12 rounded-xl border border-dashed border-bg-border p-5 sm:p-6">
-          <p className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
-            still being written
-          </p>
+      {compact.length > 0 && (
+        <section className="mt-12">
+          <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-ink-muted">
+            Also into
+          </h2>
           <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-            {pending.map((section) => (
-              <li key={section.slug} className="min-w-0">
+            {compact.map((section) => (
+              <li
+                key={section.slug}
+                className="min-w-0 rounded-xl border border-bg-border bg-bg-panel p-5"
+              >
                 <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink-primary">
                   {section.label}
                 </p>
-                <p className="mt-1 text-sm text-ink-secondary">{section.eyebrow}</p>
+                <p className="mt-2 text-sm leading-relaxed text-ink-secondary">
+                  {section.eyebrow}
+                </p>
+                {section.href && (
+                  <Link
+                    href={section.href}
+                    className="mt-3 inline-block font-mono text-xs text-ink-muted hover:text-accent"
+                  >
+                    see more →
+                  </Link>
+                )}
               </li>
             ))}
           </ul>
@@ -64,9 +79,7 @@ function Section({ section }: { section: InterestSection }) {
         <h2 className="font-mono text-xs uppercase tracking-[0.2em] text-ink-primary">
           {section.label}
         </h2>
-        <span className="font-mono text-[10px] uppercase tracking-wider text-ink-muted">
-          {section.items.length} item{section.items.length === 1 ? "" : "s"}
-        </span>
+
       </header>
       <p className="mt-2 text-sm text-ink-secondary">{section.eyebrow}</p>
 
@@ -74,24 +87,25 @@ function Section({ section }: { section: InterestSection }) {
         {section.items.map((item, i) => (
           <li
             key={i}
-            className="flex items-baseline justify-between gap-4 py-2.5"
+            className="flex flex-col gap-0.5 py-2.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4"
           >
             {item.href ? (
               <a
                 href={item.href}
-                target="_blank"
-                rel="noreferrer"
-                className="min-w-0 truncate text-ink-primary transition-colors hover:text-accent"
+                {...(item.href.startsWith("/")
+                  ? {}
+                  : { target: "_blank", rel: "noreferrer" })}
+                className="min-w-0 text-ink-primary transition-colors hover:text-accent"
               >
                 {item.primary}
               </a>
             ) : (
-              <span className="min-w-0 truncate text-ink-primary">
+              <span className="min-w-0 text-ink-primary">
                 {item.primary}
               </span>
             )}
             {item.secondary && (
-              <span className="shrink-0 text-right text-xs text-ink-muted">
+              <span className="shrink-0 text-xs text-ink-muted sm:text-right">
                 {item.secondary}
               </span>
             )}

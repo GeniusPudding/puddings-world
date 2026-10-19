@@ -50,6 +50,28 @@ get a monogram tile. Cards with an image are listed first (`lib/now.ts`),
 otherwise in file order. The first four render open; the rest sit behind a
 native `<details>` toggle.
 
+## Contact form
+
+`/contact` has a message form (`components/ContactForm.tsx`) that posts to
+`POST /api/contact` with JSON `{ name?, email?, message, website? }`.
+Validation lives in `lib/contact.ts` (`parseContact`, `renderEmail`): the
+message is required (max 2000 chars), name and email are optional, and a
+filled `website` field is a honeypot that is accepted and silently dropped.
+Each IP (hashed) may send 3 messages per 10 minutes.
+
+Every accepted message is pushed to the Redis list `contact:messages`
+(newest 500 kept, readable in the Upstash console) and, when
+`RESEND_API_KEY` is set, emailed through Resend with the sender's address
+as reply-to. Env vars:
+
+- `RESEND_API_KEY` — enables email delivery.
+- `CONTACT_TO` — recipient (default `geniuspuddingforgames@gmail.com`).
+- `CONTACT_FROM` — sender (default `puddingsworld <onboarding@resend.dev>`;
+  Resend's test sender only delivers to the Resend account's own address,
+  so verify the domain before changing `CONTACT_TO` to anything else).
+
+With neither Redis nor Resend configured the endpoint answers 503.
+
 ## Projects: discovered from GitHub
 
 `/projects` is not hand-maintained. A weekly GitHub Action

@@ -18,6 +18,17 @@ export type Musing = {
   imageCaption?: string;
 };
 
+/** A one- or two-line saying. Shown as a card wall on /musings, no detail page. */
+export type Saying = {
+  text: string;
+  /** YYYY-MM-DD, or just YYYY when the exact day is lost. */
+  date?: string;
+  /** Optional small caption: where or why it came up. */
+  context?: string;
+};
+
+export const sayings: Saying[] = [];
+
 // ---------------------------------------------------------------------------
 // Replace these placeholders with real pieces. The page handles four types
 // out of the box: poem · lyrics · dessert · note. Add more types in MusingType
