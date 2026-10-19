@@ -28,7 +28,7 @@ export function Footer() {
           </li>
           <li>
             <a
-              href="https://github.com/GeniusPudding/puddings-world"
+              href="https://github.com/puddings-world/puddings-world"
               target="_blank"
               rel="noreferrer"
               className="text-ink-muted transition-colors hover:text-accent"

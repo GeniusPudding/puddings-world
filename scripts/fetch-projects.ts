@@ -20,7 +20,7 @@ const MARKER_TOPIC = "puddings-world";
 const MANIFEST_PATH = ".puddings.json";
 const USER = "GeniusPudding";
 // Other accounts whose public repos are scanned for the marker topic.
-const EXTRA_ACCOUNTS = ["puddingforhealth"];
+const EXTRA_ACCOUNTS = ["puddingforhealth", "puddings-world"];
 const ACTIVE_WINDOW_DAYS = 90;
 
 const TOKEN = process.env.GH_PAT ?? process.env.GITHUB_TOKEN ?? "";
