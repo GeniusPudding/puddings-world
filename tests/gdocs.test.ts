@@ -86,3 +86,40 @@ test("folder listing yields entries and flags Google Docs", () => {
     { id: "1ZZZZZZZZZZZZZ", title: "demo.mp3", isDoc: false },
   ]);
 });
+
+test("doc titles lose upload extensions and a 歌詞 label", () => {
+  assert.equal(
+    titleFromDisposition(`attachment; filename*=UTF-8''${encodeURIComponent("佛道.docx.md")}`),
+    "佛道",
+  );
+  assert.equal(
+    titleFromDisposition(`attachment; filename*=UTF-8''${encodeURIComponent("來不及，寫歌 歌詞.md")}`),
+    "來不及，寫歌",
+  );
+  assert.equal(titleFromDisposition('attachment; filename="Rain (lyrics).md"'), "Rain");
+});
+
+test("a first line repeating the doc title is not printed twice", () => {
+  assert.deepEqual(parseLyrics("牙套 \n\n想輕吻那道光\n踏上了竹筏\n", "牙套"), [
+    { title: "牙套", body: "想輕吻那道光\n踏上了竹筏" },
+  ]);
+  assert.deepEqual(parseLyrics("來不及， 寫歌\n\n你喜歡這旋律嗎?\n", "來不及，寫歌"), [
+    { title: "來不及，寫歌", body: "你喜歡這旋律嗎?" },
+  ]);
+  assert.deepEqual(parseLyrics("喝囉怛那哆囉夜耶 唵\n萬佛祈求\n", "佛道"), [
+    { title: "佛道", body: "喝囉怛那哆囉夜耶 唵\n萬佛祈求" },
+  ]);
+});
+
+test("an audio line attaches a playable recording", () => {
+  const drive = `https://drive.google.com/file/d/${DOC}/view?usp=sharing`;
+  assert.deepEqual(parseLyrics(`歌\n\nla\naudio: [${drive}](${drive})\n`, "歌"), [
+    { title: "歌", audio: `https://drive.google.com/uc?export=download&id=${DOC}`, body: "la" },
+  ]);
+  assert.deepEqual(parseLyrics("la\n音檔：https://cdn.example.com/a.mp3\n", "x"), [
+    { title: "x", audio: "https://cdn.example.com/a.mp3", body: "la" },
+  ]);
+  assert.deepEqual(parseLyrics("la\naudio: http://insecure.example/a.mp3\n", "x"), [
+    { title: "x", body: "la" },
+  ]);
+});

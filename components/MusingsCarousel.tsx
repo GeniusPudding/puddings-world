@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import type { Swiper as SwiperType } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
 import {
   Autoplay,
@@ -55,9 +57,53 @@ export function MusingsCarousel({
   /** Off on previews, where the pieces have no page yet. */
   linkable?: boolean;
 }) {
+  const swiperRef = useRef<SwiperType | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Browsers only allow sound after a click, so playback starts from a
+  // card's button; from then on the music follows the carousel.
+  const listening = useRef(false);
+  const [playing, setPlaying] = useState<string | null>(null);
+
+  useEffect(() => () => audioRef.current?.pause(), []);
+
+  function playFor(m: Musing | undefined) {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (!m?.audio) {
+      audio.pause();
+      return;
+    }
+    if (audio.src !== m.audio) audio.src = m.audio;
+    swiperRef.current?.autoplay?.stop();
+    audio.play().then(
+      () => setPlaying(m.slug),
+      () => setPlaying(null),
+    );
+  }
+
+  function toggle(m: Musing) {
+    if (playing === m.slug) {
+      listening.current = false;
+      audioRef.current?.pause();
+      return;
+    }
+    listening.current = true;
+    playFor(m);
+  }
+
   return (
     <div className="musings-carousel">
+      <audio
+        ref={audioRef}
+        preload="none"
+        onPause={() => setPlaying(null)}
+        onEnded={() => swiperRef.current?.slideNext()}
+      />
       <Swiper
+        onSwiper={(s) => (swiperRef.current = s)}
+        onSlideChange={(s) => {
+          if (listening.current) playFor(musings[s.realIndex]);
+        }}
         modules={[
           Autoplay,
           EffectCoverflow,
@@ -98,7 +144,12 @@ export function MusingsCarousel({
             style={{ width: "min(560px, 88vw)" }}
             className="!h-auto"
           >
-            <MusingCard musing={m} linkable={linkable} />
+            <MusingCard
+              musing={m}
+              linkable={linkable}
+              playing={playing === m.slug}
+              onToggle={() => toggle(m)}
+            />
           </SwiperSlide>
         ))}
       </Swiper>
@@ -106,7 +157,17 @@ export function MusingsCarousel({
   );
 }
 
-function MusingCard({ musing, linkable }: { musing: Musing; linkable: boolean }) {
+function MusingCard({
+  musing,
+  linkable,
+  playing,
+  onToggle,
+}: {
+  musing: Musing;
+  linkable: boolean;
+  playing: boolean;
+  onToggle: () => void;
+}) {
   const text = musing.excerpt ?? musing.body;
   const truncated =
     !!musing.excerpt && musing.excerpt.length < musing.body.length;
@@ -153,16 +214,40 @@ function MusingCard({ musing, linkable }: { musing: Musing; linkable: boolean })
         <p className="mt-6 font-mono text-xs text-ink-muted">{musing.meta}</p>
       )}
 
-      {linkable && (
-      <div className="mt-8 flex items-baseline justify-end border-t border-bg-border pt-4">
-        <Link
-          href={`/musings/${musing.slug}`}
-          className="font-mono text-xs text-ink-muted transition-colors hover:text-accent"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {truncated ? "read full" : "open"} →
-        </Link>
-      </div>
+      {(linkable || musing.type === "lyrics") && (
+        <div className="mt-8 flex items-center justify-between gap-3 border-t border-bg-border pt-4">
+          {musing.audio ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggle();
+              }}
+              aria-pressed={playing}
+              className={`flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-xs transition-colors ${
+                playing
+                  ? "border-accent-amber/60 text-accent-amber"
+                  : "border-bg-border text-ink-secondary hover:border-accent-amber/60 hover:text-accent-amber"
+              }`}
+            >
+              <span aria-hidden>{playing ? "❚❚" : "▶"}</span>
+              {playing ? "pause" : "listen"}
+            </button>
+          ) : musing.type === "lyrics" ? (
+            <span className="font-mono text-xs italic text-ink-muted">♪ recording coming soon</span>
+          ) : (
+            <span />
+          )}
+          {linkable && (
+            <Link
+              href={`/musings/${musing.slug}`}
+              className="font-mono text-xs text-ink-muted transition-colors hover:text-accent"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {truncated ? "read full" : "open"} →
+            </Link>
+          )}
+        </div>
       )}
     </article>
   );

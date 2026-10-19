@@ -13,6 +13,8 @@ export type Musing = {
   excerpt?: string;
   /** Small caption: "lyrics for ___", "dessert lab — 第 3 號實驗" */
   meta?: string;
+  /** Recording to play with the piece (https URL). */
+  audio?: string;
   /** Optional hero image (under /public, e.g. "/musings/<slug>.jpg"). */
   image?: string;
   imageCaption?: string;

@@ -4,7 +4,7 @@
 export type DocRef = { kind: "doc" | "folder"; id: string };
 export type SourceKind = "lyrics" | "sayings" | "auto";
 
-export type ParsedPiece = { title?: string; date?: string; body: string };
+export type ParsedPiece = { title?: string; date?: string; audio?: string; body: string };
 export type ParsedSaying = { text: string; date?: string; context?: string };
 
 const ID = "([A-Za-z0-9_-]{10,})";
@@ -48,7 +48,40 @@ export function titleFromDisposition(header: string | null): string | undefined 
     }
   }
   name ??= header.match(/filename="([^"]+)"/i)?.[1];
-  return name?.replace(/\.(md|txt)$/i, "").trim() || undefined;
+  return name ? cleanTitle(name) : undefined;
+}
+
+/** Drops export and upload extensions and a trailing 歌詞 / lyrics label. */
+export function cleanTitle(name: string): string | undefined {
+  return (
+    name
+      .replace(/\.(md|txt)$/i, "")
+      .replace(/\.(docx?|odt|rtf)$/i, "")
+      .replace(/\s*[（(]?\s*(?:歌詞|lyrics)\s*[)）]?\s*$/i, "")
+      .trim() || undefined
+  );
+}
+
+const squash = (s: string) => s.replace(/[\s　]+/g, "").toLowerCase();
+
+const AUDIO_LINE = /^\s*(?:audio|mp3|demo|音檔|音樂|錄音)\s*[:：]\s*(.+?)\s*$/i;
+
+/**
+ * Playable URL for an `audio:` line: Drive file links become direct
+ * downloads, other https URLs pass through, anything else is dropped.
+ */
+export function audioUrl(line: string): string | undefined {
+  const raw = line.match(/\]\((https?:[^)\s]+)\)/)?.[1] ?? line.replace(/^<|>$/g, "");
+  const ref = parseDocUrl(raw);
+  if (ref?.kind === "doc" && raw.includes("drive.google.com")) {
+    return `https://drive.google.com/uc?export=download&id=${ref.id}`;
+  }
+  try {
+    const url = new URL(raw);
+    return url.protocol === "https:" ? url.toString() : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 const SEPARATOR = /^\s*(?:-{3,}|\*{3,}|_{3,}|＊{3,}|={3,})\s*$/;
@@ -87,7 +120,9 @@ function splitBlocks(text: string): string[][] {
 /**
  * One doc may hold one song or several. A heading (`# 歌名`) or a `---` line
  * starts a new song; a lone date line (`2023-05-01`, `日期：2023`) anywhere in
- * a song becomes its date. Without any heading the doc title names the song.
+ * a song becomes its date, and an `audio: <url>` line its recording. Without
+ * any heading the doc title names the song, and a first line that just
+ * repeats that title is dropped.
  */
 export function parseLyrics(raw: string, docTitle?: string): ParsedPiece[] {
   const text = cleanDocText(raw);
@@ -96,8 +131,14 @@ export function parseLyrics(raw: string, docTitle?: string): ParsedPiece[] {
   for (const block of blocks) {
     let title: string | undefined;
     let date: string | undefined;
+    let audio: string | undefined;
     const body: string[] = [];
     for (const line of block) {
+      const a = line.match(AUDIO_LINE);
+      if (a && !audio) {
+        audio = audioUrl(a[1]);
+        continue;
+      }
       const h = line.match(HEADING);
       if (h && !title && !body.some((l) => l.trim())) {
         title = h[1];
@@ -112,10 +153,20 @@ export function parseLyrics(raw: string, docTitle?: string): ParsedPiece[] {
     }
     const joined = body.join("\n").replace(/\n{3,}/g, "\n\n").trim();
     if (!joined) continue;
-    pieces.push({ ...(title ? { title } : {}), ...(date ? { date } : {}), body: joined });
+    pieces.push({
+      ...(title ? { title } : {}),
+      ...(date ? { date } : {}),
+      ...(audio ? { audio } : {}),
+      body: joined,
+    });
   }
-  if (pieces.length === 1 && !pieces[0].title && docTitle) pieces[0].title = docTitle;
-  return pieces;
+  if (pieces.length === 1 && !pieces[0].title && docTitle) {
+    const only = pieces[0];
+    only.title = docTitle;
+    const [first, ...rest] = only.body.split("\n");
+    if (squash(first) === squash(docTitle)) only.body = rest.join("\n").trim();
+  }
+  return pieces.filter((p) => p.body);
 }
 
 const BULLET = /^\s*(?:[-*•・]|\d+[.)、])\s+/;

@@ -29,6 +29,7 @@ export function docsToMusings(docs: LoadedDoc[]): { musings: Musing[]; sayings: 
         type: "lyrics",
         ...(p.title ? { title: p.title } : {}),
         ...(p.date ? { date: p.date } : {}),
+        ...(p.audio ? { audio: p.audio } : {}),
         body: p.body,
         ...(excerpt ? { excerpt } : {}),
       });

@@ -70,6 +70,14 @@ export default async function MusingDetailPage({
           </h1>
         )}
 
+        {m.audio ? (
+          <audio controls preload="none" src={m.audio} className="mt-6 w-full" />
+        ) : (
+          m.type === "lyrics" && (
+            <p className="mt-4 font-mono text-xs italic text-ink-muted">♪ recording coming soon</p>
+          )
+        )}
+
         {m.image && (
           <figure className="mt-8 overflow-hidden rounded-xl border border-bg-border">
             <div className="relative aspect-[4/3]">

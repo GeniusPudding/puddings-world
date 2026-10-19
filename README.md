@@ -81,7 +81,11 @@ now (`lib/musings.ts` `loadMusings`). Each source is a doc link or a Drive
 folder link shared as "Anyone with the link: Viewer", with a `kind`:
 
 - `lyrics`: one song per doc, or a heading (`# 歌名`) / `---` line starts
-  each song. A doc with no heading names its only song after the doc title.
+  each song. A doc with no heading names its only song after the doc title
+  (minus `.docx` and a trailing `歌詞` / `lyrics`), and drops a first line
+  that just repeats it. An `audio: <url>` line (also `mp3` / `demo` / `音檔`
+  / `音樂` / `錄音`) attaches a recording: a Drive file link (shared
+  publicly) becomes a direct download URL; other https URLs are used as is.
 - `sayings`: one per paragraph or bullet; a following line starting with
   `—` is its context (a trailing year or date in it becomes the date).
 - `auto`: headings or separators mean lyrics, otherwise sayings.
@@ -104,6 +108,11 @@ remembered in the browser's localStorage only.
 
 Lyrics render in a coverflow carousel that autoplays every 7 s (pauses on
 hover, stops after interaction); sayings in a continuously drifting strip.
+A song with a recording gets a listen button. Browsers block sound until a
+click, so playback only starts from that button; after it, the music
+follows the carousel (switching cards switches songs, a finished song
+advances to the next card, and the 7 s autoplay stops). Songs without a
+recording show "recording coming soon". Detail pages show a native player.
 
 ## Admin dashboard and analytics
 
