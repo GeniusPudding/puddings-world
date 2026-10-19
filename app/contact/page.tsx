@@ -4,7 +4,8 @@ export const metadata = {
 
 const CONTACT = {
   email: "geniuspuddingforgames@gmail.com",
-  github: "https://github.com/GeniusPudding",
+  github: "https://github.com/puddings-world",
+  githubPersonal: "https://github.com/GeniusPudding",
 };
 
 export default function ContactPage() {
@@ -31,6 +32,12 @@ export default function ContactPage() {
           href={CONTACT.github}
           external
         />
+        <ContactRow
+          label="Personal"
+          value={CONTACT.githubPersonal.replace("https://", "")}
+          href={CONTACT.githubPersonal}
+          external
+        />
       </section>
 
       <p className="mt-12 text-sm text-ink-muted">
@@ -54,7 +61,7 @@ function ContactRow({
   external?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-bg-border bg-bg-panel px-5 py-4">
+    <div className="flex items-center justify-between gap-4 rounded-lg border border-bg-border bg-bg-panel px-5 py-4">
       <span className="font-mono text-xs uppercase tracking-wider text-ink-muted">
         {label}
       </span>
@@ -62,7 +69,7 @@ function ContactRow({
         href={href}
         target={external ? "_blank" : undefined}
         rel={external ? "noreferrer" : undefined}
-        className="font-mono text-sm text-ink-primary hover:text-accent"
+        className="min-w-0 truncate font-mono text-sm text-ink-primary hover:text-accent"
       >
         {value}
       </a>

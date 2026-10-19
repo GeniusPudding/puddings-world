@@ -13,7 +13,17 @@ export function Header({ totalProjects, live, shipped, lastFetched }: Props) {
         A running tab of what I&apos;m building, grouped by research, tools,
         and side projects. Every card is discovered from GitHub: tag a repo
         with the <code className="font-mono text-ink-primary">puddings-world</code>{" "}
-        topic and it shows up here on the next weekly refresh.
+        topic and it shows up here on the next weekly refresh. Public code
+        lives in the{" "}
+        <a
+          href="https://github.com/puddings-world"
+          target="_blank"
+          rel="noreferrer"
+          className="text-ink-primary underline decoration-bg-border underline-offset-4 hover:text-accent"
+        >
+          puddings-world organization on GitHub ↗
+        </a>
+        .
       </p>
 
       <dl className="mt-8 grid grid-cols-3 gap-2 sm:gap-3">

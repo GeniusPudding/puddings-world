@@ -21,8 +21,8 @@ const IDENTITIES: Identity[] = [
     routes: [
       { label: "Project dashboard with live activity", href: "/projects" },
       {
-        label: "GitHub @GeniusPudding",
-        href: "https://github.com/GeniusPudding",
+        label: "GitHub: puddings-world",
+        href: "https://github.com/puddings-world",
         external: true,
       },
       { label: "Suggested first stop: InvisibleGo", href: "/projects/invisiblego" },
