@@ -31,8 +31,8 @@ export function SayingsCarousel({ sayings }: { sayings: Saying[] }) {
         }
       >
         {sayings.map((s, i) => (
-          <SwiperSlide key={i} style={{ width: "min(360px, 78vw)" }} className="!h-auto">
-            <figure className="relative isolate flex h-full flex-col justify-between overflow-hidden rounded-xl border border-bg-border bg-bg-panel p-7">
+          <SwiperSlide key={i} style={{ width: "min(360px, 78vw)" }} className="!h-auto self-center">
+            <figure className="relative isolate flex flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-panel p-7 min-h-[8.5rem] justify-center">
               <div
                 aria-hidden
                 className="pointer-events-none absolute inset-0 -z-10"
@@ -43,7 +43,7 @@ export function SayingsCarousel({ sayings }: { sayings: Saying[] }) {
               />
               <span
                 aria-hidden
-                className="pointer-events-none absolute -top-6 left-3 -z-10 select-none font-serif text-[7rem] leading-none text-ink-primary/[0.05]"
+                className="pointer-events-none absolute -top-3 right-4 -z-10 select-none font-serif text-[6rem] leading-none text-ink-primary/[0.05]"
               >
                 “
               </span>
