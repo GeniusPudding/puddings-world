@@ -1,6 +1,68 @@
 {
-  "fetchedAt": "2026-10-19T03:48:06.366Z",
+  "fetchedAt": "2026-10-19T03:48:50.236Z",
   "projects": [
+    {
+      "slug": "mapetite",
+      "title": "mapetite",
+      "tagline": "Browser extension that curates food places on top of Google Maps, synced two-way with Google saved lists.",
+      "track": "side",
+      "status": "active",
+      "repo": {
+        "owner": "puddings-world",
+        "name": "mapetite",
+        "private": true
+      },
+      "topics": [],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 0,
+        "openIssues": 0,
+        "defaultBranch": "main",
+        "pushedAt": "2026-10-18T16:30:33Z",
+        "weeklyCommits": 61,
+        "latestCommit": {
+          "sha": "77ebf96",
+          "message": "Sidebar: notice board apart from tags; drop list dropdown; food-only Google types",
+          "date": "2026-10-18T16:30:30Z",
+          "url": "https://github.com/puddings-world/mapetite/commit/77ebf967841b79b571f38ae1c64ede5cfde144aa"
+        }
+      }
+    },
+    {
+      "slug": "paperfact",
+      "title": "Paperfact",
+      "tagline": "Desktop paper reader that turns any paper into a guided reading session: AI commentary, citation maps, and a cross-venue reading queue.",
+      "track": "tool",
+      "status": "active",
+      "repo": {
+        "owner": "puddings-world",
+        "name": "Paperfact",
+        "private": true
+      },
+      "topics": [],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 0,
+        "openIssues": 0,
+        "defaultBranch": "master",
+        "pushedAt": "2026-10-18T08:27:56Z",
+        "weeklyCommits": 35,
+        "latestCommit": {
+          "sha": "13e14a6",
+          "message": "深入分析: dive, 承先 and 啟後 made as one unit; AI buttons look the part",
+          "date": "2026-10-18T08:27:55Z",
+          "url": "https://github.com/puddings-world/Paperfact/commit/13e14a6d7b5b95d90e5d2c8f66173179454cd242"
+        },
+        "latestRelease": {
+          "tag": "cataract-2026-10-15",
+          "name": "Cataract reading list — 2026-10-15",
+          "date": "2026-10-15T13:46:23Z",
+          "url": "https://github.com/puddings-world/Paperfact/releases/tag/cataract-2026-10-15"
+        }
+      }
+    },
     {
       "slug": "virtual-embryo-challenge",
       "title": "virtual-embryo-challenge",
@@ -26,6 +88,36 @@
           "message": "Add vec delta and vec recompose for pseudobulk-level T3 hypotheses",
           "date": "2026-10-14T02:28:58Z",
           "url": "https://github.com/GeniusPudding/virtual-embryo-challenge/commit/927b31b1e333f7ed5ab1a96d4b47156284199720"
+        }
+      }
+    },
+    {
+      "slug": "cataract-vision-lab",
+      "title": "cataract-vision-lab",
+      "tagline": "Research code for cataract surgery video analysis: Cataract-1K/101 dataset tooling, reproduction of the published segmentation and phase-recognition baselines, and remote GPU training.",
+      "track": "research",
+      "status": "active",
+      "repo": {
+        "owner": "puddings-world",
+        "name": "cataract-vision-lab",
+        "private": true
+      },
+      "topics": [
+        "ophthalmology"
+      ],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 0,
+        "openIssues": 0,
+        "defaultBranch": "main",
+        "pushedAt": "2026-10-12T03:54:10Z",
+        "weeklyCommits": 1,
+        "latestCommit": {
+          "sha": "65e4e6c",
+          "message": "Bundle: stage the surgmamba, srmamba, mstcn and mc_resnet50_bigru families",
+          "date": "2026-10-12T03:54:08Z",
+          "url": "https://github.com/puddings-world/cataract-vision-lab/commit/65e4e6c8805b3e2ada41e960bdab9d08725dd705"
         }
       }
     },
@@ -60,6 +152,36 @@
       }
     },
     {
+      "slug": "streetperformermaster",
+      "title": "StreetPerformerMaster",
+      "tagline": "Music production and the service workflows and software tools required for street performances (covering, singing)",
+      "track": "side",
+      "status": "paused",
+      "repo": {
+        "owner": "puddings-world",
+        "name": "StreetPerformerMaster",
+        "private": true
+      },
+      "topics": [
+        "music"
+      ],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 0,
+        "openIssues": 0,
+        "defaultBranch": "main",
+        "pushedAt": "2026-07-03T05:32:40Z",
+        "weeklyCommits": 0,
+        "latestCommit": {
+          "sha": "37d2f98",
+          "message": "feat(contract): machine-readable KTV contract + per-language codegen",
+          "date": "2026-07-03T05:32:22Z",
+          "url": "https://github.com/puddings-world/StreetPerformerMaster/commit/37d2f983e117708be290d6a843fbe42ca01617d1"
+        }
+      }
+    },
+    {
       "slug": "clip-claude",
       "title": "Clip-Claude",
       "tagline": "Paste screenshots into Claude Code / Gemini CLI / Codex as if they natively supported image paste.",
@@ -86,6 +208,36 @@
           "message": "Cross-platform paste + SSH bridge",
           "date": "2026-07-03T05:13:07Z",
           "url": "https://github.com/puddings-world/Clip-Claude/commit/840b9ab22ca9981e6a171620d8a02c616b6e1e24"
+        }
+      }
+    },
+    {
+      "slug": "reverse-turing-test",
+      "title": "reverse-turing-test",
+      "tagline": "Reverse Turing Test live-talk party game for 20-30 players (Cloudflare Workers + Durable Objects)",
+      "track": "side",
+      "status": "paused",
+      "repo": {
+        "owner": "puddings-world",
+        "name": "reverse-turing-test",
+        "private": true
+      },
+      "topics": [
+        "game"
+      ],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 0,
+        "openIssues": 0,
+        "defaultBranch": "master",
+        "pushedAt": "2026-06-05T18:03:08Z",
+        "weeklyCommits": 0,
+        "latestCommit": {
+          "sha": "4d9d9da",
+          "message": "Bump cache-buster to 20260606a for the 3-question final UI rewrite",
+          "date": "2026-06-05T18:03:01Z",
+          "url": "https://github.com/puddings-world/reverse-turing-test/commit/4d9d9da2ac4ef91e35172c0a26550a8e4672a182"
         }
       }
     },
