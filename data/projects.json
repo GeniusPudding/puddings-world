@@ -1,68 +1,6 @@
 {
-  "fetchedAt": "2026-10-18T18:18:18.996Z",
+  "fetchedAt": "2026-10-19T03:48:06.366Z",
   "projects": [
-    {
-      "slug": "mapetite",
-      "title": "mapetite",
-      "tagline": "Browser extension that curates food places on top of Google Maps, synced two-way with Google saved lists.",
-      "track": "side",
-      "status": "active",
-      "repo": {
-        "owner": "GeniusPudding",
-        "name": "mapetite",
-        "private": true
-      },
-      "topics": [],
-      "links": [],
-      "featured": false,
-      "activity": {
-        "stars": 0,
-        "openIssues": 0,
-        "defaultBranch": "main",
-        "pushedAt": "2026-10-18T16:30:33Z",
-        "weeklyCommits": 61,
-        "latestCommit": {
-          "sha": "77ebf96",
-          "message": "Sidebar: notice board apart from tags; drop list dropdown; food-only Google types",
-          "date": "2026-10-18T16:30:30Z",
-          "url": "https://github.com/GeniusPudding/mapetite/commit/77ebf967841b79b571f38ae1c64ede5cfde144aa"
-        }
-      }
-    },
-    {
-      "slug": "paperfact",
-      "title": "Paperfact",
-      "tagline": "Desktop paper reader that turns any paper into a guided reading session: AI commentary, citation maps, and a cross-venue reading queue.",
-      "track": "tool",
-      "status": "active",
-      "repo": {
-        "owner": "GeniusPudding",
-        "name": "Paperfact",
-        "private": true
-      },
-      "topics": [],
-      "links": [],
-      "featured": false,
-      "activity": {
-        "stars": 0,
-        "openIssues": 0,
-        "defaultBranch": "master",
-        "pushedAt": "2026-10-18T08:27:56Z",
-        "weeklyCommits": 35,
-        "latestCommit": {
-          "sha": "13e14a6",
-          "message": "深入分析: dive, 承先 and 啟後 made as one unit; AI buttons look the part",
-          "date": "2026-10-18T08:27:55Z",
-          "url": "https://github.com/GeniusPudding/Paperfact/commit/13e14a6d7b5b95d90e5d2c8f66173179454cd242"
-        },
-        "latestRelease": {
-          "tag": "cataract-2026-10-15",
-          "name": "Cataract reading list — 2026-10-15",
-          "date": "2026-10-15T13:46:23Z",
-          "url": "https://github.com/GeniusPudding/Paperfact/releases/tag/cataract-2026-10-15"
-        }
-      }
-    },
     {
       "slug": "virtual-embryo-challenge",
       "title": "virtual-embryo-challenge",
@@ -92,45 +30,19 @@
       }
     },
     {
-      "slug": "cataract-vision-lab",
-      "title": "cataract-vision-lab",
-      "tagline": "Research code for cataract surgery video analysis: Cataract-1K/101 dataset tooling, reproduction of the published segmentation and phase-recognition baselines, and remote GPU training.",
-      "track": "research",
-      "status": "active",
-      "repo": {
-        "owner": "GeniusPudding",
-        "name": "cataract-vision-lab",
-        "private": true
-      },
-      "topics": [],
-      "links": [],
-      "featured": false,
-      "activity": {
-        "stars": 0,
-        "openIssues": 0,
-        "defaultBranch": "main",
-        "pushedAt": "2026-10-12T03:54:10Z",
-        "weeklyCommits": 1,
-        "latestCommit": {
-          "sha": "65e4e6c",
-          "message": "Bundle: stage the surgmamba, srmamba, mstcn and mc_resnet50_bigru families",
-          "date": "2026-10-12T03:54:08Z",
-          "url": "https://github.com/GeniusPudding/cataract-vision-lab/commit/65e4e6c8805b3e2ada41e960bdab9d08725dd705"
-        }
-      }
-    },
-    {
       "slug": "kaikou-claude",
       "title": "Kaikou-Claude",
       "tagline": "Use Chinese voice input to use claude-code (開口即克)",
       "track": "tool",
       "status": "paused",
       "repo": {
-        "owner": "GeniusPudding",
+        "owner": "puddings-world",
         "name": "Kaikou-Claude",
         "private": false
       },
-      "topics": [],
+      "topics": [
+        "claude-code"
+      ],
       "links": [],
       "featured": false,
       "activity": {
@@ -143,35 +55,7 @@
           "sha": "dc964bc",
           "message": "Fix setup robustness: correct venv timing and improve dependency diagnostics",
           "date": "2026-05-10T11:11:06Z",
-          "url": "https://github.com/GeniusPudding/Kaikou-Claude/commit/dc964bc7145a96bfb80a9dc3a758536a5566cdc7"
-        }
-      }
-    },
-    {
-      "slug": "streetperformermaster",
-      "title": "StreetPerformerMaster",
-      "tagline": "Music production and the service workflows and software tools required for street performances (covering, singing)",
-      "track": "side",
-      "status": "paused",
-      "repo": {
-        "owner": "GeniusPudding",
-        "name": "StreetPerformerMaster",
-        "private": true
-      },
-      "topics": [],
-      "links": [],
-      "featured": false,
-      "activity": {
-        "stars": 0,
-        "openIssues": 0,
-        "defaultBranch": "main",
-        "pushedAt": "2026-07-03T05:32:40Z",
-        "weeklyCommits": 0,
-        "latestCommit": {
-          "sha": "37d2f98",
-          "message": "feat(contract): machine-readable KTV contract + per-language codegen",
-          "date": "2026-07-03T05:32:22Z",
-          "url": "https://github.com/GeniusPudding/StreetPerformerMaster/commit/37d2f983e117708be290d6a843fbe42ca01617d1"
+          "url": "https://github.com/puddings-world/Kaikou-Claude/commit/dc964bc7145a96bfb80a9dc3a758536a5566cdc7"
         }
       }
     },
@@ -182,11 +66,13 @@
       "track": "tool",
       "status": "paused",
       "repo": {
-        "owner": "GeniusPudding",
+        "owner": "puddings-world",
         "name": "Clip-Claude",
         "private": false
       },
-      "topics": [],
+      "topics": [
+        "claude-code"
+      ],
       "links": [],
       "featured": false,
       "activity": {
@@ -199,35 +85,7 @@
           "sha": "840b9ab",
           "message": "Cross-platform paste + SSH bridge",
           "date": "2026-07-03T05:13:07Z",
-          "url": "https://github.com/GeniusPudding/Clip-Claude/commit/840b9ab22ca9981e6a171620d8a02c616b6e1e24"
-        }
-      }
-    },
-    {
-      "slug": "reverse-turing-test",
-      "title": "reverse-turing-test",
-      "tagline": "Reverse Turing Test live-talk party game for 20-30 players (Cloudflare Workers + Durable Objects)",
-      "track": "side",
-      "status": "paused",
-      "repo": {
-        "owner": "GeniusPudding",
-        "name": "reverse-turing-test",
-        "private": true
-      },
-      "topics": [],
-      "links": [],
-      "featured": false,
-      "activity": {
-        "stars": 0,
-        "openIssues": 0,
-        "defaultBranch": "master",
-        "pushedAt": "2026-06-05T18:03:08Z",
-        "weeklyCommits": 0,
-        "latestCommit": {
-          "sha": "4d9d9da",
-          "message": "Bump cache-buster to 20260606a for the 3-question final UI rewrite",
-          "date": "2026-06-05T18:03:01Z",
-          "url": "https://github.com/GeniusPudding/reverse-turing-test/commit/4d9d9da2ac4ef91e35172c0a26550a8e4672a182"
+          "url": "https://github.com/puddings-world/Clip-Claude/commit/840b9ab22ca9981e6a171620d8a02c616b6e1e24"
         }
       }
     },
@@ -238,11 +96,13 @@
       "track": "tool",
       "status": "paused",
       "repo": {
-        "owner": "GeniusPudding",
+        "owner": "puddings-world",
         "name": "Listen-Claude",
         "private": false
       },
-      "topics": [],
+      "topics": [
+        "claude-code"
+      ],
       "links": [],
       "featured": false,
       "activity": {
@@ -255,7 +115,7 @@
           "sha": "a1710c1",
           "message": "/listen off: hard-stop — purge queue + kill in-progress audio",
           "date": "2026-05-27T14:05:03Z",
-          "url": "https://github.com/GeniusPudding/Listen-Claude/commit/a1710c175c9f7a17f85affb5d6deffb4daa5c70e"
+          "url": "https://github.com/puddings-world/Listen-Claude/commit/a1710c175c9f7a17f85affb5d6deffb4daa5c70e"
         }
       }
     },
@@ -266,11 +126,13 @@
       "track": "side",
       "status": "paused",
       "repo": {
-        "owner": "GeniusPudding",
+        "owner": "puddings-world",
         "name": "InvisibleGo",
         "private": false
       },
-      "topics": [],
+      "topics": [
+        "game"
+      ],
       "links": [],
       "featured": false,
       "activity": {
@@ -283,7 +145,7 @@
           "sha": "3c359fe",
           "message": "Make 3-illegal auto-skip a turn rotation, not a pass",
           "date": "2026-05-08T16:53:28Z",
-          "url": "https://github.com/GeniusPudding/InvisibleGo/commit/3c359fe67e597dd813a68750236d0d0e1bae17e9"
+          "url": "https://github.com/puddings-world/InvisibleGo/commit/3c359fe67e597dd813a68750236d0d0e1bae17e9"
         }
       }
     },
@@ -294,11 +156,13 @@
       "track": "tool",
       "status": "paused",
       "repo": {
-        "owner": "GeniusPudding",
+        "owner": "puddings-world",
         "name": "reprise-studio",
         "private": false
       },
-      "topics": [],
+      "topics": [
+        "music"
+      ],
       "links": [],
       "featured": false,
       "activity": {
@@ -311,7 +175,7 @@
           "sha": "2395d97",
           "message": "Fix TimeScrubber swallowing shortcut keys when slider has focus",
           "date": "2026-05-02T01:59:23Z",
-          "url": "https://github.com/GeniusPudding/reprise-studio/commit/2395d97cb7ff7a7f0309008130f21f30f578a542"
+          "url": "https://github.com/puddings-world/reprise-studio/commit/2395d97cb7ff7a7f0309008130f21f30f578a542"
         }
       }
     },
@@ -322,11 +186,13 @@
       "track": "tool",
       "status": "paused",
       "repo": {
-        "owner": "GeniusPudding",
+        "owner": "puddings-world",
         "name": "SADroid",
         "private": false
       },
-      "topics": [],
+      "topics": [
+        "android-security"
+      ],
       "links": [],
       "featured": false,
       "activity": {
@@ -339,7 +205,7 @@
           "sha": "dcd54e8",
           "message": "Move ApkSmith submodule from droidbot/ to project root",
           "date": "2026-05-01T16:10:26Z",
-          "url": "https://github.com/GeniusPudding/SADroid/commit/dcd54e8cff22665fbd5924a42fb472edcb61bb3c"
+          "url": "https://github.com/puddings-world/SADroid/commit/dcd54e8cff22665fbd5924a42fb472edcb61bb3c"
         }
       }
     },
@@ -350,11 +216,13 @@
       "track": "tool",
       "status": "paused",
       "repo": {
-        "owner": "GeniusPudding",
+        "owner": "puddings-world",
         "name": "MandpopDataPipeline",
         "private": false
       },
-      "topics": [],
+      "topics": [
+        "music"
+      ],
       "links": [],
       "featured": false,
       "activity": {
@@ -367,7 +235,7 @@
           "sha": "37496f6",
           "message": "Update CLAUDE.md with git conventions, sync master list",
           "date": "2026-05-01T07:35:43Z",
-          "url": "https://github.com/GeniusPudding/MandpopDataPipeline/commit/37496f681a654c16716eb006db84813222aa2f22"
+          "url": "https://github.com/puddings-world/MandpopDataPipeline/commit/37496f681a654c16716eb006db84813222aa2f22"
         }
       }
     },
@@ -378,11 +246,13 @@
       "track": "tool",
       "status": "paused",
       "repo": {
-        "owner": "GeniusPudding",
+        "owner": "puddings-world",
         "name": "ApkSmith",
         "private": false
       },
-      "topics": [],
+      "topics": [
+        "android-security"
+      ],
       "links": [],
       "featured": false,
       "activity": {
@@ -395,7 +265,7 @@
           "sha": "50a7c97",
           "message": "Fix all ruff lint errors + stabilise E2E test",
           "date": "2026-04-22T14:48:52Z",
-          "url": "https://github.com/GeniusPudding/ApkSmith/commit/50a7c9770bcda8d042e2cd5ebef3043fcfa3ca3f"
+          "url": "https://github.com/puddings-world/ApkSmith/commit/50a7c9770bcda8d042e2cd5ebef3043fcfa3ca3f"
         }
       }
     },
