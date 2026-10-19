@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { musings, type MusingType } from "@/content/musings";
+import type { MusingType } from "@/content/musings";
+import { loadMusings } from "@/lib/musings";
 
 const TYPE_COLOR: Record<MusingType, string> = {
   poem: "text-accent",
@@ -10,14 +11,11 @@ const TYPE_COLOR: Record<MusingType, string> = {
   note: "text-accent-green",
 };
 
-function sortByDateDesc(a: { date?: string }, b: { date?: string }) {
-  return (b.date ?? "").localeCompare(a.date ?? "");
-}
+export const revalidate = 600;
+export const dynamicParams = true;
 
-const ordered = [...musings].sort(sortByDateDesc);
-
-export function generateStaticParams() {
-  return ordered.map((m) => ({ slug: m.slug }));
+export async function generateStaticParams() {
+  return (await loadMusings()).musings.map((m) => ({ slug: m.slug }));
 }
 
 export async function generateMetadata({
@@ -26,7 +24,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const m = ordered.find((x) => x.slug === slug);
+  const m = (await loadMusings()).musings.find((x) => x.slug === slug);
   if (!m) return { title: "Not found" };
   return {
     title: `${m.title ?? m.type} · musings · puddingsworld`,
@@ -40,6 +38,7 @@ export default async function MusingDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const ordered = (await loadMusings()).musings;
   const idx = ordered.findIndex((x) => x.slug === slug);
   if (idx === -1) notFound();
   const m = ordered[idx];

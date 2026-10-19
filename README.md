@@ -73,6 +73,38 @@ as reply-to. Env vars:
 
 With neither Redis nor Resend configured the endpoint answers 503.
 
+## Musings from Google Docs
+
+`/musings` shows the hand-written pieces in `content/musings.ts` plus
+whatever the Google Docs listed in `content/musing-sources.ts` hold right
+now (`lib/musings.ts` `loadMusings`). Each source is a doc link or a Drive
+folder link shared as "Anyone with the link: Viewer", with a `kind`:
+
+- `lyrics`: one song per doc, or a heading (`# 歌名`) / `---` line starts
+  each song. A doc with no heading names its only song after the doc title.
+- `sayings`: one per paragraph or bullet; a following line starting with
+  `—` is its context (a trailing year or date in it becomes the date).
+- `auto`: headings or separators mean lyrics, otherwise sayings.
+
+A line holding only a date (`2023-05-01`, `2023.5`, `日期：2023`) dates the
+piece. Docs are read through the public export URL
+(`/document/d/<id>/export?format=md`, falling back to `txt`; the title comes
+from `Content-Disposition`), folders through `embeddedfolderview` (Docs
+only, up to 60). Fetches are cached for 10 minutes and the pages revalidate
+on the same window, so an edit in Docs shows up within about 10 minutes
+without a deploy. A doc that can't be read is skipped and logged. Parsers
+are pure (`lib/gdocs.ts`); fetching is in `lib/gdocs-fetch.ts`.
+
+`/musings/lab` (unlinked, `noindex`) previews links before they are listed:
+paste doc or folder links (several lines at once split into rows), pick a
+kind, and `POST /api/musings/preview` with `{ sources: [{ url, kind }] }`
+(max 20) returns per-source results plus the parsed `musings` and `sayings`,
+rendered with the real carousels. The preview skips the cache. Rows are
+remembered in the browser's localStorage only.
+
+Lyrics render in a coverflow carousel that autoplays every 7 s (pauses on
+hover, stops after interaction); sayings in a continuously drifting strip.
+
 ## Admin dashboard and analytics
 
 `/admin` is unlinked and `noindex`. Without a session it shows a password

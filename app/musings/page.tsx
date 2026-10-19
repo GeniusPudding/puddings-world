@@ -1,5 +1,9 @@
 import { MusingsCarousel } from "@/components/MusingsCarousel";
-import { musings, sayings } from "@/content/musings";
+import { SayingsCarousel } from "@/components/SayingsCarousel";
+import { loadMusings } from "@/lib/musings";
+
+// Same window as DOC_REVALIDATE_SEC; Next needs a literal here.
+export const revalidate = 600;
 
 export const metadata = {
   title: "Musings · puddingsworld",
@@ -7,13 +11,8 @@ export const metadata = {
     "Song lyrics, sayings and short pieces I've written. The unhurried side of puddingsworld.",
 };
 
-function sortByDateDesc(a: { date?: string }, b: { date?: string }) {
-  return (b.date ?? "").localeCompare(a.date ?? "");
-}
-
-export default function MusingsPage() {
-  const sorted = [...musings].sort(sortByDateDesc);
-  const sortedSayings = [...sayings].sort(sortByDateDesc);
+export default async function MusingsPage() {
+  const { musings, sayings } = await loadMusings();
 
   return (
     <main className="w-full py-16">
@@ -33,38 +32,27 @@ export default function MusingsPage() {
         </header>
       </div>
 
-      <div className="mx-auto w-full max-w-6xl px-2 sm:px-6">
-        <MusingsCarousel musings={sorted} />
-      </div>
+      {musings.length > 0 && (
+        <>
+          <div className="mx-auto w-full max-w-6xl px-2 sm:px-6">
+            <MusingsCarousel musings={musings} />
+          </div>
+          <div className="mx-auto w-full max-w-3xl px-6">
+            <p className="mt-12 text-center font-mono text-xs text-ink-muted">
+              {musings.length} piece{musings.length === 1 ? "" : "s"} · newest first
+            </p>
+          </div>
+        </>
+      )}
 
-      <div className="mx-auto w-full max-w-3xl px-6">
-        <p className="mt-12 text-center font-mono text-xs text-ink-muted">
-          {sorted.length} piece{sorted.length === 1 ? "" : "s"} · newest first
-        </p>
-      </div>
-
-      {sortedSayings.length > 0 && (
-        <section className="mx-auto mt-20 w-full max-w-5xl px-6">
-          <h2 className="font-mono text-xs uppercase tracking-[0.25em] text-accent">
+      {sayings.length > 0 && (
+        <section className="mt-20 w-full">
+          <h2 className="mx-auto w-full max-w-5xl px-6 font-mono text-xs uppercase tracking-[0.25em] text-accent">
             sayings
           </h2>
-          <ul className="mt-6 gap-4 sm:columns-2 lg:columns-3">
-            {sortedSayings.map((s, i) => (
-              <li
-                key={i}
-                className="mb-4 break-inside-avoid rounded-xl border border-bg-border bg-bg-panel p-5"
-              >
-                <p className="whitespace-pre-line font-serif text-lg leading-relaxed text-ink-primary">
-                  {s.text}
-                </p>
-                {(s.date || s.context) && (
-                  <p className="mt-3 font-mono text-[11px] text-ink-muted">
-                    {[s.context, s.date].filter(Boolean).join(" · ")}
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
+          <div className="mt-6">
+            <SayingsCarousel sayings={sayings} />
+          </div>
         </section>
       )}
     </main>

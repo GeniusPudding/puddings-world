@@ -125,3 +125,8 @@ body {
 .ktv-fade-in {
   animation: ktv-fade-in 0.25s ease-out both;
 }
+
+/* ---------- Sayings strip: continuous linear drift ---------- */
+.sayings-carousel .swiper-wrapper {
+  transition-timing-function: linear !important;
+}
