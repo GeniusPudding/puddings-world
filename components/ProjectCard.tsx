@@ -2,11 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Project } from "@/lib/types";
 import { formatRelative, repoUrl } from "@/lib/projects";
+import { ProgressBar } from "./ProjectProgress";
 import { StatusBadge } from "./StatusBadge";
 
 export function ProjectCard({ project }: { project: Project }) {
   const href = repoUrl(project);
   const activity = project.activity;
+  const current = project.progress?.find((m) => m.status === "doing");
 
   return (
     <article className="group relative flex min-w-0 flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-panel transition-colors hover:border-ink-muted has-[a.card-link:focus-visible]:border-accent">
@@ -54,6 +56,13 @@ export function ProjectCard({ project }: { project: Project }) {
       <p className="mt-3 text-sm leading-relaxed text-ink-secondary">
         {project.tagline}
       </p>
+
+      {project.progress && (
+        <div className="mt-3 space-y-1">
+          <ProgressBar milestones={project.progress} />
+          {current && <p className="truncate text-xs text-ink-muted">now: {current.title}</p>}
+        </div>
+      )}
 
       {project.paper && (
         <p className="mt-3 truncate font-mono text-xs text-accent">

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
+import { PageviewBeacon } from "@/components/PageviewBeacon";
 import { newsreader } from "@/lib/fonts";
 import "./globals.css";
 
@@ -45,6 +46,7 @@ export default function RootLayout({
         <Nav />
         <div className="flex-1">{children}</div>
         <Footer />
+        <PageviewBeacon />
       </body>
     </html>
   );

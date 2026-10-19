@@ -6,6 +6,7 @@
 import { writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { externalProjects } from "../content/external-projects";
+import { normalizeProgress } from "../lib/progress";
 import type {
   Activity,
   Manifest,
@@ -250,6 +251,7 @@ async function buildProject(repo: RepoResponse, manifest: Manifest): Promise<Pro
     paper: manifest.paper,
     featured: manifest.featured ?? false,
     order: manifest.order,
+    progress: normalizeProgress(manifest.progress),
   };
   try {
     const [activity, citation] = await Promise.all([

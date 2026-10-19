@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { parseContact, RATE_LIMIT, RATE_WINDOW_SEC, renderEmail } from "@/lib/contact";
+import { logEvent } from "@/lib/event-log";
 import { getRedis } from "@/lib/ktv/kv";
 import { clientIp, hashIp } from "@/lib/ktv/rate-limit";
 
@@ -56,6 +57,7 @@ export async function POST(req: Request) {
   }
   const { subject, text } = renderEmail(parsed.value, receivedAt);
   const sent = await sendEmail(subject, text, parsed.value.email);
+  await logEvent("contact.message", `${parsed.value.name}${sent ? "" : " (not emailed)"}`);
 
   if (!stored && !sent) {
     return NextResponse.json(

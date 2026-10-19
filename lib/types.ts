@@ -13,6 +13,11 @@ export type Paper = {
 
 export type ProjectLink = { label: string; href: string };
 
+export type MilestoneStatus = "done" | "doing" | "next";
+
+/** One step of a project's public roadmap. */
+export type Milestone = { title: string; status: MilestoneStatus; note?: string };
+
 /**
  * Optional `.puddings.json` at a repo root. Every field overrides what the
  * fetcher derives from GitHub metadata. Treat the contents as public copy,
@@ -36,6 +41,8 @@ export type Manifest = {
   hidden?: boolean;
   /** Lower sorts first inside its track. Defaults to recency. */
   order?: number;
+  /** Public roadmap, oldest step first. Shown even when the repo is private. */
+  progress?: Milestone[];
 };
 
 export type Activity = {
@@ -74,6 +81,7 @@ export type Project = {
   paper?: Paper;
   featured: boolean;
   order?: number;
+  progress?: Milestone[];
   activity?: Activity;
   error?: string;
 };

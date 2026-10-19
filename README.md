@@ -36,6 +36,7 @@ DOCKER=1 ./scripts/deploy.sh       # Docker → Cloud Run / Fly.io
 - `content/` — hand-authored content (musings, interests, external projects)
 - `data/projects.json` — generated project snapshot (do not edit; see below)
 - `lib/projects.ts` — loads the snapshot, groups and sorts by track
+- `lib/analytics.ts`, `lib/admin-auth.ts`, `lib/event-log.ts` — admin dashboard
 - `scripts/fetch-projects.ts` — the generator
 - `Dockerfile` — multi-stage build for self-host
 
@@ -72,6 +73,36 @@ as reply-to. Env vars:
 
 With neither Redis nor Resend configured the endpoint answers 503.
 
+## Admin dashboard and analytics
+
+`/admin` is unlinked and `noindex`. Without a session it shows a password
+form that posts `{ password }` to `POST /api/admin/login`; the password is
+the `ADMIN_PASSWORD` env var (no var, no login). A correct password sets an
+httpOnly cookie holding `<expiry>.<HMAC>` keyed by that password
+(`lib/admin-auth.ts`), valid 30 days; changing the password signs every
+session out. Five wrong passwords per hashed IP lock login for 15 minutes.
+`POST /api/admin/logout` clears the cookie.
+
+The dashboard shows, for the last 7 / 30 / 90 days (`/admin?days=`): views
+per day, daily unique visitors, top pages, traffic sources, visitor
+countries, the latest 50 contact messages and the latest 100 activity-log
+entries.
+
+Page views come from `components/PageviewBeacon.tsx` (root layout), which
+sends `{ path, referrer?, utm? }` to `POST /api/track` on every route change,
+with the referrer and `utm_source` only on the landing page. The route skips
+bots, `/api`, `/admin` and signed-in admins, then updates per-day Redis keys
+(Taipei calendar days, kept 400 days): `stats:<day>:views` (hash path →
+count), `stats:<day>:uv` (HyperLogLog of hashed IPs),
+`stats:<day>:refs` (hash source → count) and `stats:<day>:countries` (from
+Vercel's `x-vercel-ip-country`). The source is `utm_source` if given, else
+the referrer host without `www.`; internal and preview referrers are
+ignored. Pure helpers live in `lib/analytics.ts`.
+
+`lib/event-log.ts` `logEvent(type, detail?)` appends to the Redis list
+`log:events` (newest 1000). Logged today: `contact.message`, `admin.login`,
+`admin.login_failed`.
+
 ## Projects: discovered from GitHub
 
 `/projects` is not hand-maintained. A weekly GitHub Action
@@ -86,7 +117,7 @@ With neither Redis nor Resend configured the endpoint answers 503.
 4. Reads an optional `.puddings.json` at the repo root (schema: `Manifest` in
    `lib/types.ts`) that overrides any derived field — title, tagline, long
    description, track, status, hero image, links, `featured`, `hidden`,
-   `order`.
+   `order`, `progress`.
 5. Reads `CITATION.cff` if present and renders it as the project's paper.
 6. Attaches stars, open issues, weekly commits, latest commit and release.
 7. Appends `content/external-projects.ts` — repos this account cannot tag.
@@ -98,6 +129,22 @@ under ~150 KB) becomes the card's thumbnail unless the manifest sets
 the card's tags. Private repos are shown
 without a link. Manifest text is published verbatim, so write it as public
 copy even on private repos.
+
+`progress` is a public roadmap, shown even for private repos: a list of
+`{ "title": "...", "status": "done" | "doing" | "next", "note"?: "..." }`,
+oldest step first. The card gets a done/total bar plus the current
+(`doing`) step, and the project page lists every milestone. Malformed
+entries are dropped (`normalizeProgress` in `lib/progress.ts`).
+
+```json
+{
+  "progress": [
+    { "title": "Prototype", "status": "done" },
+    { "title": "Closed beta", "status": "doing", "note": "10 testers" },
+    { "title": "Public launch", "status": "next" }
+  ]
+}
+```
 
 To put a repo on the site: add the `puddings-world` topic plus one of
 `research` / `tool` / `side-project` on GitHub. To take it down: remove the

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ProjectProgress } from "@/components/ProjectProgress";
 import { ProjectVisual } from "@/components/ProjectVisual";
 import { StatusBadge } from "@/components/StatusBadge";
 import {
@@ -106,6 +107,7 @@ export default async function ProjectDetailPage({
               No long description yet — the repo&apos;s own README has the details.
             </p>
           )}
+          {project.progress && <ProjectProgress milestones={project.progress} />}
         </article>
 
         <aside className="space-y-6">
