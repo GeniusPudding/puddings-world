@@ -4,7 +4,7 @@
 export type DocRef = { kind: "doc" | "folder"; id: string };
 export type SourceKind = "lyrics" | "sayings" | "auto";
 
-export type ParsedPiece = { title?: string; date?: string; audio?: string; body: string };
+export type ParsedPiece = { title?: string; date?: string; audio?: string; hook?: string; body: string };
 export type ParsedSaying = { text: string; date?: string; context?: string };
 
 const ID = "([A-Za-z0-9_-]{10,})";
@@ -84,6 +84,8 @@ export function audioUrl(line: string): string | undefined {
   }
 }
 
+const COVER_LINE = /^\s*(?:cover|hook|封面)\s*[:：]\s*(.+?)\s*$/i;
+
 const SEPARATOR = /^\s*(?:-{3,}|\*{3,}|_{3,}|＊{3,}|={3,})\s*$/;
 const HEADING = /^\s*#{1,6}\s+(.+?)\s*#*\s*$/;
 const DATE_LINE = /^\s*(?:date|日期)?\s*[:：]?\s*(\d{4}(?:[-./]\d{1,2}){0,2})\s*$/i;
@@ -120,7 +122,8 @@ function splitBlocks(text: string): string[][] {
 /**
  * One doc may hold one song or several. A heading (`# 歌名`) or a `---` line
  * starts a new song; a lone date line (`2023-05-01`, `日期：2023`) anywhere in
- * a song becomes its date, and an `audio: <url>` line its recording. Without
+ * a song becomes its date, an `audio: <url>` line its recording, and a
+ * `cover: line one / line two` line the words on its card. Without
  * any heading the doc title names the song, and a first line that just
  * repeats that title is dropped.
  */
@@ -132,11 +135,17 @@ export function parseLyrics(raw: string, docTitle?: string): ParsedPiece[] {
     let title: string | undefined;
     let date: string | undefined;
     let audio: string | undefined;
+    let hook: string | undefined;
     const body: string[] = [];
     for (const line of block) {
       const a = line.match(AUDIO_LINE);
       if (a && !audio) {
         audio = audioUrl(a[1]);
+        continue;
+      }
+      const c = line.match(COVER_LINE);
+      if (c && !hook) {
+        hook = c[1].split(/\s+\/\s+/).join("\n");
         continue;
       }
       const h = line.match(HEADING);
@@ -157,6 +166,7 @@ export function parseLyrics(raw: string, docTitle?: string): ParsedPiece[] {
       ...(title ? { title } : {}),
       ...(date ? { date } : {}),
       ...(audio ? { audio } : {}),
+      ...(hook ? { hook } : {}),
       body: joined,
     });
   }

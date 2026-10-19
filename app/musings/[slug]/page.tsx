@@ -2,7 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { MusingType } from "@/content/musings";
-import { loadMusings } from "@/lib/musings";
+import { LyricPlayer } from "@/components/LyricDisc";
+import { MusingLanding } from "@/components/MusingTransition";
+import { loadMusings, stanzasOf } from "@/lib/musings";
 
 const TYPE_COLOR: Record<MusingType, string> = {
   poem: "text-accent",
@@ -46,7 +48,16 @@ export default async function MusingDetailPage({
   const next = idx < ordered.length - 1 ? ordered[idx + 1] : null;
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-6 py-16">
+    <main className="relative mx-auto w-full max-w-2xl px-6 py-16">
+      <MusingLanding />
+      {m.type === "lyrics" && m.title && (
+        <span
+          aria-hidden
+          className="lyric-vertical pointer-events-none absolute -right-24 top-28 hidden select-none font-serif text-8xl leading-none tracking-[0.3em] text-ink-primary/[0.04] lg:block"
+        >
+          {m.title}
+        </span>
+      )}
       <Link
         href="/musings"
         className="font-mono text-xs text-ink-muted transition-colors hover:text-accent"
@@ -65,17 +76,18 @@ export default async function MusingDetailPage({
         </header>
 
         {m.title && (
-          <h1 className="mt-6 font-serif text-3xl font-medium tracking-tight sm:text-4xl">
+          <h1
+            className="mt-6 w-fit font-serif text-3xl font-medium tracking-tight sm:text-4xl"
+            style={{ viewTransitionName: "musing-title" }}
+          >
             {m.title}
           </h1>
         )}
 
-        {m.audio ? (
-          <audio controls preload="none" src={m.audio} className="mt-6 w-full" />
+        {m.type === "lyrics" ? (
+          <LyricPlayer audio={m.audio} />
         ) : (
-          m.type === "lyrics" && (
-            <p className="mt-4 font-mono text-xs italic text-ink-muted">♪ recording coming soon</p>
-          )
+          m.audio && <audio controls preload="none" src={m.audio} className="mt-6 w-full" />
         )}
 
         {m.image && (
@@ -97,11 +109,25 @@ export default async function MusingDetailPage({
           </figure>
         )}
 
-        <div
-          className={`whitespace-pre-line font-serif text-lg leading-[1.9] text-ink-primary ${m.title || m.image ? "mt-8" : "mt-10"}`}
-        >
-          {m.body}
-        </div>
+        {m.type === "lyrics" ? (
+          <div className="mt-12 space-y-9 font-serif text-lg leading-[2] tracking-wide text-ink-primary">
+            {stanzasOf(m.body).map((st, i) => (
+              <p
+                key={i}
+                className={`stanza-in whitespace-pre-line ${st.repeated ? "border-l border-accent-amber/40 pl-5 text-ink-primary" : "text-ink-secondary"}`}
+                style={{ animationDelay: `${Math.min(250 + i * 140, 1800)}ms` }}
+              >
+                {st.text}
+              </p>
+            ))}
+          </div>
+        ) : (
+          <div
+            className={`whitespace-pre-line font-serif text-lg leading-[1.9] text-ink-primary ${m.title || m.image ? "mt-8" : "mt-10"}`}
+          >
+            {m.body}
+          </div>
+        )}
 
         {m.meta && (
           <p className="mt-8 font-mono text-xs text-ink-muted">{m.meta}</p>

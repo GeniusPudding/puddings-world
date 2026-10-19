@@ -1,35 +1,38 @@
 "use client";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { A11y, Autoplay, FreeMode, Keyboard } from "swiper/modules";
+import { A11y, Autoplay, Keyboard } from "swiper/modules";
 import "swiper/css";
-import "swiper/css/free-mode";
 import type { Saying } from "@/content/musings";
 
-/** A slowly drifting strip of sayings; pauses while hovered or touched. */
+export const SAYING_DWELL_MS = 6500;
+
+/**
+ * A strip of sayings that steps one card along every few seconds, slowly
+ * enough to read; pauses while hovered or touched.
+ */
 export function SayingsCarousel({ sayings }: { sayings: Saying[] }) {
   return (
     <div className="sayings-carousel">
       <Swiper
-        modules={[A11y, Autoplay, FreeMode, Keyboard]}
+        modules={[A11y, Autoplay, Keyboard]}
         slidesPerView="auto"
-        spaceBetween={16}
-        slidesOffsetBefore={16}
-        slidesOffsetAfter={16}
+        spaceBetween={40}
+        slidesOffsetBefore={24}
+        slidesOffsetAfter={24}
         loop={sayings.length > 3}
-        freeMode={{ enabled: true, momentum: true }}
         keyboard={{ enabled: true }}
         grabCursor
-        speed={6000}
+        speed={1800}
         autoplay={
           sayings.length > 1
-            ? { delay: 0, pauseOnMouseEnter: true, disableOnInteraction: false }
+            ? { delay: SAYING_DWELL_MS, pauseOnMouseEnter: true, disableOnInteraction: false }
             : false
         }
       >
         {sayings.map((s, i) => (
-          <SwiperSlide key={i} style={{ width: "min(340px, 80vw)" }} className="!h-auto">
-            <figure className="relative isolate flex h-full flex-col justify-between overflow-hidden rounded-xl border border-bg-border bg-bg-panel p-6">
+          <SwiperSlide key={i} style={{ width: "min(360px, 78vw)" }} className="!h-auto">
+            <figure className="relative isolate flex h-full flex-col justify-between overflow-hidden rounded-xl border border-bg-border bg-bg-panel p-7">
               <div
                 aria-hidden
                 className="pointer-events-none absolute inset-0 -z-10"

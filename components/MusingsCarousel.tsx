@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { Swiper as SwiperType } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -18,6 +19,8 @@ import "swiper/css/effect-coverflow";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import type { Musing, MusingType } from "@/content/musings";
+import { Disc } from "./LyricDisc";
+import { openMusing } from "./MusingTransition";
 
 const TYPE_LABEL: Record<MusingType, string> = {
   poem: "poem",
@@ -141,19 +144,143 @@ export function MusingsCarousel({
         {musings.map((m) => (
           <SwiperSlide
             key={m.slug}
-            style={{ width: "min(560px, 88vw)" }}
+            style={{ width: m.type === "lyrics" ? "min(440px, 84vw)" : "min(560px, 88vw)" }}
             className="!h-auto"
           >
-            <MusingCard
-              musing={m}
-              linkable={linkable}
-              playing={playing === m.slug}
-              onToggle={() => toggle(m)}
-            />
+            {m.type === "lyrics" ? (
+              <LyricCover
+                musing={m}
+                linkable={linkable}
+                playing={playing === m.slug}
+                onToggle={() => toggle(m)}
+              />
+            ) : (
+              <MusingCard
+                musing={m}
+                linkable={linkable}
+                playing={playing === m.slug}
+                onToggle={() => toggle(m)}
+              />
+            )}
           </SwiperSlide>
         ))}
       </Swiper>
     </div>
+  );
+}
+
+function ListenButton({ playing, onToggle }: { playing: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        onToggle();
+      }}
+      aria-pressed={playing}
+      className={`relative z-10 flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-xs transition-colors ${
+        playing
+          ? "border-accent-amber/60 text-accent-amber"
+          : "border-bg-border bg-bg-panel/60 text-ink-secondary hover:border-accent-amber/60 hover:text-accent-amber"
+      }`}
+    >
+      <span aria-hidden>{playing ? "❚❚" : "▶"}</span>
+      {playing ? "pause" : "listen"}
+    </button>
+  );
+}
+
+/**
+ * A song as a record sleeve: its title written down the side, a couple of
+ * lines from it, and a disc that turns while it plays. The words wait inside.
+ */
+function LyricCover({
+  musing,
+  linkable,
+  playing,
+  onToggle,
+}: {
+  musing: Musing;
+  linkable: boolean;
+  playing: boolean;
+  onToggle: () => void;
+}) {
+  const router = useRouter();
+  const ref = useRef<HTMLElement | null>(null);
+  const href = `/musings/${musing.slug}`;
+  const hook = musing.hook ?? musing.body.split("\n").slice(0, 2).join("\n");
+
+  return (
+    <article
+      ref={ref}
+      className="lyric-cover group relative isolate flex aspect-[4/5] flex-col overflow-hidden rounded-2xl border border-bg-border bg-bg-panel p-7 sm:aspect-square sm:p-9"
+      onPointerEnter={() => linkable && router.prefetch(href)}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(110% 80% at 100% 100%, color-mix(in srgb, var(--color-accent-amber) 13%, transparent), transparent 60%), radial-gradient(80% 60% at 0% 0%, color-mix(in srgb, var(--color-accent) 7%, transparent), transparent 70%)",
+        }}
+      />
+      <span
+        aria-hidden
+        className="lyric-vertical pointer-events-none absolute right-5 top-6 -z-10 select-none font-serif text-6xl leading-none tracking-[0.2em] text-ink-primary/[0.06] sm:text-7xl"
+      >
+        {musing.title}
+      </span>
+      <Disc
+        spinning={playing}
+        className="absolute -bottom-16 -right-16 -z-10 h-56 w-56 opacity-70 transition-transform duration-700 group-hover:-translate-x-2 group-hover:-translate-y-2"
+      />
+
+      <div className="flex items-baseline gap-3 font-mono text-[11px] uppercase tracking-[0.25em] text-ink-muted">
+        <span className="text-accent-amber">lyrics</span>
+        {musing.date && <span>{musing.date}</span>}
+      </div>
+
+      <div className="my-auto max-w-[80%] py-6">
+        <span aria-hidden className="block h-px w-8 bg-accent-amber/60" />
+        <p className="mt-5 whitespace-pre-line font-serif text-lg font-normal leading-[2] tracking-wide text-ink-secondary sm:text-xl">
+          {hook}
+        </p>
+      </div>
+
+      <div>
+        <h3
+          data-vt="title"
+          className="w-fit font-serif text-3xl font-medium tracking-tight text-ink-primary sm:text-4xl"
+        >
+          {musing.title}
+        </h3>
+        <div className="mt-4 flex min-h-7 items-center justify-between gap-3">
+          {musing.audio ? (
+            <ListenButton playing={playing} onToggle={onToggle} />
+          ) : (
+            <span className="font-mono text-xs italic text-ink-muted">♪ recording coming soon</span>
+          )}
+          {linkable && (
+            <span className="font-mono text-xs text-ink-muted transition-colors group-hover:text-accent">
+              read →
+            </span>
+          )}
+        </div>
+      </div>
+
+      {linkable && (
+        <a
+          href={href}
+          aria-label={`Read ${musing.title ?? "the lyrics"}`}
+          className="lyric-cover-link absolute inset-0 z-0"
+          onClick={(e) => {
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+            e.preventDefault();
+            openMusing(router, href, ref.current);
+          }}
+        />
+      )}
+    </article>
   );
 }
 
@@ -217,22 +344,7 @@ function MusingCard({
       {(linkable || musing.type === "lyrics") && (
         <div className="mt-8 flex items-center justify-between gap-3 border-t border-bg-border pt-4">
           {musing.audio ? (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggle();
-              }}
-              aria-pressed={playing}
-              className={`flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-xs transition-colors ${
-                playing
-                  ? "border-accent-amber/60 text-accent-amber"
-                  : "border-bg-border text-ink-secondary hover:border-accent-amber/60 hover:text-accent-amber"
-              }`}
-            >
-              <span aria-hidden>{playing ? "❚❚" : "▶"}</span>
-              {playing ? "pause" : "listen"}
-            </button>
+            <ListenButton playing={playing} onToggle={onToggle} />
           ) : musing.type === "lyrics" ? (
             <span className="font-mono text-xs italic text-ink-muted">♪ recording coming soon</span>
           ) : (

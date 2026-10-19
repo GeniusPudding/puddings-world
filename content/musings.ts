@@ -11,6 +11,8 @@ export type Musing = {
   body: string;
   /** Optional shorter version shown on the carousel card. Falls back to body. */
   excerpt?: string;
+  /** A line or two for a lyrics card's cover; the full words wait inside. */
+  hook?: string;
   /** Small caption: "lyrics for ___", "dessert lab — 第 3 號實驗" */
   meta?: string;
   /** Recording to play with the piece (https URL). */

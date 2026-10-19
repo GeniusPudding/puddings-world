@@ -86,6 +86,9 @@ folder link shared as "Anyone with the link: Viewer", with a `kind`:
   that just repeats it. An `audio: <url>` line (also `mp3` / `demo` / `音檔`
   / `音樂` / `錄音`) attaches a recording: a Drive file link (shared
   publicly) becomes a direct download URL; other https URLs are used as is.
+  A `cover: line one / line two` line (also `hook` / `封面`) picks the words
+  on the song's card; without it the card shows the line the song repeats
+  most plus the next one (`hookOf`), or its opening two lines.
 - `sayings`: one per paragraph or bullet; a following line starting with
   `—` is its context (a trailing year or date in it becomes the date).
 - `auto`: headings or separators mean lyrics, otherwise sayings.
@@ -107,12 +110,24 @@ rendered with the real carousels. The preview skips the cache. Rows are
 remembered in the browser's localStorage only.
 
 Lyrics render in a coverflow carousel that autoplays every 7 s (pauses on
-hover, stops after interaction); sayings in a continuously drifting strip.
+hover, stops after interaction). Each song is a record-sleeve card: its
+title written vertically in the background, the two cover lines, the title,
+and a disc that turns while the song plays; the full words only appear
+inside. Sayings sit in a strip that steps one card every 6.5 s
+(`SAYING_DWELL_MS`) with a slow 1.8 s glide.
+
 A song with a recording gets a listen button. Browsers block sound until a
 click, so playback only starts from that button; after it, the music
 follows the carousel (switching cards switches songs, a finished song
 advances to the next card, and the 7 s autoplay stops). Songs without a
-recording show "recording coming soon". Detail pages show a native player.
+recording show "recording coming soon".
+
+Clicking the focused card opens the song with a view transition
+(`components/MusingTransition.tsx`): the card's title and disc glide into
+the page heading and player, then the stanzas surface one by one, choruses
+(stanzas sung more than once, `stanzasOf`) marked with an amber rule.
+Browsers without view transitions, or with reduced motion, just navigate.
+The detail page's disc spins while its player plays.
 
 ## Admin dashboard and analytics
 

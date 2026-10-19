@@ -126,7 +126,67 @@ body {
   animation: ktv-fade-in 0.25s ease-out both;
 }
 
-/* ---------- Sayings strip: continuous linear drift ---------- */
-.sayings-carousel .swiper-wrapper {
-  transition-timing-function: linear !important;
+/* ---------- Lyrics covers: record sleeve, disc, vertical title ---------- */
+.lyric-vertical {
+  writing-mode: vertical-rl;
+  max-height: 80%;
+  overflow: hidden;
+}
+.lyric-disc {
+  background:
+    radial-gradient(circle, var(--color-bg-base) 0 4%, color-mix(in srgb, var(--color-accent-amber) 55%, var(--color-bg-panel)) 4.5% 17%, transparent 17.5%),
+    repeating-radial-gradient(circle, color-mix(in srgb, var(--color-ink-primary) 7%, transparent) 0 1px, transparent 1px 4px),
+    radial-gradient(circle, #1a1a1f 0 70%, #0d0d10 71%);
+  box-shadow: 0 0 0 1px var(--color-bg-border);
+}
+.lyric-disc[data-spinning] {
+  animation: lyric-spin 6s linear infinite;
+}
+@keyframes lyric-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.lyric-cover {
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.musings-carousel .swiper-slide-active .lyric-cover:hover {
+  border-color: color-mix(in srgb, var(--color-accent-amber) 35%, var(--color-bg-border));
+  box-shadow: 0 24px 60px -30px color-mix(in srgb, var(--color-accent-amber) 40%, transparent);
+}
+/* Side cards slide into focus on click; only the focused one opens. */
+.musings-carousel .swiper-slide:not(.swiper-slide-active) .lyric-cover-link {
+  pointer-events: none;
+}
+
+/* ---------- Opening a piece: title and disc glide, stanzas surface ---------- */
+::view-transition-group(musing-title),
+::view-transition-group(musing-disc) {
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+}
+@keyframes stanza-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.stanza-in {
+  animation: stanza-in 0.9s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stanza-in,
+  .lyric-disc[data-spinning] {
+    animation: none;
+  }
 }

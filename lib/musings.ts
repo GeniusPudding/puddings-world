@@ -2,20 +2,42 @@ import { musingSources } from "@/content/musing-sources";
 import { type Musing, musings, type Saying, sayings } from "@/content/musings";
 import { type LoadedDoc, loadSource, type MusingSource } from "./gdocs-fetch";
 
-const EXCERPT_LINES = 12;
+const HOOK_LINES = 2;
 
-/** First stanzas of a song, cut at a stanza break, for the carousel card. */
-export function excerptOf(body: string): string | undefined {
-  const lines = body.split("\n");
-  if (lines.length <= EXCERPT_LINES + 2) return undefined;
-  let cut = EXCERPT_LINES;
-  for (let i = EXCERPT_LINES; i >= 4; i--) {
-    if (!lines[i]?.trim()) {
-      cut = i;
-      break;
+const squash = (s: string) => s.replace(/[\s　]+/g, "");
+
+/**
+ * The couple of lines a lyrics card shows on its cover: the line the song
+ * repeats most (its hook) with the line after it, or the opening lines when
+ * nothing repeats.
+ */
+export function hookOf(body: string): string {
+  const stanzas = body
+    .split(/\n\s*\n/)
+    .map((s) => s.split("\n").map((l) => l.trim()).filter(Boolean));
+  const counts = new Map<string, number>();
+  for (const line of stanzas.flat()) counts.set(squash(line), (counts.get(squash(line)) ?? 0) + 1);
+  const best = Math.max(0, ...counts.values());
+  if (best > 1) {
+    for (const stanza of stanzas) {
+      const i = stanza.findIndex((l) => counts.get(squash(l)) === best);
+      if (i !== -1) return stanza.slice(i, i + HOOK_LINES).join("\n");
     }
   }
-  return lines.slice(0, cut).join("\n").trim();
+  return (stanzas[0] ?? []).slice(0, HOOK_LINES).join("\n");
+}
+
+export type Stanza = { text: string; repeated: boolean };
+
+/** A song's stanzas, flagging the ones it sings more than once (its chorus). */
+export function stanzasOf(body: string): Stanza[] {
+  const texts = body
+    .split(/\n\s*\n/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const seen = new Map<string, number>();
+  for (const t of texts) seen.set(squash(t), (seen.get(squash(t)) ?? 0) + 1);
+  return texts.map((text) => ({ text, repeated: (seen.get(squash(text)) ?? 0) > 1 }));
 }
 
 export function docsToMusings(docs: LoadedDoc[]): { musings: Musing[]; sayings: Saying[] } {
@@ -23,7 +45,6 @@ export function docsToMusings(docs: LoadedDoc[]): { musings: Musing[]; sayings: 
   const said: Saying[] = [];
   for (const doc of docs) {
     doc.pieces.forEach((p, i) => {
-      const excerpt = excerptOf(p.body);
       out.push({
         slug: `${doc.id.slice(0, 12)}-${i + 1}`,
         type: "lyrics",
@@ -31,7 +52,7 @@ export function docsToMusings(docs: LoadedDoc[]): { musings: Musing[]; sayings: 
         ...(p.date ? { date: p.date } : {}),
         ...(p.audio ? { audio: p.audio } : {}),
         body: p.body,
-        ...(excerpt ? { excerpt } : {}),
+        hook: p.hook ?? hookOf(p.body),
       });
     });
     said.push(...doc.sayings);

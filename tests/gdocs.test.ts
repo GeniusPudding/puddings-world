@@ -123,3 +123,9 @@ test("an audio line attaches a playable recording", () => {
     { title: "x", body: "la" },
   ]);
 });
+
+test("a cover line picks the words on the song's card and stays out of the lyrics", () => {
+  assert.deepEqual(parseLyrics("la\ncover: 妳手冲了我的咖啡 / 也沖走了我對自己的安慰\nli\n", "x"), [
+    { title: "x", hook: "妳手冲了我的咖啡\n也沖走了我對自己的安慰", body: "la\nli" },
+  ]);
+});
