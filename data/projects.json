@@ -1,42 +1,6 @@
 {
-  "fetchedAt": "2026-10-19T06:37:28.493Z",
+  "fetchedAt": "2026-10-23T13:37:55.782Z",
   "projects": [
-    {
-      "slug": "paperfact",
-      "title": "Paperfact",
-      "tagline": "Desktop paper reader that turns any paper into a guided reading session: AI commentary, citation maps, and a cross-venue reading queue.",
-      "track": "tool",
-      "status": "active",
-      "repo": {
-        "owner": "puddings-world",
-        "name": "Paperfact",
-        "private": true
-      },
-      "topics": [
-        "product"
-      ],
-      "links": [],
-      "featured": false,
-      "activity": {
-        "stars": 0,
-        "openIssues": 0,
-        "defaultBranch": "master",
-        "pushedAt": "2026-10-19T06:32:07Z",
-        "weeklyCommits": 36,
-        "latestCommit": {
-          "sha": "d8aadd4",
-          "message": "AI accounts and per-task models, research questions, topic lists, stress tests",
-          "date": "2026-10-19T06:32:05Z",
-          "url": "https://github.com/puddings-world/Paperfact/commit/d8aadd41ff238c27750bfacb3e3172fb1eb0d6af"
-        },
-        "latestRelease": {
-          "tag": "cataract-2026-10-15",
-          "name": "Cataract reading list — 2026-10-15",
-          "date": "2026-10-15T13:46:23Z",
-          "url": "https://github.com/puddings-world/Paperfact/releases/tag/cataract-2026-10-15"
-        }
-      }
-    },
     {
       "slug": "mapetite",
       "title": "mapetite",
@@ -57,15 +21,48 @@
         "stars": 0,
         "openIssues": 0,
         "defaultBranch": "main",
-        "pushedAt": "2026-10-19T05:38:15Z",
-        "weeklyCommits": 62,
+        "pushedAt": "2026-10-23T12:46:15Z",
+        "weeklyCommits": 42,
         "latestCommit": {
-          "sha": "311f37a",
-          "message": "Docs: agent contract, tester telemetry spec and consent draft",
-          "date": "2026-10-19T05:38:13Z",
-          "url": "https://github.com/puddings-world/mapetite/commit/311f37a98954488d87dd8cfb8d3d35b5d0f80c97"
+          "sha": "a88b76f",
+          "message": "Vegetarian means a meat-free place, not vegetables on the menu",
+          "date": "2026-10-23T12:46:13Z",
+          "url": "https://github.com/puddings-world/mapetite/commit/a88b76f31feb6bbcf73fd3023f50bb4d555d7ae1"
         }
       }
+    },
+    {
+      "slug": "paperfact",
+      "title": "Paperfact",
+      "tagline": "Desktop paper reader that turns any paper into a guided reading session: AI commentary, citation maps, notes, slides and shareable research bundles.",
+      "track": "research",
+      "status": "active",
+      "repo": {
+        "owner": "puddings-world",
+        "name": "Paperfact",
+        "private": false
+      },
+      "topics": [
+        "papers",
+        "pyside6",
+        "reading"
+      ],
+      "links": [],
+      "featured": false,
+      "activity": {
+        "stars": 0,
+        "openIssues": 0,
+        "defaultBranch": "master",
+        "pushedAt": "2026-10-21T12:06:05Z",
+        "weeklyCommits": 6,
+        "latestCommit": {
+          "sha": "6b3771a",
+          "message": "Scan committable files for credentials before the full check",
+          "date": "2026-10-21T12:06:04Z",
+          "url": "https://github.com/puddings-world/Paperfact/commit/6b3771a5a1565f3bfdc91f3eee6b4b1638021770"
+        }
+      },
+      "pinned": 5
     },
     {
       "slug": "virtual-embryo-challenge",
@@ -85,13 +82,13 @@
         "stars": 1,
         "openIssues": 0,
         "defaultBranch": "main",
-        "pushedAt": "2026-10-14T02:29:04Z",
-        "weeklyCommits": 4,
+        "pushedAt": "2026-10-20T05:14:37Z",
+        "weeklyCommits": 1,
         "latestCommit": {
-          "sha": "927b31b",
-          "message": "Add vec delta and vec recompose for pseudobulk-level T3 hypotheses",
-          "date": "2026-10-14T02:28:58Z",
-          "url": "https://github.com/GeniusPudding/virtual-embryo-challenge/commit/927b31b1e333f7ed5ab1a96d4b47156284199720"
+          "sha": "83f4bf7",
+          "message": "Add vec flow: OT developmental flow as a shared T1/T2/T3 backbone",
+          "date": "2026-10-20T05:14:36Z",
+          "url": "https://github.com/GeniusPudding/virtual-embryo-challenge/commit/83f4bf741ecf3df904cc6c0a8568cf11a0c9ab49"
         }
       }
     },
@@ -153,7 +150,8 @@
           "date": "2026-05-10T11:11:06Z",
           "url": "https://github.com/puddings-world/Kaikou-Claude/commit/dc964bc7145a96bfb80a9dc3a758536a5566cdc7"
         }
-      }
+      },
+      "pinned": 0
     },
     {
       "slug": "streetperformermaster",
@@ -213,7 +211,8 @@
           "date": "2026-07-03T05:13:07Z",
           "url": "https://github.com/puddings-world/Clip-Claude/commit/840b9ab22ca9981e6a171620d8a02c616b6e1e24"
         }
-      }
+      },
+      "pinned": 3
     },
     {
       "slug": "reverse-turing-test",
@@ -303,7 +302,8 @@
           "date": "2026-05-08T16:53:28Z",
           "url": "https://github.com/puddings-world/InvisibleGo/commit/3c359fe67e597dd813a68750236d0d0e1bae17e9"
         }
-      }
+      },
+      "pinned": 1
     },
     {
       "slug": "reprise-studio",
@@ -423,7 +423,8 @@
           "date": "2026-04-22T14:48:52Z",
           "url": "https://github.com/puddings-world/ApkSmith/commit/50a7c9770bcda8d042e2cd5ebef3043fcfa3ca3f"
         }
-      }
+      },
+      "pinned": 2
     },
     {
       "slug": "flowfusionbp",
@@ -547,7 +548,7 @@
       "tagline": "OCR for ophthalmological surgical video overlays.",
       "description": "Reads numerical readouts (device parameters, timings, settings) directly off ophthalmological surgical video — useful when raw device telemetry isn't recorded but the screen is. Combines region detection with a small recognizer trained on the fonts surgical equipment actually uses.",
       "track": "research",
-      "status": "paused",
+      "status": "active",
       "repo": {
         "owner": "puddingforhealth",
         "name": "SurgeryOCR",
@@ -560,13 +561,13 @@
         "stars": 1,
         "openIssues": 0,
         "defaultBranch": "main",
-        "pushedAt": "2026-01-01T11:49:33Z",
-        "weeklyCommits": 0,
+        "pushedAt": "2026-10-21T01:47:40Z",
+        "weeklyCommits": 6,
         "latestCommit": {
-          "sha": "a05e1f0",
-          "message": "Modularize the analysis functions",
-          "date": "2026-01-01T11:49:13Z",
-          "url": "https://github.com/puddingforhealth/SurgeryOCR/commit/a05e1f0df5012e554b0395c4dc0fa35d590acbe5"
+          "sha": "272ebed",
+          "message": "Pin OpenCV 4.11.0.86 so cloud and local runs decode identically",
+          "date": "2026-10-21T01:47:38Z",
+          "url": "https://github.com/puddingforhealth/SurgeryOCR/commit/272ebedab4d93b657306b53a57b43a5a16c72b11"
         }
       }
     },

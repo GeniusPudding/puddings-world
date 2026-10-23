@@ -60,14 +60,46 @@ function pushedAt(p: Project): number {
   return p.activity ? new Date(p.activity.pushedAt).getTime() : 0;
 }
 
+/** Manifest order, then GitHub pins, then featured, then most recently pushed. */
 export function sortProjects(projects: Project[]): Project[] {
   return [...projects].sort((a, b) => {
     const ao = a.order ?? Number.POSITIVE_INFINITY;
     const bo = b.order ?? Number.POSITIVE_INFINITY;
     if (ao !== bo) return ao - bo;
+    const ap = a.pinned ?? Number.POSITIVE_INFINITY;
+    const bp = b.pinned ?? Number.POSITIVE_INFINITY;
+    if (ap !== bp) return ap - bp;
     if (a.featured !== b.featured) return a.featured ? -1 : 1;
     return pushedAt(b) - pushedAt(a);
   });
+}
+
+/** Marks each project by its repo's place in the pinned list ("owner/name"). */
+export function applyPins(projects: Project[], pinned: string[]): Project[] {
+  const rank = new Map(pinned.map((n, i) => [n.toLowerCase(), i]));
+  return projects.map((p) => {
+    const { pinned: _, ...rest } = p;
+    const r = rank.get(`${p.repo.owner}/${p.repo.name}`.toLowerCase());
+    return r === undefined ? rest : { ...rest, pinned: r };
+  });
+}
+
+export const SPOTLIGHT_RECENT = 3;
+export const SPOTLIGHT_WINDOW_DAYS = 30;
+
+/**
+ * The row above the tracks: everything pinned on GitHub in pin order, then
+ * the few other projects pushed to most recently within the window.
+ */
+export function spotlight(projects: Project[], now = Date.now()): Project[] {
+  const pinned = projects
+    .filter((p) => p.pinned !== undefined)
+    .sort((a, b) => a.pinned! - b.pinned!);
+  const recent = projects
+    .filter((p) => p.pinned === undefined && now - pushedAt(p) <= SPOTLIGHT_WINDOW_DAYS * DAY)
+    .sort((a, b) => pushedAt(b) - pushedAt(a))
+    .slice(0, SPOTLIGHT_RECENT);
+  return [...pinned, ...recent];
 }
 
 export function groupByTrack(projects: Project[]): Track[] {

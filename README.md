@@ -181,7 +181,13 @@ ignored. Pure helpers live in `lib/analytics.ts`.
 A screenshot at `public/projects/<slug>.{jpg,png,webp}` (16:9, 1280×720,
 under ~150 KB) becomes the card's thumbnail unless the manifest sets
 `image`; this is how private repos get one. Inside a track, projects sort by manifest `order`, then
-`featured`, then most recent push. Remaining GitHub topics become
+their place among the repos pinned on the GitHub profile (then the
+`puddings-world` org; read over GraphQL, so only with a token), then
+`featured`, then most recent push. Above the tracks, `/projects` shows a
+"Pinned & recently active" row (`spotlight`): every pinned project in pin
+order, then the three other projects pushed to most recently in the last
+30 days. Pins are read when the snapshot is built, so re-pinning shows up
+on the next weekly refresh. Remaining GitHub topics become
 the card's tags. Private repos are shown
 without a link. Manifest text is published verbatim, so write it as public
 copy even on private repos.

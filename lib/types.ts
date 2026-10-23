@@ -81,6 +81,8 @@ export type Project = {
   paper?: Paper;
   featured: boolean;
   order?: number;
+  /** Position among the repos pinned on the GitHub profile, 0 first. */
+  pinned?: number;
   progress?: Milestone[];
   activity?: Activity;
   error?: string;

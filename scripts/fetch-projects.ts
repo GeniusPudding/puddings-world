@@ -7,6 +7,7 @@ import { writeFile, mkdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { externalProjects } from "../content/external-projects";
 import { normalizeProgress } from "../lib/progress";
+import { applyPins } from "../lib/projects";
 import type {
   Activity,
   Manifest,
@@ -116,6 +117,32 @@ async function discoverRepos(): Promise<RepoResponse[]> {
     seen.add(key);
     return true;
   });
+}
+
+/**
+ * "owner/name" of the repos pinned on the profile, then on the org, in pin
+ * order. GraphQL needs a token; without one nothing counts as pinned.
+ */
+async function fetchPinned(): Promise<string[]> {
+  if (!TOKEN) return [];
+  const pins = `pinnedItems(first: 6, types: REPOSITORY) { nodes { ... on Repository { nameWithOwner } } }`;
+  const query = `{ user(login: "${USER}") { ${pins} } organization(login: "puddings-world") { ${pins} } }`;
+  try {
+    const res = await fetch(`${API}/graphql`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ query }),
+    });
+    type Pins = { pinnedItems: { nodes: { nameWithOwner?: string }[] } } | null;
+    const json = (await res.json()) as { data?: { user: Pins; organization: Pins } };
+    const names = [json.data?.user, json.data?.organization].flatMap(
+      (o) => o?.pinnedItems.nodes.map((n) => n.nameWithOwner) ?? [],
+    );
+    return [...new Set(names.filter((n): n is string => !!n).map((n) => n.toLowerCase()))];
+  } catch (err) {
+    console.warn(`  pinned repos unavailable (${String(err)})`);
+    return [];
+  }
 }
 
 async function fetchFile(owner: string, name: string, path: string): Promise<string | null> {
@@ -299,20 +326,24 @@ async function main() {
     }
   }
 
+  const pinned = await fetchPinned();
+  console.log(`Pinned: ${pinned.join(", ") || "none"}`);
+  const ranked = applyPins(projects, pinned);
+
   const slugs = new Set<string>();
-  for (const p of projects) {
+  for (const p of ranked) {
     if (slugs.has(p.slug)) throw new Error(`Duplicate project slug: ${p.slug}`);
     slugs.add(p.slug);
   }
 
   const snapshot: ProjectsSnapshot = {
     fetchedAt: new Date().toISOString(),
-    projects,
+    projects: ranked,
   };
   const outPath = join(process.cwd(), "data", "projects.json");
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, JSON.stringify(snapshot, null, 2) + "\n", "utf8");
-  console.log(`Wrote ${outPath} (${projects.length} project(s))`);
+  console.log(`Wrote ${outPath} (${ranked.length} project(s))`);
 }
 
 main().catch((err) => {
