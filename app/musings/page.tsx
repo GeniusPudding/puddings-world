@@ -6,7 +6,7 @@ import { loadMusings } from "@/lib/musings";
 export const revalidate = 600;
 
 export const metadata = {
-  title: "Musings · puddingsworld",
+  title: "Musings",
   description:
     "Song lyrics, sayings and short pieces I've written. The unhurried side of puddingsworld.",
 };

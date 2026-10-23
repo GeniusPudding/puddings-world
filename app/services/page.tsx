@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Services · puddingsworld",
+  title: "Services",
   description: "Digitalization consulting and custom software development.",
 };
 

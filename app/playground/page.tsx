@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Playground · puddingsworld",
+  title: "Playground",
   description: "Fun links, mini games, and small experiments.",
 };
 

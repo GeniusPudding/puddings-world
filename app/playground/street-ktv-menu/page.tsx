@@ -3,7 +3,7 @@ import { loadCatalog } from "@/lib/ktv/catalog";
 import { KtvMenu } from "./_components/KtvMenu";
 
 export const metadata = {
-  title: "Street KTV — request a song · puddingsworld",
+  title: "Street KTV — request a song",
   description:
     "Live song queue for street KTV gigs. Scan, pick a song, and the performer will sing it.",
 };

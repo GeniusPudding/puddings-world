@@ -29,7 +29,7 @@ export async function generateMetadata({
   const m = (await loadMusings()).musings.find((x) => x.slug === slug);
   if (!m) return { title: "Not found" };
   return {
-    title: `${m.title ?? m.type} · musings · puddingsworld`,
+    title: `${m.title ?? m.type} · musings`,
     description: m.body.split("\n").slice(0, 2).join(" "),
   };
 }

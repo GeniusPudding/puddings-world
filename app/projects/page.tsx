@@ -4,7 +4,7 @@ import { TrackSection } from "@/components/TrackSection";
 import { groupByTrack, loadProjects, spotlight } from "@/lib/projects";
 
 export const metadata = {
-  title: "Projects · puddingsworld",
+  title: "Projects",
   description: "A live dashboard of research code, tools, and side projects.",
 };
 

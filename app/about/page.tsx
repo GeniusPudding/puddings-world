@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "About · puddingsworld",
+  title: "About",
 };
 
 const BACKGROUND = [

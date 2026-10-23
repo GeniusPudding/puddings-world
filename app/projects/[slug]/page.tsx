@@ -29,7 +29,7 @@ export async function generateMetadata({
   const project = (await orderedProjects()).find((p) => p.slug === slug);
   if (!project) return { title: "Project not found" };
   return {
-    title: `${project.title} · puddingsworld`,
+    title: project.title,
     description: project.tagline,
   };
 }

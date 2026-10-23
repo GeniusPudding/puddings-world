@@ -7,6 +7,10 @@ type WithTransitions = Document & {
   startViewTransition?: (update: () => Promise<void>) => unknown;
 };
 
+// The page stays frozen while a view transition waits, so give up early and
+// let a slow page arrive without the glide.
+const MAX_WAIT_MS = 800;
+
 let landed: (() => void) | null = null;
 
 /**
@@ -26,7 +30,7 @@ export function openMusing(router: AppRouter, href: string, card: HTMLElement | 
     () =>
       new Promise<void>((resolve) => {
         landed = resolve;
-        setTimeout(resolve, 1500);
+        setTimeout(resolve, MAX_WAIT_MS);
         router.push(href);
       }),
   );

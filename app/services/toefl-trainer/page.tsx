@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "TOEFL Daily Trainer · puddingsworld",
+  title: "TOEFL Daily Trainer",
   description:
     "Daily TOEFL iBT practice tool — reading, listening, speaking, writing, vocabulary. Installable PWA, works offline.",
 };

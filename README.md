@@ -126,7 +126,10 @@ Clicking the focused card opens the song with a view transition
 (`components/MusingTransition.tsx`): the card's title and disc glide into
 the page heading and player, then the stanzas surface one by one, choruses
 (stanzas sung more than once, `stanzasOf`) marked with an amber rule.
-Browsers without view transitions, or with reduced motion, just navigate.
+The focused card's page is prefetched whenever the carousel settles, and
+the transition waits at most 0.8 s for it (the page is frozen meanwhile);
+a slower page simply arrives without the glide. Browsers without view
+transitions, or with reduced motion, just navigate.
 The detail page's disc spins while its player plays.
 
 ## Admin dashboard and analytics

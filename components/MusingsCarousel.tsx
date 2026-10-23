@@ -60,6 +60,7 @@ export function MusingsCarousel({
   /** Off on previews, where the pieces have no page yet. */
   linkable?: boolean;
 }) {
+  const router = useRouter();
   const swiperRef = useRef<SwiperType | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // Browsers only allow sound after a click, so playback starts from a
@@ -68,6 +69,12 @@ export function MusingsCarousel({
   const [playing, setPlaying] = useState<string | null>(null);
 
   useEffect(() => () => audioRef.current?.pause(), []);
+
+  // Opening the focused piece only glides if its page is already loaded.
+  function prefetchFocused(index: number) {
+    const m = musings[index];
+    if (linkable && m) router.prefetch(`/musings/${m.slug}`);
+  }
 
   function playFor(m: Musing | undefined) {
     const audio = audioRef.current;
@@ -103,8 +110,12 @@ export function MusingsCarousel({
         onEnded={() => swiperRef.current?.slideNext()}
       />
       <Swiper
-        onSwiper={(s) => (swiperRef.current = s)}
+        onSwiper={(s) => {
+          swiperRef.current = s;
+          prefetchFocused(s.realIndex);
+        }}
         onSlideChange={(s) => {
+          prefetchFocused(s.realIndex);
           if (listening.current) playFor(musings[s.realIndex]);
         }}
         modules={[
@@ -213,9 +224,7 @@ function LyricCover({
   return (
     <article
       ref={ref}
-      className="lyric-cover group relative isolate flex aspect-[4/5] flex-col overflow-hidden rounded-2xl border border-bg-border bg-bg-panel p-7 sm:aspect-square sm:p-9"
-      onPointerEnter={() => linkable && router.prefetch(href)}
-    >
+      className="lyric-cover group relative isolate flex aspect-[4/5] flex-col overflow-hidden rounded-2xl border border-bg-border bg-bg-panel p-7 sm:aspect-square sm:p-9"    >
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10"

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { interests, type InterestSection } from "@/content/interests";
 
 export const metadata = {
-  title: "Interests · puddingsworld",
+  title: "Interests",
   description: "What I read, sing, eat and play: papers, Mandopop, Taipei food, Go, basketball, science, literature, history.",
 };
 
