@@ -17,26 +17,26 @@ export type NowItem = {
 };
 
 export const now = {
-  updated: "2026-10-18",
+  updated: "2026-10-19",
   items: [
     {
       title: "Paperfact",
-      note: "I'm building **Paperfact, a desktop reader that turns any paper into a guided reading session**: AI commentary paragraph by paragraph, a citation map of what a paper builds on and what built on it, and a reading queue across venues. This week it learned proper math and diagram typesetting, a keyboard-first list view, exportable reading-list bundles, a macOS build, and a round that **drafts a presentation-ready slide deck from a close reading**.",
+      note: "I'm building **Paperfact, a desktop reader that turns any paper into a guided reading session**: AI commentary paragraph by paragraph, a citation map of what a paper builds on and what built on it, and a nightly reading queue across ICLR, ICML and NeurIPS. Recent work added math and diagram typesetting, keyboard-first navigation, shareable reading-list bundles, a macOS build, and a round that **drafts a presentation-ready slide deck from a close reading**.",
       image: "/now/paperfact.jpg",
     },
     {
       title: "Mapetite",
-      note: "I'm building a **browser extension that curates food places on top of Google Maps**. Saved places now **sync both ways with Google lists** in near real time, candidates are filtered down to actual food, and the first review and visit-tracking cards just landed.",
+      note: "I'm building a **browser extension that curates food places on top of Google Maps**. Saved places **sync both ways with Google lists** in near real time, and the smart input now understands time of day, finds saved places near a landmark, and remembers tags I take off so the AI never puts them back.",
       image: "/now/mapetite.jpg",
     },
     {
       title: "Agent CLI companions",
-      note: "I'm building **three small companions for terminal coding agents, Claude Code, Codex and Gemini CLI alike**: Kaikou for Chinese voice input, Clip for pasting screenshots where the CLI has no image paste, Listen for spoken replies in my own voice. This week Kaikou cut idle CPU use, picked up automatic mic selection, Simplified-to-Traditional conversion and model warm-up, and gained a **bench comparing Whisper, Breeze, Qwen3 and FireRed** on my own recordings; Clip finished an audit pass (clipboard never left open, no console flashes, cheaper idle polling); Listen's speech server stopped popping windows, with readback paused until it stays quiet.",
+      note: "I'm building **three small companions for terminal coding agents, Claude Code, Codex and Gemini CLI alike**: Kaikou for Chinese voice input, Clip for pasting screenshots where the CLI has no image paste, Listen for spoken replies in my own voice. Kaikou now picks the loudest mic, converts to Traditional script and warms its model up, and gained a **bench for comparing speech recognizers on my own recordings**; Clip finished an audit pass and Listen's speech server stopped popping console windows.",
       href: "/projects/kaikou-claude",
     },
     {
       title: "Assistant Hub",
-      note: "I'm building a **personal command centre**: a task ledger, routines, widgets, a phone view and a desktop sidebar. This week it gained **automatic triage of phone captures**, a listening player for lecture series, and a weekly watcher for campus talks.",
+      note: "I'm building a **personal command centre**: a task ledger, routines, widgets, a phone view and a desktop sidebar. This week it gained **automatic triage of phone captures**, a listening player for lecture series, a project view with each line's git activity, and the weekly draft that keeps this section up to date.",
       image: "/now/assistant-hub.jpg",
     },
     {
@@ -47,11 +47,11 @@ export const now = {
     },
     {
       title: "Virtual Embryo Challenge",
-      note: "I'm competing in the **Virtual Embryo Challenge at NeurIPS 2026**. This week's tooling covers pseudobulk-shift baselines, in-silico knockouts, delta and recompose steps for hypothesis building, and **submissions straight through the challenge API**, with the final deadline in early December.",
+      note: "I'm competing in the **Virtual Embryo Challenge at NeurIPS 2026**. My toolkit now covers pseudobulk-shift baselines, in-silico knockouts, delta and recompose steps for building hypotheses, and **submissions straight through the challenge API**, ahead of the final deadline in early December.",
     },
     {
       title: "Cataract surgery video analysis",
-      note: "I'm starting a **research line on cataract surgery video**. The first study is now scoped around **capsulorhexis tracking and surgical-skill assessment**, building on a published benchmark.",
+      note: "I'm starting a **research line on cataract surgery video**. The first study is scoped around **capsulorhexis tracking and surgical-skill assessment**, building on a published benchmark.",
     },
     {
       title: "Xensur Medical",
@@ -65,7 +65,7 @@ export const now = {
     },
     {
       title: "This site",
-      note: "I'm keeping this site as a mount surface for the tools above. The **projects page is now discovered from GitHub topics** instead of a hand-written list, and the TOEFL trainer picked up a phone listening playlist.",
+      note: "I'm keeping this site as a mount surface for the tools above. The **projects page is discovered from GitHub topics** and refreshes weekly, now with thumbnails and eight more repos, and this section gets a weekly draft I review before it goes live.",
       href: "/projects",
       image: "/now/this-site.png",
     },
