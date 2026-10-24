@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-23T13:37:55.782Z",
+  "fetchedAt": "2026-10-24T04:35:02.766Z",
   "projects": [
     {
       "slug": "mapetite",
@@ -21,13 +21,13 @@
         "stars": 0,
         "openIssues": 0,
         "defaultBranch": "main",
-        "pushedAt": "2026-10-23T12:46:15Z",
+        "pushedAt": "2026-10-24T02:59:35Z",
         "weeklyCommits": 42,
         "latestCommit": {
-          "sha": "a88b76f",
-          "message": "Vegetarian means a meat-free place, not vegetables on the menu",
-          "date": "2026-10-23T12:46:13Z",
-          "url": "https://github.com/puddings-world/mapetite/commit/a88b76f31feb6bbcf73fd3023f50bb4d555d7ae1"
+          "sha": "808edfc",
+          "message": "Keep untrusted text out of shells and other windows out of lane frames",
+          "date": "2026-10-24T02:59:33Z",
+          "url": "https://github.com/puddings-world/mapetite/commit/808edfcfa0223815541cd15d21b2afa51e95dca8"
         }
       }
     },
@@ -53,13 +53,13 @@
         "stars": 0,
         "openIssues": 0,
         "defaultBranch": "master",
-        "pushedAt": "2026-10-21T12:06:05Z",
-        "weeklyCommits": 6,
+        "pushedAt": "2026-10-23T18:23:28Z",
+        "weeklyCommits": 7,
         "latestCommit": {
-          "sha": "6b3771a",
-          "message": "Scan committable files for credentials before the full check",
-          "date": "2026-10-21T12:06:04Z",
-          "url": "https://github.com/puddings-world/Paperfact/commit/6b3771a5a1565f3bfdc91f3eee6b4b1638021770"
+          "sha": "3f4552f",
+          "message": "Release v0.2.0 with research planning, PDF downloads and shared progress",
+          "date": "2026-10-23T18:23:05Z",
+          "url": "https://github.com/puddings-world/Paperfact/commit/3f4552fd656035c68c5434a318e617413774cfd6"
         }
       },
       "pinned": 5
@@ -561,13 +561,13 @@
         "stars": 1,
         "openIssues": 0,
         "defaultBranch": "main",
-        "pushedAt": "2026-10-21T01:47:40Z",
-        "weeklyCommits": 6,
+        "pushedAt": "2026-10-24T03:26:59Z",
+        "weeklyCommits": 7,
         "latestCommit": {
-          "sha": "272ebed",
-          "message": "Pin OpenCV 4.11.0.86 so cloud and local runs decode identically",
-          "date": "2026-10-21T01:47:38Z",
-          "url": "https://github.com/puddingforhealth/SurgeryOCR/commit/272ebedab4d93b657306b53a57b43a5a16c72b11"
+          "sha": "91cf542",
+          "message": "Add PTS-aligned review workstation and verified cloud batch workflows",
+          "date": "2026-10-24T03:26:40Z",
+          "url": "https://github.com/puddingforhealth/SurgeryOCR/commit/91cf542de121dab516d89e49690095d408477b80"
         }
       }
     },
