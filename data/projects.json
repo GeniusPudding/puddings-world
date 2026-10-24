@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-10-24T04:35:02.766Z",
+  "fetchedAt": "2026-10-24T04:49:08.548Z",
   "projects": [
     {
       "slug": "mapetite",
@@ -35,7 +35,7 @@
       "slug": "paperfact",
       "title": "Paperfact",
       "tagline": "Desktop paper reader that turns any paper into a guided reading session: AI commentary, citation maps, notes, slides and shareable research bundles.",
-      "track": "research",
+      "track": "tool",
       "status": "active",
       "repo": {
         "owner": "puddings-world",
